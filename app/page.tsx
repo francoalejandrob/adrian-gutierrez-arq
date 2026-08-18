@@ -2,6 +2,7 @@ import Hero from "@/components/hero";
 import Intro from "@/components/intro";
 import ProyectosGrid from "@/components/proyectos-grid";
 import SobreEstudio from "@/components/sobre-estudio";
+import ContactoCta from "@/components/contacto-cta";
 import InstagramFeed from "@/components/instagram-feed";
 import Filosofia from "@/components/filosofia";
 import Proceso from "@/components/proceso";
@@ -14,6 +15,7 @@ export default function Home() {
       <Intro />
       <ProyectosGrid />
       <SobreEstudio />
+      <ContactoCta />
       <InstagramFeed />
       <Filosofia />
       <Proceso />
