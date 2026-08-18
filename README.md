@@ -4,6 +4,11 @@ Sitio web de una página para el estudio de arquitectura de Adrián Gutiérrez
 (Salinas, Ecuador). Next.js 16 (App Router) + TypeScript + Tailwind CSS 4 +
 Framer Motion.
 
+**En vivo:** https://adrian-gutierrez-arq.vercel.app
+(el formulario de contacto no enviará emails hasta que se configure
+`RESEND_API_KEY` en las variables de entorno del proyecto en Vercel — ver
+más abajo).
+
 ## Contenido de demostración
 
 Este proyecto está en desarrollo. Los siguientes datos son **de ejemplo** y
