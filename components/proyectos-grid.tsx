@@ -9,6 +9,7 @@ import {
 } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import ArrowIcon from "@/components/icons/arrow-icon";
 import RevealText from "@/components/reveal-text";
 import { Project, projects } from "@/lib/content";
 import { EASE_OUT } from "@/lib/motion";
@@ -33,9 +34,10 @@ export default function ProyectosGrid() {
         <div className="mt-10 flex justify-center">
           <Link
             href="/proyectos"
-            className="press cursor-pointer bg-carbon px-10 py-4 font-mono text-xs uppercase tracking-[0.2em] text-hueso transition-colors duration-200 hover:bg-naranja hover:text-carbon"
+            className="press inline-flex cursor-pointer items-center gap-3 border border-carbon bg-hueso px-8 py-4 font-mono text-xs font-semibold uppercase tracking-[0.15em] text-carbon transition-colors duration-200 hover:bg-carbon hover:text-hueso"
           >
             Ver todos nuestros proyectos
+            <ArrowIcon className="h-4 w-4 shrink-0" />
           </Link>
         </div>
       </div>
