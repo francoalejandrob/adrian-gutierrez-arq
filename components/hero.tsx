@@ -30,7 +30,7 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative flex min-h-screen flex-col justify-end overflow-hidden bg-carbon text-hueso"
+      className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-carbon text-hueso"
     >
       <motion.div
         style={{ y: scrollY }}
@@ -61,24 +61,24 @@ export default function Hero() {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-carbon via-carbon/50 to-carbon/20"
+        className="pointer-events-none absolute inset-0 bg-carbon/45"
       />
 
       <motion.div
         style={{ opacity: heroOpacity }}
-        className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-20 pt-40 md:px-10"
+        className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center px-6 text-center"
       >
         <motion.p
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: EASE_OUT }}
-          className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-naranja"
+          className="mb-8 font-mono text-xs uppercase tracking-[0.25em] text-naranja"
         >
-          {studio.coordinates} — {studio.location}
+          {studio.location} · {studio.coordinates}
         </motion.p>
-        <h1 className="max-w-4xl font-display text-5xl leading-[1.1] tracking-normal sm:text-6xl md:text-7xl">
+        <h1 className="font-display text-6xl leading-[1.1] tracking-normal sm:text-7xl md:text-8xl">
           <RevealText
-            text="Diseñamos casas que responden a la luz, no al catálogo."
+            text="Diseñamos casas que responden a la luz."
             triggerOnMount
             delay={0.15}
           />
@@ -87,7 +87,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7, ease: EASE_OUT }}
-          className="mt-8 max-w-xl text-lg text-hueso/80"
+          className="mt-8 max-w-xl text-xl text-hueso/85"
         >
           Arquitectura residencial de lujo y remodelaciones en la costa de
           Salinas, Ecuador.
@@ -99,15 +99,13 @@ export default function Hero() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.9 }}
         style={{ opacity: heroOpacity }}
-        className="relative z-10 mx-auto mb-10 flex flex-col items-center gap-2 text-hueso/60"
+        className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2"
+        aria-hidden="true"
       >
-        <span className="font-mono text-[10px] uppercase tracking-[0.25em]">
-          Desplázate
-        </span>
         <motion.span
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: EASE_OUT }}
-          className="h-8 w-px bg-hueso/60"
+          className="block h-10 w-px bg-hueso/50"
         />
       </motion.div>
     </section>

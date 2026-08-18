@@ -21,9 +21,6 @@ export default function Proceso() {
   return (
     <section id="proceso" className="bg-hueso py-32 md:py-44">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
-        <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-piedra">
-          Cómo trabajamos
-        </p>
         <h2 className="max-w-2xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
           <RevealText text="Un proceso claro, de la primera conversación a la entrega de llaves." />
         </h2>
@@ -35,22 +32,19 @@ export default function Proceso() {
             className="absolute inset-x-0 top-0 h-0.5 origin-left bg-naranja"
           />
 
-          <div className="grid grid-cols-1 gap-10 pt-6 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-10 pt-8 md:grid-cols-4">
             {process.map((step, i) => (
               <motion.div
-                key={step.phase}
+                key={step.title}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-10%" }}
                 transition={{ duration: 0.6, delay: i * 0.1, ease: EASE_OUT }}
               >
-                <span className="font-mono text-xs uppercase tracking-[0.15em] text-naranja">
-                  {step.phase}
-                </span>
-                <h3 className="mt-3 font-display text-2xl text-carbon">
+                <h3 className="font-display text-2xl text-carbon">
                   {step.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-piedra">
+                <p className="mt-3 text-base leading-relaxed text-piedra">
                   {step.description}
                 </p>
               </motion.div>

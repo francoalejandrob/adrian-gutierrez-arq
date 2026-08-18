@@ -30,7 +30,7 @@ export default function SobreEstudio() {
             <p className="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-piedra">
               {studio.name}
             </p>
-            <p className="text-sm text-piedra">{studio.role}</p>
+            <p className="text-base text-piedra">{studio.role}</p>
           </motion.div>
 
           <motion.div
@@ -40,10 +40,10 @@ export default function SobreEstudio() {
             transition={{ duration: 0.7, delay: 0.1, ease: EASE_OUT }}
             className="md:col-span-8"
           >
-            <blockquote className="font-display text-2xl italic leading-snug text-carbon sm:text-3xl">
+            <blockquote className="font-display text-3xl italic leading-[1.3] text-carbon sm:text-4xl">
               “{architectBio.quote}”
             </blockquote>
-            <p className="mt-8 max-w-2xl text-base leading-relaxed text-carbon/80">
+            <p className="mt-8 max-w-2xl text-lg leading-relaxed text-carbon/80">
               {architectBio.bio}
             </p>
           </motion.div>

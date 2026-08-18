@@ -2,6 +2,7 @@ import Hero from "@/components/hero";
 import Marquee from "@/components/marquee";
 import Intro from "@/components/intro";
 import ProyectosGrid from "@/components/proyectos-grid";
+import InstagramFeed from "@/components/instagram-feed";
 import Filosofia from "@/components/filosofia";
 import SobreEstudio from "@/components/sobre-estudio";
 import Proceso from "@/components/proceso";
@@ -22,6 +23,7 @@ export default function Home() {
       <Marquee items={TICKER_ITEMS} />
       <Intro />
       <ProyectosGrid />
+      <InstagramFeed />
       <Filosofia />
       <SobreEstudio />
       <Proceso />

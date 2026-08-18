@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import InstagramIcon from "@/components/icons/instagram-icon";
 import { studio } from "@/lib/content";
 
 const SECONDARY_LINKS = [
@@ -49,9 +50,15 @@ export default function Footer() {
               {studio.email}
             </a>
             <span className="text-sm text-hueso/70">{studio.location}</span>
-            <span className="font-mono text-xs text-hueso/40">
-              {studio.coordinates}
-            </span>
+            <a
+              href={`https://instagram.com/${studio.instagram}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram de Adrián Gutiérrez Arquitectura & Diseño"
+              className="press mt-2 flex w-fit items-center gap-2 text-sm text-hueso/70 transition-colors hover:text-naranja"
+            >
+              <InstagramIcon className="h-4 w-4" />@{studio.instagram}
+            </a>
           </div>
         </div>
 

@@ -22,10 +22,7 @@ export default function Intro() {
           transition={{ duration: 0.7, ease: EASE_OUT }}
           className="md:col-span-8"
         >
-          <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-piedra">
-            Estudio
-          </p>
-          <h2 className="max-w-2xl font-display text-3xl leading-tight text-carbon sm:text-4xl md:text-5xl">
+          <h2 className="max-w-2xl font-display text-3xl leading-[1.25] text-carbon sm:text-4xl md:text-5xl">
             Cada proyecto empieza por entender cómo entra el sol, de dónde
             viene el viento y cómo se va a vivir el espacio, mucho antes de
             dibujar una fachada.
@@ -47,7 +44,7 @@ export default function Intro() {
               <div className="font-display text-4xl text-naranja">
                 <CountUp to={stat.to} suffix={stat.suffix} />
               </div>
-              <div className="mt-1 text-sm text-piedra">{stat.label}</div>
+              <div className="mt-1 text-base text-piedra">{stat.label}</div>
             </div>
           ))}
         </motion.div>

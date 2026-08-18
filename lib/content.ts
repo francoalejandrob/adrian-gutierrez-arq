@@ -4,6 +4,7 @@ export const studio = {
   location: "Salinas, Ecuador",
   coordinates: "2.21° S / 80.95° W",
   email: "adriangch95@gmail.com",
+  instagram: "agutierrez.arq",
   years: 5,
   projectCount: 20,
 };
@@ -87,29 +88,24 @@ export const philosophy: PhilosophyItem[] = [
 ];
 
 export type ProcessStep = {
-  phase: string;
   title: string;
   description: string;
 };
 
 export const process: ProcessStep[] = [
   {
-    phase: "FASE 01",
     title: "Consulta",
     description: "Escuchamos el terreno, el presupuesto y la forma de vida de quienes habitarán el proyecto.",
   },
   {
-    phase: "FASE 02",
     title: "Diseño",
     description: "Anteproyecto, planos definitivos y una maqueta clara de cómo se va a vivir cada espacio.",
   },
   {
-    phase: "FASE 03",
     title: "Obra",
     description: "Supervisión directa en sitio para que lo construido sea fiel a lo diseñado, sin sorpresas.",
   },
   {
-    phase: "FASE 04",
     title: "Entrega",
     description: "Recorrido final, cierre de detalles y acompañamiento durante los primeros meses de uso.",
   },
