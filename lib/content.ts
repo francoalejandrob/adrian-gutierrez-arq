@@ -15,45 +15,50 @@ export type Project = {
   tagline: string;
   category: "Residencial" | "Remodelación";
   code: string;
-  art: "casa-malecon" | "villa-punta-carnero" | "residencia-chipipe" | "casa-libertador";
+  image: string;
+  imageAlt: string;
 };
 
 export const projects: Project[] = [
   {
-    id: "casa-malecon",
-    name: "Casa Malecón",
+    id: "casa-aire",
+    name: "Casa Aire",
     location: "Salinas, Ecuador",
-    tagline: "Vivienda de playa de líneas limpias, abierta por completo al horizonte del Pacífico.",
+    tagline: "Volúmenes blancos y vidrio corredizo alrededor de una piscina que organiza la vida social de la casa.",
     category: "Residencial",
     code: "PROY. 01",
-    art: "casa-malecon",
+    image: "/proyectos/casa-aire.jpg",
+    imageAlt: "Fachada posterior de Casa Aire con piscina, terraza y grandes ventanales corredizos",
   },
   {
-    id: "villa-punta-carnero",
-    name: "Villa Punta Carnero",
-    location: "Punta Carnero, Ecuador",
-    tagline: "Volúmenes escalonados sobre el acantilado, en diálogo constante con el viento y la luz.",
+    id: "villa-atardecer",
+    name: "Villa Atardecer",
+    location: "Manglaralto, Ecuador",
+    tagline: "Piedra local y madera en una casa de descanso pensada para ver caer el sol sobre la piscina.",
     category: "Residencial",
     code: "PROY. 02",
-    art: "villa-punta-carnero",
+    image: "/proyectos/villa-atardecer.jpg",
+    imageAlt: "Villa de piedra con piscina y vegetación tropical al atardecer",
   },
   {
-    id: "residencia-chipipe",
-    name: "Residencia Chipipe",
-    location: "Salinas, Ecuador",
-    tagline: "Remodelación integral de una vivienda de los años 90 hacia un lenguaje cálido y minimal.",
-    category: "Remodelación",
+    id: "casa-embalse",
+    name: "Casa del Embalse",
+    location: "Chongón, Ecuador",
+    tagline: "Una casa de retiro familiar frente al agua, rodeada de vegetación nativa y silencio.",
+    category: "Residencial",
     code: "PROY. 03",
-    art: "residencia-chipipe",
+    image: "/proyectos/casa-embalse.jpg",
+    imageAlt: "Casa de techo de teja frente a un embalse, rodeada de árboles",
   },
   {
-    id: "casa-libertador",
-    name: "Casa Libertador",
+    id: "residencia-norte",
+    name: "Residencia Norte",
     location: "Guayaquil, Ecuador",
-    tagline: "Ampliación y reordenamiento de una casa urbana en torno a un patio central de luz.",
+    tagline: "Reordenamiento de fachada y accesos para una vivienda familiar en una urbanización cerrada.",
     category: "Remodelación",
     code: "PROY. 04",
-    art: "casa-libertador",
+    image: "/proyectos/residencia-norte.jpg",
+    imageAlt: "Fachada contemporánea de Residencia Norte con acceso vehicular y balcón",
   },
 ];
 

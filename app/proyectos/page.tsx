@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { projects } from "@/lib/content";
 
@@ -25,17 +26,30 @@ export default function ProyectosPage() {
         {projects.map((project) => (
           <li
             key={project.id}
-            className="flex flex-col justify-between gap-2 border-l-2 border-transparent py-6 pl-4 transition-colors duration-300 hover:border-naranja hover:bg-arena/30 sm:flex-row sm:items-center"
+            className="group flex flex-col gap-4 border-l-2 border-transparent py-6 pl-4 transition-colors duration-300 hover:border-naranja hover:bg-arena/30 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div>
-              <span className="font-mono text-xs uppercase tracking-[0.15em] text-piedra">
-                {project.code}
-              </span>
-              <h2 className="font-display text-2xl text-carbon">
-                {project.name}
-              </h2>
+            <div className="flex items-center gap-5">
+              <div className="relative h-16 w-24 shrink-0 overflow-hidden bg-arena sm:h-20 sm:w-28">
+                <Image
+                  src={project.image}
+                  alt={project.imageAlt}
+                  fill
+                  sizes="120px"
+                  className="object-cover grayscale-[55%] transition-[filter,transform] duration-500 ease-out-strong group-hover:scale-105 group-hover:grayscale-0"
+                />
+              </div>
+              <div>
+                <span className="font-mono text-xs uppercase tracking-[0.15em] text-piedra">
+                  {project.code}
+                </span>
+                <h2 className="font-display text-2xl text-carbon">
+                  {project.name}
+                </h2>
+              </div>
             </div>
-            <span className="text-sm text-piedra">{project.location}</span>
+            <span className="text-sm text-piedra sm:pl-4">
+              {project.location}
+            </span>
           </li>
         ))}
       </ul>

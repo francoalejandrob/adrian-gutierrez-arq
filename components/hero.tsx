@@ -1,16 +1,13 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import {
   motion,
-  useMotionTemplate,
-  useMotionValue,
   useReducedMotion,
   useScroll,
-  useSpring,
   useTransform,
 } from "framer-motion";
-import BlueprintArt from "@/components/blueprint-art";
 import RevealText from "@/components/reveal-text";
 import { studio } from "@/lib/content";
 import { EASE_OUT } from "@/lib/motion";
@@ -19,11 +16,6 @@ export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springX = useSpring(mouseX, { stiffness: 60, damping: 20, mass: 0.5 });
-  const springY = useSpring(mouseY, { stiffness: 60, damping: 20, mass: 0.5 });
-
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
@@ -31,56 +23,45 @@ export default function Hero() {
   const scrollY = useTransform(
     scrollYProgress,
     [0, 1],
-    shouldReduceMotion ? [0, 0] : [0, 120],
+    shouldReduceMotion ? [0, 0] : [0, 100],
   );
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-
-  const artTransform = useMotionTemplate`translate3d(${springX}px, calc(${springY}px + ${scrollY}px), 0)`;
-
-  function handleMouseMove(event: React.MouseEvent<HTMLElement>) {
-    const rect = sectionRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const relativeX = (event.clientX - rect.left) / rect.width - 0.5;
-    const relativeY = (event.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(relativeX * 24);
-    mouseY.set(relativeY * 24);
-  }
-
-  function handleMouseLeave() {
-    mouseX.set(0);
-    mouseY.set(0);
-  }
 
   return (
     <section
       ref={sectionRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       className="relative flex min-h-screen flex-col justify-end overflow-hidden bg-carbon text-hueso"
     >
       <motion.div
-        style={{ opacity: heroOpacity }}
-        className="pointer-events-none absolute inset-0"
+        style={{ y: scrollY }}
+        className="absolute inset-0 -top-[10%] h-[120%]"
+        aria-hidden="true"
       >
-        <motion.div
-          initial={{ scale: shouldReduceMotion ? 1 : 1.08, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.7 }}
-          transition={{ duration: 1.6, ease: EASE_OUT }}
-          className="flex h-full items-center justify-center"
-        >
-          <motion.div style={{ transform: artTransform }}>
-            <BlueprintArt
-              variant="hero"
-              className="h-[70vh] w-full max-w-5xl"
-              strokeClassName="text-hueso/40"
-            />
-          </motion.div>
-        </motion.div>
+        {shouldReduceMotion ? (
+          <Image
+            src="/proyectos/villa-atardecer.jpg"
+            alt=""
+            fill
+            priority
+            className="object-cover"
+          />
+        ) : (
+          <video
+            className="h-full w-full scale-105 object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+          >
+            <source src="/videos/hero-banner.mp4" type="video/mp4" />
+          </video>
+        )}
       </motion.div>
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-carbon via-carbon/40 to-carbon/10"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-carbon via-carbon/50 to-carbon/20"
       />
 
       <motion.div

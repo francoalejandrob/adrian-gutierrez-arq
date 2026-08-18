@@ -1,29 +1,25 @@
 "use client";
 
-import { ElementType, useMemo } from "react";
 import { motion } from "framer-motion";
 import { EASE_OUT } from "@/lib/motion";
 
 export default function RevealText({
   text,
-  as: Component = "span",
   className,
   delay = 0,
   once = true,
   triggerOnMount = false,
 }: {
   text: string;
-  as?: ElementType;
   className?: string;
   delay?: number;
   once?: boolean;
   triggerOnMount?: boolean;
 }) {
   const words = text.split(" ");
-  const MotionComponent = useMemo(() => motion.create(Component), [Component]);
 
   return (
-    <MotionComponent className={className} aria-label={text}>
+    <motion.span className={className} aria-label={text}>
       {words.map((word, i) => (
         <span
           key={i}
@@ -46,10 +42,10 @@ export default function RevealText({
             }}
           >
             {word}
-            {i < words.length - 1 ? " " : ""}
+            {i < words.length - 1 ? " " : ""}
           </motion.span>
         </span>
       ))}
-    </MotionComponent>
+    </motion.span>
   );
 }

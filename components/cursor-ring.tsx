@@ -8,7 +8,12 @@ const RING_SIZE = 24;
 
 export default function CursorRing() {
   const shouldReduceMotion = useReducedMotion();
-  const [enabled, setEnabled] = useState(false);
+  const [pointerFine] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches,
+  );
+  const enabled = pointerFine && !shouldReduceMotion;
   const [hovering, setHovering] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -16,11 +21,6 @@ export default function CursorRing() {
   const y = useMotionValue(-100);
   const springX = useSpring(x, { stiffness: 400, damping: 40, mass: 0.4 });
   const springY = useSpring(y, { stiffness: 400, damping: 40, mass: 0.4 });
-
-  useEffect(() => {
-    const query = window.matchMedia("(hover: hover) and (pointer: fine)");
-    setEnabled(query.matches && !shouldReduceMotion);
-  }, [shouldReduceMotion]);
 
   useEffect(() => {
     if (!enabled) return;
