@@ -5,7 +5,7 @@ import { studio } from "@/lib/content";
 
 export default function Contacto() {
   return (
-    <section id="contacto" className="bg-carbon py-20 text-hueso md:py-28">
+    <section id="contacto" className="bg-carbon py-14 text-hueso md:py-20">
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 px-6 md:grid-cols-12 md:px-10">
         <div className="relative min-h-[420px] overflow-hidden md:col-span-5">
           <Image

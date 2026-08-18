@@ -19,7 +19,7 @@ export default function Proceso() {
   });
 
   return (
-    <section id="proceso" className="bg-hueso py-20 md:py-28">
+    <section id="proceso" className="bg-hueso py-14 md:py-20">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
         <h2 className="max-w-2xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
           <RevealText text="Un proceso claro, de la primera conversación a la entrega de llaves." />

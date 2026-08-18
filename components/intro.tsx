@@ -14,7 +14,7 @@ const stats = [
 
 export default function Intro() {
   return (
-    <section className="bg-carbon py-20 text-hueso md:py-28">
+    <section className="bg-carbon py-14 text-hueso md:py-20">
       <div className="mx-auto flex max-w-4xl flex-col items-center px-6 text-center md:px-10">
         <h2 className="font-display text-3xl leading-[1.3] sm:text-4xl md:text-5xl">
           <RevealText text="Cada proyecto empieza por entender cómo entra el sol, de dónde viene el viento y cómo se va a" />{" "}
