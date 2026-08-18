@@ -5,7 +5,6 @@ import { studio } from "@/lib/content";
 
 const SECONDARY_LINKS = [
   { href: "/#proyectos", label: "Proyectos" },
-  { href: "/#filosofia", label: "Filosofía" },
   { href: "/#estudio", label: "Estudio" },
   { href: "/#proceso", label: "Proceso" },
   { href: "/#contacto", label: "Contacto" },
