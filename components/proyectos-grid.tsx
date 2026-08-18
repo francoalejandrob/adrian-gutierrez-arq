@@ -15,8 +15,8 @@ import { EASE_OUT } from "@/lib/motion";
 
 export default function ProyectosGrid() {
   return (
-    <section id="proyectos" className="bg-hueso py-28 md:py-36">
-      <div className="mx-auto max-w-7xl px-6 md:px-10">
+    <section id="proyectos" className="bg-hueso py-32 md:py-44">
+      <div className="mx-auto max-w-[1600px] px-6 md:px-10">
         <div className="mb-16 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-piedra">

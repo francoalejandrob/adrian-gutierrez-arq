@@ -13,8 +13,8 @@ const stats = [
 
 export default function Intro() {
   return (
-    <section className="border-t border-piedra/20 bg-hueso py-28 md:py-36">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 px-6 md:grid-cols-12 md:px-10">
+    <section className="border-t border-piedra/20 bg-hueso py-32 md:py-44">
+      <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 px-6 md:grid-cols-12 md:px-10">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -66,7 +66,7 @@ export default function Hero() {
 
       <motion.div
         style={{ opacity: heroOpacity }}
-        className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-40 md:px-10"
+        className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-20 pt-40 md:px-10"
       >
         <motion.p
           initial={{ opacity: 0, y: 8 }}
@@ -76,7 +76,7 @@ export default function Hero() {
         >
           {studio.coordinates} — {studio.location}
         </motion.p>
-        <h1 className="max-w-4xl font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
+        <h1 className="max-w-4xl font-display text-5xl leading-[1.1] tracking-normal sm:text-6xl md:text-7xl">
           <RevealText
             text="Diseñamos casas que responden a la luz, no al catálogo."
             triggerOnMount

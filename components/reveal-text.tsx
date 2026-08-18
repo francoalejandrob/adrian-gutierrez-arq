@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { motion } from "framer-motion";
 import { EASE_OUT } from "@/lib/motion";
 
@@ -21,30 +22,31 @@ export default function RevealText({
   return (
     <motion.span className={className} aria-label={text}>
       {words.map((word, i) => (
-        <span
-          key={i}
-          className="inline-block overflow-hidden align-top"
-          aria-hidden="true"
-        >
-          <motion.span
-            className="inline-block"
-            initial={{ y: "110%" }}
-            {...(triggerOnMount
-              ? { animate: { y: "0%" } }
-              : {
-                  whileInView: { y: "0%" },
-                  viewport: { once, margin: "-10%" },
-                })}
-            transition={{
-              duration: 0.7,
-              ease: EASE_OUT,
-              delay: delay + i * 0.05,
-            }}
+        <Fragment key={i}>
+          <span
+            className="inline-block overflow-hidden align-top"
+            aria-hidden="true"
           >
-            {word}
-            {i < words.length - 1 ? " " : ""}
-          </motion.span>
-        </span>
+            <motion.span
+              className="inline-block"
+              initial={{ y: "110%" }}
+              {...(triggerOnMount
+                ? { animate: { y: "0%" } }
+                : {
+                    whileInView: { y: "0%" },
+                    viewport: { once, margin: "-10%" },
+                  })}
+              transition={{
+                duration: 0.7,
+                ease: EASE_OUT,
+                delay: delay + i * 0.05,
+              }}
+            >
+              {word}
+            </motion.span>
+          </span>
+          {i < words.length - 1 ? " " : null}
+        </Fragment>
       ))}
     </motion.span>
   );

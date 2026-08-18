@@ -13,7 +13,7 @@ const SECONDARY_LINKS = [
 export default function Footer() {
   return (
     <footer className="bg-carbon text-hueso">
-      <div className="mx-auto max-w-7xl px-6 py-16 md:px-10">
+      <div className="mx-auto max-w-[1600px] px-6 py-16 md:px-10">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
           <div>
             <Image

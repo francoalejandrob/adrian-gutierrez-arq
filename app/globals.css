@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --color-hueso: #f6f2ea;
-  --color-carbon: #1b1814;
-  --color-naranja: #d9722e;
-  --color-naranja-oscuro: #b3591f;
-  --color-arena: #ded3c2;
-  --color-piedra: #8a8175;
+  /* Paleta "Concreto Cálido" */
+  --color-hueso: #f1eee8;
+  --color-carbon: #17151a;
+  --color-naranja: #b26a45;
+  --color-naranja-oscuro: #8c5335;
+  --color-arena: #e4dfd4;
+  --color-piedra: #6e6659;
 }
 
 @theme inline {

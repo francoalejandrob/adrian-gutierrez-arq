@@ -4,8 +4,8 @@ import { studio } from "@/lib/content";
 
 export default function Contacto() {
   return (
-    <section id="contacto" className="bg-carbon py-28 text-hueso md:py-36">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 px-6 md:grid-cols-12 md:px-10">
+    <section id="contacto" className="bg-carbon py-32 text-hueso md:py-44">
+      <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 px-6 md:grid-cols-12 md:px-10">
         <div className="md:col-span-4">
           <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-naranja">
             Contacto
