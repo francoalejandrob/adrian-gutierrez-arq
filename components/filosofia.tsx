@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import BlueprintArt, { BlueprintVariant } from "@/components/blueprint-art";
+import RevealText from "@/components/reveal-text";
 import { philosophy } from "@/lib/content";
 import { EASE_OUT } from "@/lib/motion";
 
@@ -20,7 +21,7 @@ export default function Filosofia() {
           Filosofía
         </p>
         <h2 className="max-w-2xl font-display text-3xl sm:text-4xl md:text-5xl">
-          Arquitectura de lujo sostenible, pensada desde cuatro principios.
+          <RevealText text="Arquitectura de lujo sostenible, pensada desde cuatro principios." />
         </h2>
 
         <div className="mt-16 grid grid-cols-1 gap-px overflow-hidden border border-hueso/10 bg-hueso/10 sm:grid-cols-2 lg:grid-cols-4">

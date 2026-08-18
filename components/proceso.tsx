@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
+import RevealText from "@/components/reveal-text";
 import { process } from "@/lib/content";
 import { EASE_OUT } from "@/lib/motion";
 
@@ -24,7 +25,7 @@ export default function Proceso() {
           Cómo trabajamos
         </p>
         <h2 className="max-w-2xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
-          Un proceso claro, de la primera conversación a la entrega de llaves.
+          <RevealText text="Un proceso claro, de la primera conversación a la entrega de llaves." />
         </h2>
 
         <div ref={trackRef} className="relative mt-16">

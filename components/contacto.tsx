@@ -1,4 +1,5 @@
 import ContactoForm from "@/components/contacto-form";
+import RevealText from "@/components/reveal-text";
 import { studio } from "@/lib/content";
 
 export default function Contacto() {
@@ -10,7 +11,7 @@ export default function Contacto() {
             Contacto
           </p>
           <h2 className="font-display text-3xl sm:text-4xl">
-            Conversemos sobre tu próximo proyecto.
+            <RevealText text="Conversemos sobre tu próximo proyecto." />
           </h2>
           <p className="mt-6 max-w-sm text-sm leading-relaxed text-hueso/60">
             Cuéntanos qué necesitas y te contactaremos para agendar una

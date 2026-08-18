@@ -3,6 +3,8 @@ import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { MotionConfig } from "framer-motion";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import ScrollProgress from "@/components/scroll-progress";
+import CursorRing from "@/components/cursor-ring";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -41,6 +43,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-screen flex-col bg-hueso font-sans text-carbon antialiased">
         <MotionConfig reducedMotion="user">
+          <ScrollProgress />
+          <CursorRing />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
