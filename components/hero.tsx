@@ -77,11 +77,12 @@ export default function Hero() {
           {studio.location} · {studio.coordinates}
         </motion.p>
         <h1 className="font-display text-6xl leading-[1.1] tracking-normal sm:text-7xl md:text-8xl">
-          <RevealText
-            text="Diseñamos casas que responden a la luz."
-            triggerOnMount
-            delay={0.15}
-          />
+          <span className="block">
+            <RevealText text="Diseñamos y construimos" triggerOnMount delay={0.15} />
+          </span>
+          <span className="block">
+            <RevealText text="tus sueños." triggerOnMount delay={0.3} />
+          </span>
         </h1>
         <motion.p
           initial={{ opacity: 0, y: 16 }}

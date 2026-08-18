@@ -32,7 +32,7 @@ export default function Proceso() {
             className="absolute inset-x-0 top-0 h-0.5 origin-left bg-naranja"
           />
 
-          <div className="grid grid-cols-1 gap-10 pt-8 md:grid-cols-4">
+          <div className="divide-y divide-carbon/10 border-b border-carbon/10">
             {process.map((step, i) => (
               <motion.div
                 key={step.title}
@@ -40,11 +40,15 @@ export default function Proceso() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-10%" }}
                 transition={{ duration: 0.6, delay: i * 0.1, ease: EASE_OUT }}
+                className="group grid grid-cols-1 gap-4 py-10 transition-colors duration-300 hover:bg-arena/40 md:grid-cols-12 md:items-center md:gap-8 md:px-4 md:py-12"
               >
-                <h3 className="font-display text-2xl text-carbon">
+                <span className="font-display text-6xl text-naranja/25 transition-colors duration-300 ease-out-strong group-hover:text-naranja md:col-span-2 md:text-7xl">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="font-display text-2xl text-carbon md:col-span-4 md:text-3xl">
                   {step.title}
                 </h3>
-                <p className="mt-3 text-base leading-relaxed text-piedra">
+                <p className="max-w-md text-base leading-relaxed text-piedra md:col-span-6">
                   {step.description}
                 </p>
               </motion.div>

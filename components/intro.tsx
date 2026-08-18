@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import CountUp from "@/components/count-up";
+import RevealText from "@/components/reveal-text";
 import { studio } from "@/lib/content";
 import { EASE_OUT } from "@/lib/motion";
 
@@ -15,24 +16,21 @@ export default function Intro() {
   return (
     <section className="bg-carbon py-20 text-hueso md:py-28">
       <div className="mx-auto flex max-w-4xl flex-col items-center px-6 text-center md:px-10">
-        <motion.h2
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-15%" }}
-          transition={{ duration: 0.7, ease: EASE_OUT }}
-          className="font-display text-3xl leading-[1.3] sm:text-4xl md:text-5xl"
-        >
-          Cada proyecto empieza por entender cómo entra el sol, de dónde
-          viene el viento y cómo se va a{" "}
-          <span className="font-semibold">vivir el espacio</span>, mucho
-          antes de dibujar una fachada.
-        </motion.h2>
+        <h2 className="font-display text-3xl leading-[1.3] sm:text-4xl md:text-5xl">
+          <RevealText text="Cada proyecto empieza por entender cómo entra el sol, de dónde viene el viento y cómo se va a" />{" "}
+          <RevealText
+            text="vivir el espacio,"
+            className="font-semibold"
+            delay={0.95}
+          />{" "}
+          <RevealText text="mucho antes de dibujar una fachada." delay={1.1} />
+        </h2>
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-15%" }}
-          transition={{ duration: 0.7, delay: 0.15, ease: EASE_OUT }}
+          transition={{ duration: 0.7, delay: 1.5, ease: EASE_OUT }}
           className="mt-16 flex flex-wrap justify-center gap-x-16 gap-y-10"
         >
           {stats.map((stat) => (

@@ -18,9 +18,12 @@ export default function ProyectosGrid() {
   return (
     <section id="proyectos" className="bg-hueso py-20 md:py-28">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
-        <h2 className="mb-10 max-w-xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
+        <h2 className="max-w-xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
           <RevealText text="Proyectos" />
         </h2>
+        <p className="mb-10 mt-3 text-lg text-piedra">
+          Conoce nuestro trabajo.
+        </p>
 
         <div
           style={{ perspective: 1200 }}
