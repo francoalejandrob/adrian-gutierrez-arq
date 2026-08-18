@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  --color-hueso: #f6f2ea;
+  --color-carbon: #1b1814;
+  --color-naranja: #d9722e;
+  --color-naranja-oscuro: #b3591f;
+  --color-arena: #ded3c2;
+  --color-piedra: #8a8175;
+}
+
+@theme inline {
+  --color-hueso: var(--color-hueso);
+  --color-carbon: var(--color-carbon);
+  --color-naranja: var(--color-naranja);
+  --color-naranja-oscuro: var(--color-naranja-oscuro);
+  --color-arena: var(--color-arena);
+  --color-piedra: var(--color-piedra);
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+body {
+  background: var(--color-hueso);
+  color: var(--color-carbon);
+}
+
+::selection {
+  background: var(--color-naranja);
+  color: var(--color-hueso);
+}
+
+.press {
+  transition: transform 150ms var(--ease-out-strong);
+}
+
+.press:active {
+  transform: scale(0.97);
+}
+
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms var(--ease-out-strong);
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
