@@ -17,17 +17,9 @@ export default function ProyectosGrid() {
   return (
     <section id="proyectos" className="bg-hueso py-32 md:py-44">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
-        <div className="mb-16 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <h2 className="max-w-xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
-            <RevealText text="Proyectos" />
-          </h2>
-          <Link
-            href="/proyectos"
-            className="press cursor-pointer font-mono text-xs uppercase tracking-[0.15em] text-carbon underline decoration-naranja decoration-2 underline-offset-4 transition-colors duration-200 hover:text-naranja"
-          >
-            Ver todos los proyectos →
-          </Link>
-        </div>
+        <h2 className="mb-16 max-w-xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
+          <RevealText text="Proyectos" />
+        </h2>
 
         <div
           style={{ perspective: 1200 }}
@@ -36,6 +28,15 @@ export default function ProyectosGrid() {
           {projects.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} />
           ))}
+        </div>
+
+        <div className="mt-16 flex justify-center">
+          <Link
+            href="/proyectos"
+            className="press cursor-pointer bg-carbon px-10 py-4 font-mono text-xs uppercase tracking-[0.2em] text-hueso transition-colors duration-200 hover:bg-naranja hover:text-carbon"
+          >
+            Ver todos nuestros proyectos
+          </Link>
         </div>
       </div>
     </section>
