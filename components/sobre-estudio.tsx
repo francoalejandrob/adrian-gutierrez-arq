@@ -14,7 +14,7 @@ const detailStrip: { label: string; art: BlueprintVariant }[] = [
 
 export default function SobreEstudio() {
   return (
-    <section id="estudio" className="bg-arena py-32 md:py-44">
+    <section id="estudio" className="bg-arena py-20 md:py-28">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
         <div className="grid grid-cols-1 gap-16 md:grid-cols-12">
           <motion.div

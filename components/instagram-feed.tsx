@@ -15,7 +15,7 @@ const POSTS = Array.from({ length: 8 }, (_, i) => ({
 
 export default function InstagramFeed() {
   return (
-    <section className="bg-carbon py-32 md:py-44">
+    <section className="bg-carbon py-20 md:py-28">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
         <div className="mb-10 flex items-center justify-between">
           <a

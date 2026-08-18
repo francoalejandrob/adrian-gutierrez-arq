@@ -15,9 +15,9 @@ import { EASE_OUT } from "@/lib/motion";
 
 export default function ProyectosGrid() {
   return (
-    <section id="proyectos" className="bg-hueso py-32 md:py-44">
+    <section id="proyectos" className="bg-hueso py-20 md:py-28">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
-        <h2 className="mb-16 max-w-xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
+        <h2 className="mb-10 max-w-xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
           <RevealText text="Proyectos" />
         </h2>
 
@@ -30,7 +30,7 @@ export default function ProyectosGrid() {
           ))}
         </div>
 
-        <div className="mt-16 flex justify-center">
+        <div className="mt-10 flex justify-center">
           <Link
             href="/proyectos"
             className="press cursor-pointer bg-carbon px-10 py-4 font-mono text-xs uppercase tracking-[0.2em] text-hueso transition-colors duration-200 hover:bg-naranja hover:text-carbon"

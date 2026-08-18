@@ -15,7 +15,7 @@ const ART_BY_WORD: Record<string, BlueprintVariant> = {
 
 export default function Filosofia() {
   return (
-    <section id="filosofia" className="bg-hueso py-32 text-carbon md:py-44">
+    <section id="filosofia" className="bg-hueso py-20 text-carbon md:py-28">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
         <h2 className="max-w-2xl font-display text-3xl sm:text-4xl md:text-5xl">
           <RevealText text="Arquitectura de lujo sostenible, pensada desde cuatro principios." />

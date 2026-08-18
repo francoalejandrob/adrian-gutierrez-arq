@@ -13,7 +13,7 @@ const stats = [
 
 export default function Intro() {
   return (
-    <section className="bg-carbon py-32 text-hueso md:py-44">
+    <section className="bg-carbon py-20 text-hueso md:py-28">
       <div className="mx-auto flex max-w-4xl flex-col items-center px-6 text-center md:px-10">
         <motion.h2
           initial={{ opacity: 0, y: 24 }}
@@ -23,8 +23,9 @@ export default function Intro() {
           className="font-display text-3xl leading-[1.3] sm:text-4xl md:text-5xl"
         >
           Cada proyecto empieza por entender cómo entra el sol, de dónde
-          viene el viento y cómo se va a vivir el espacio, mucho antes de
-          dibujar una fachada.
+          viene el viento y cómo se va a{" "}
+          <span className="font-semibold">vivir el espacio</span>, mucho
+          antes de dibujar una fachada.
         </motion.h2>
 
         <motion.div
