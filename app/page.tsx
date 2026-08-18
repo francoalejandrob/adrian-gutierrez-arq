@@ -1,9 +1,9 @@
 import Hero from "@/components/hero";
 import Intro from "@/components/intro";
 import ProyectosGrid from "@/components/proyectos-grid";
+import SobreEstudio from "@/components/sobre-estudio";
 import InstagramFeed from "@/components/instagram-feed";
 import Filosofia from "@/components/filosofia";
-import SobreEstudio from "@/components/sobre-estudio";
 import Proceso from "@/components/proceso";
 import Contacto from "@/components/contacto";
 
@@ -13,9 +13,9 @@ export default function Home() {
       <Hero />
       <Intro />
       <ProyectosGrid />
+      <SobreEstudio />
       <InstagramFeed />
       <Filosofia />
-      <SobreEstudio />
       <Proceso />
       <Contacto />
     </>
