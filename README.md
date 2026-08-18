@@ -81,6 +81,8 @@ lib/resend.ts               → cliente de Resend
 
 ## Despliegue en Vercel
 
+El código ya está en GitHub: https://github.com/francoalejandrob/adrian-gutierrez-arq
+
 1. Sube el repositorio a GitHub.
 2. Importa el proyecto en [Vercel](https://vercel.com/new).
 3. Agrega las variables de entorno (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
