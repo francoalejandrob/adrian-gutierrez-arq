@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
-import RevealText from "@/components/reveal-text";
 import { process } from "@/lib/content";
 import { EASE_OUT } from "@/lib/motion";
 
@@ -21,11 +20,18 @@ export default function Proceso() {
   return (
     <section id="proceso" className="bg-hueso py-14 md:py-20">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
-        <h2 className="max-w-2xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
-          <RevealText text="Un proceso claro, de la primera conversación a la entrega de llaves." />
-        </h2>
+        <motion.h2
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-15%" }}
+          transition={{ duration: 0.7, ease: EASE_OUT }}
+          className="max-w-2xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl"
+        >
+          Un proceso claro, de la primera conversación a la entrega de
+          llaves.
+        </motion.h2>
 
-        <div ref={trackRef} className="relative mt-16">
+        <div ref={trackRef} className="relative mt-10">
           <div className="absolute inset-x-0 top-0 h-0.5 bg-piedra/20" />
           <motion.div
             style={{ scaleX: progress }}
