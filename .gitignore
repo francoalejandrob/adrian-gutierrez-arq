@@ -42,3 +42,5 @@ next-env.d.ts
 
 # raw source assets (optimized copies live in /public)
 /biblioteca
+/logos
+/proyectos

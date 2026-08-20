@@ -17,15 +17,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
           <div>
             <Image
-              src="/logo.png"
+              src="/logo-icon.png"
               alt="Adrián Gutiérrez — Arquitectura & Diseño"
-              width={56}
-              height={56}
-              className="h-12 w-12 rounded-sm object-cover"
+              width={55}
+              height={48}
+              className="h-12 w-auto"
             />
             <p className="mt-4 max-w-xs text-sm text-hueso/60">
-              Arquitectura residencial de lujo y remodelaciones en Salinas,
-              Ecuador.
+              Arquitectura, diseño y construcción de proyectos en Ecuador y
+              Estados Unidos.
             </p>
           </div>
 

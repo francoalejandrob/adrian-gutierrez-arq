@@ -39,7 +39,7 @@ export default function Hero() {
       >
         {shouldReduceMotion ? (
           <Image
-            src="/proyectos/villa-atardecer.jpg"
+            src="/proyectos/casa-eg/1.jpg"
             alt=""
             fill
             priority
@@ -76,22 +76,25 @@ export default function Hero() {
         >
           {studio.location} · {studio.coordinates}
         </motion.p>
-        <h1 className="font-display text-6xl leading-[1.1] tracking-normal sm:text-7xl md:text-8xl">
+        <h1 className="font-display text-5xl leading-[1.15] tracking-normal sm:text-6xl md:text-7xl">
           <span className="block">
             <RevealText text="Diseñamos y construimos" triggerOnMount delay={0.15} />
           </span>
           <span className="block">
-            <RevealText text="tus sueños." triggerOnMount delay={0.3} />
+            <RevealText text="proyectos que buscan" triggerOnMount delay={0.3} />
+          </span>
+          <span className="block">
+            <RevealText text="trascender." triggerOnMount delay={0.45} />
           </span>
         </h1>
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7, ease: EASE_OUT }}
+          transition={{ duration: 0.8, delay: 0.85, ease: EASE_OUT }}
           className="mt-8 max-w-xl text-xl text-hueso/85"
         >
-          Arquitectura residencial de lujo y remodelaciones en la costa de
-          Salinas, Ecuador.
+          Arquitectura, diseño y construcción concebidos para crear espacios
+          con identidad, propósito y permanencia.
         </motion.p>
       </motion.div>
 

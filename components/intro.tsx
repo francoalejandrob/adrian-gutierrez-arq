@@ -6,8 +6,11 @@ import { studio } from "@/lib/content";
 import { EASE_OUT } from "@/lib/motion";
 
 const stats = [
-  { to: studio.years, suffix: "", label: "Años de trayectoria" },
-  { to: studio.projectCount, suffix: "+", label: "Proyectos entregados" },
+  {
+    to: studio.projectCount,
+    suffix: "+",
+    label: "Proyectos entregados en Ecuador y Estados Unidos",
+  },
   { to: 100, suffix: "%", label: "Supervisión directa en obra" },
 ];
 

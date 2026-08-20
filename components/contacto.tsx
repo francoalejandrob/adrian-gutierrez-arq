@@ -9,8 +9,8 @@ export default function Contacto() {
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 px-6 md:grid-cols-12 md:px-10">
         <div className="relative min-h-[420px] overflow-hidden md:col-span-5">
           <Image
-            src="/proyectos/villa-atardecer.jpg"
-            alt="Villa Atardecer, uno de los proyectos del estudio"
+            src="/proyectos/suite-palmar/1.jpg"
+            alt="Suite Palmar, uno de los proyectos del estudio"
             fill
             sizes="(min-width: 768px) 40vw, 100vw"
             className="object-cover"

@@ -14,6 +14,8 @@ import RevealText from "@/components/reveal-text";
 import { Project, projects } from "@/lib/content";
 import { EASE_OUT } from "@/lib/motion";
 
+const featuredProjects = projects.filter((project) => project.featured);
+
 export default function ProyectosGrid() {
   return (
     <section id="proyectos" className="bg-hueso py-14 md:py-20">
@@ -29,7 +31,7 @@ export default function ProyectosGrid() {
           style={{ perspective: 1200 }}
           className="grid grid-cols-1 gap-px overflow-hidden border border-piedra/20 bg-piedra/20 sm:grid-cols-2"
         >
-          {projects.map((project, i) => (
+          {featuredProjects.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} />
           ))}
         </div>
@@ -82,44 +84,49 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-10%" }}
       transition={{ duration: 0.6, delay: index * 0.08, ease: EASE_OUT }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
       style={{
         rotateX: springRotateX,
         rotateY: springRotateY,
         transformStyle: "preserve-3d",
       }}
-      className="group relative flex aspect-[4/3] flex-col justify-between overflow-hidden bg-carbon p-8"
+      className="group relative aspect-[4/3] overflow-hidden bg-carbon"
     >
-      <Image
-        src={project.image}
-        alt={project.imageAlt}
-        fill
-        sizes="(min-width: 640px) 50vw, 100vw"
-        className="object-cover grayscale-[55%] contrast-[1.05] transition-[filter,transform] duration-700 ease-out-strong group-hover:scale-110 group-hover:grayscale-0"
-      />
+      <Link
+        href={`/proyectos/${project.id}`}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className="press relative flex h-full w-full flex-col justify-between p-8"
+      >
+        <Image
+          src={project.image}
+          alt={project.imageAlt}
+          fill
+          sizes="(min-width: 640px) 50vw, 100vw"
+          className="object-cover grayscale-[55%] contrast-[1.05] transition-[filter,transform] duration-700 ease-out-strong group-hover:scale-110 group-hover:grayscale-0"
+        />
 
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-t from-carbon/85 via-carbon/10 to-carbon/40 transition-opacity duration-500 group-hover:from-carbon/90"
-      />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-carbon/85 via-carbon/10 to-carbon/40 transition-opacity duration-500 group-hover:from-carbon/90"
+        />
 
-      <div className="relative flex items-start justify-between">
-        <span className="font-mono text-xs uppercase tracking-[0.15em] text-hueso/80 transition-colors duration-300 group-hover:text-naranja">
-          {project.code}
-        </span>
-        <span className="font-mono text-xs uppercase tracking-[0.15em] text-hueso/80">
-          {project.category}
-        </span>
-      </div>
+        <div className="relative flex items-start justify-between">
+          <span className="font-mono text-xs uppercase tracking-[0.15em] text-hueso/80 transition-colors duration-300 group-hover:text-naranja">
+            {project.code}
+          </span>
+          <span className="font-mono text-xs uppercase tracking-[0.15em] text-hueso/80">
+            {project.category}
+          </span>
+        </div>
 
-      <div className="relative">
-        <h3 className="font-display text-3xl text-hueso">{project.name}</h3>
-        <p className="mt-1 text-base text-hueso/70">{project.location}</p>
-        <p className="mt-3 max-w-sm text-base text-hueso/80 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          {project.tagline}
-        </p>
-      </div>
+        <div className="relative">
+          <h3 className="font-display text-3xl text-hueso">{project.name}</h3>
+          <p className="mt-1 text-base text-hueso/70">{project.location}</p>
+          <p className="mt-3 max-w-sm text-base text-hueso/80 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            {project.tagline}
+          </p>
+        </div>
+      </Link>
 
       <span
         aria-hidden="true"

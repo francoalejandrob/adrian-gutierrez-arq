@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import BlueprintArt, { BlueprintVariant } from "@/components/blueprint-art";
 import { architectBio, studio } from "@/lib/content";
@@ -24,8 +25,14 @@ export default function SobreEstudio() {
             transition={{ duration: 0.7, ease: EASE_OUT }}
             className="md:col-span-4"
           >
-            <div className="flex h-40 w-40 items-center justify-center border border-hueso/20 font-display text-3xl text-hueso transition-colors duration-300 hover:border-naranja">
-              AG
+            <div className="flex h-40 w-40 items-center justify-center border border-hueso/20 p-8 transition-colors duration-300 hover:border-naranja">
+              <Image
+                src="/logo-icon.png"
+                alt=""
+                width={480}
+                height={422}
+                className="h-full w-full object-contain"
+              />
             </div>
             <p className="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-hueso/60">
               {studio.name}
@@ -41,11 +48,16 @@ export default function SobreEstudio() {
             className="md:col-span-8"
           >
             <blockquote className="font-display text-3xl italic leading-[1.3] text-hueso sm:text-4xl">
-              “{architectBio.quote}”
+              &ldquo;{architectBio.quote}&rdquo;
             </blockquote>
-            <p className="mt-8 max-w-2xl text-lg leading-relaxed text-hueso/80">
-              {architectBio.bio}
-            </p>
+            {architectBio.bio.map((paragraph) => (
+              <p
+                key={paragraph.slice(0, 24)}
+                className="mt-6 max-w-2xl text-lg leading-relaxed text-hueso/80"
+              >
+                {paragraph}
+              </p>
+            ))}
           </motion.div>
         </div>
 

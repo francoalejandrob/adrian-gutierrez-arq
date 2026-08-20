@@ -11,21 +11,34 @@ más abajo).
 
 ## Contenido de demostración
 
-Este proyecto está en desarrollo. Los siguientes datos son **de ejemplo** y
-deben reemplazarse con información real antes de publicar el sitio:
+Este proyecto está en desarrollo. Los 7 proyectos reales (`lib/content.ts`,
+fotos en `public/proyectos/`) ya reemplazan el contenido ficticio original,
+pero lo siguiente sigue siendo **provisional** y debe revisarse antes de
+publicar el sitio:
 
-- Los 4 proyectos destacados (`lib/content.ts`) son ficticios.
+- La ubicación de cada proyecto se infirió a partir de las imágenes (el
+  estudio opera desde Salinas, Ecuador) y debe confirmarse caso por caso en
+  `lib/content.ts`.
+- La descripción y el tagline de cada proyecto se redactaron a partir del
+  contenido visual de los renders; conviene revisarlos con datos reales del
+  cliente/obra.
 - La bio y la cita del arquitecto (`lib/content.ts`) fueron redactadas como
   placeholder editorial.
 - Los años de experiencia (5) y proyectos entregados (20) son genéricos.
-- No hay fotografía real todavía: en vez de fotos se usan ilustraciones de
-  línea tipo plano arquitectónico (`components/blueprint-art.tsx`) como
-  lenguaje visual del sitio. Pueden mantenerse como estilo o reemplazarse por
-  fotografía real de proyectos en `components/proyectos-grid.tsx`,
-  `components/hero.tsx`, `components/filosofia.tsx` y
-  `components/sobre-estudio.tsx`.
 - No se incluyeron redes sociales en el footer porque no se proporcionaron
   cuentas reales; agrégalas en `components/footer.tsx` cuando existan.
+
+Las fotos y el logo originales (alta resolución) viven en `/proyectos` y
+`/logos` en la raíz del repo — estas carpetas están en `.gitignore` (no se
+suben a git). Las versiones optimizadas para el sitio se generan a
+`public/proyectos/` y `public/logo-icon.png` con:
+
+```bash
+npm run process-assets
+```
+
+Vuelve a correr ese comando si agregas o cambias fotos en `/proyectos` o
+`/logos`.
 
 ## Configurar el envío de emails (Resend)
 

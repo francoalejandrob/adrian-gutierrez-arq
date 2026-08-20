@@ -49,11 +49,11 @@ export default function Navbar() {
           onClick={() => setMenuOpen(false)}
         >
           <Image
-            src="/logo.png"
+            src="/logo-icon.png"
             alt="Adrián Gutiérrez — Arquitectura & Diseño"
-            width={44}
-            height={44}
-            className="h-10 w-10 rounded-sm object-cover"
+            width={45}
+            height={40}
+            className="h-10 w-auto"
             priority
           />
           <span className="hidden font-display text-lg tracking-normal text-hueso sm:inline">
