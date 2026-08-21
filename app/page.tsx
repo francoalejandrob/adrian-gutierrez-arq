@@ -6,8 +6,11 @@ import ContactoCta from "@/components/contacto-cta";
 import InstagramFeed from "@/components/instagram-feed";
 import Proceso from "@/components/proceso";
 import Contacto from "@/components/contacto";
+import { getInstagramPosts } from "@/lib/instagram";
 
-export default function Home() {
+export default async function Home() {
+  const instagramPosts = await getInstagramPosts();
+
   return (
     <>
       <Hero />
@@ -15,7 +18,7 @@ export default function Home() {
       <ProyectosGrid />
       <SobreEstudio />
       <ContactoCta />
-      <InstagramFeed />
+      <InstagramFeed posts={instagramPosts} />
       <Proceso />
       <Contacto />
     </>

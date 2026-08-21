@@ -76,6 +76,50 @@ El formulario incluye un campo honeypot oculto (`company`) como protección
 anti-spam básica: si un bot lo rellena, la solicitud se descarta en
 silencio.
 
+## Feed de Instagram
+
+La sección "@agutierrez.arq" de la home (`components/instagram-feed.tsx`)
+puede mostrar las publicaciones reales del perfil de Instagram. Mientras no
+esté configurado, muestra 8 fotos reales de proyectos como respaldo (en vez
+de las fotos de stock que traía antes).
+
+Instagram ya no ofrece esto sin autenticación: hace falta un token de la
+API de Instagram (Meta). Pasos para activarlo:
+
+1. **Cuenta profesional**: en la app de Instagram, entra a la cuenta
+   `@agutierrez.arq` → Configuración → Tipo de cuenta y herramientas →
+   cambia a cuenta **profesional** (Business o Creador), si no lo es ya.
+2. **App de Meta for Developers**: entra a
+   [developers.facebook.com/apps](https://developers.facebook.com/apps),
+   crea una app nueva y agrégale el producto **Instagram** ("API setup with
+   Instagram login").
+3. Sigue el asistente de esa sección para conectar la cuenta
+   `@agutierrez.arq` como usuario de la app y generar un **token de
+   acceso**. Copia también el **ID de usuario de Instagram** que te muestra
+   ahí.
+4. Ese token es de corta duración; cámbialo por uno de larga duración
+   (60 días) con:
+
+   ```bash
+   curl -i -X GET "https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=TU_CLIENT_SECRET&access_token=TU_TOKEN_CORTO"
+   ```
+
+5. Completa en `.env.local` (local) y en las variables de entorno del
+   proyecto en Vercel (producción):
+
+   ```
+   IG_ACCESS_TOKEN=el_token_de_larga_duracion
+   IG_USER_ID=el_id_de_usuario_de_instagram
+   ```
+
+6. Reinicia el servidor / vuelve a desplegar.
+
+**Importante**: el token de larga duración vence a los 60 días y hay que
+renovarlo antes de esa fecha con `grant_type=ig_refresh_token` (ver
+[docs de Meta](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login#step-6--refresh-tokens)),
+o el feed simplemente vuelve a mostrar el respaldo de fotos de proyectos
+hasta que se actualice.
+
 ## Desarrollo local
 
 ```bash
@@ -104,5 +148,7 @@ El código ya está en GitHub: https://github.com/francoalejandrob/adrian-gutier
 1. Sube el repositorio a GitHub.
 2. Importa el proyecto en [Vercel](https://vercel.com/new).
 3. Agrega las variables de entorno (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
-   `CONTACT_FROM_EMAIL`) en la configuración del proyecto en Vercel.
+   `CONTACT_FROM_EMAIL` y, si ya tienes el feed de Instagram configurado,
+   `IG_ACCESS_TOKEN` e `IG_USER_ID`) en la configuración del proyecto en
+   Vercel.
 4. Despliega.
