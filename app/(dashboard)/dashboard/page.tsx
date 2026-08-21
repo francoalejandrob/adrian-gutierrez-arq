@@ -4,11 +4,23 @@ import { LEAD_STATUS_LABELS, type LeadStatus } from "@/lib/supabase/types";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
+  const today = new Date().toISOString().slice(0, 10);
 
-  const [{ data: leads }, { count: clientCount }] = await Promise.all([
-    supabase.from("leads").select("status"),
-    supabase.from("clients").select("*", { count: "exact", head: true }),
-  ]);
+  const [{ data: leads }, { count: clientCount }, { count: activeProjects }, { data: overdueTasks }] =
+    await Promise.all([
+      supabase.from("leads").select("status"),
+      supabase.from("clients").select("*", { count: "exact", head: true }),
+      supabase
+        .from("projects")
+        .select("*", { count: "exact", head: true })
+        .not("status", "in", "(completed,cancelled,on_hold)"),
+      supabase
+        .from("tasks")
+        .select("id, title, due_date, projects(name)")
+        .lt("due_date", today)
+        .neq("status", "completed")
+        .order("due_date"),
+    ]);
 
   const byStatus = (Object.keys(LEAD_STATUS_LABELS) as LeadStatus[]).map((status) => ({
     status,
@@ -28,12 +40,30 @@ export default async function DashboardPage() {
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Kpi label="Leads abiertos" value={openLeads} />
         <Kpi label="Clientes" value={clientCount ?? 0} />
-        {byStatus
-          .filter((s) => s.status === "propuesta" || s.status === "negociacion")
-          .map((s) => (
-            <Kpi key={s.status} label={LEAD_STATUS_LABELS[s.status]} value={s.count} />
-          ))}
+        <Kpi label="Proyectos activos" value={activeProjects ?? 0} />
+        <Kpi label="Tareas vencidas" value={overdueTasks?.length ?? 0} alert={(overdueTasks?.length ?? 0) > 0} />
       </div>
+
+      {(overdueTasks?.length ?? 0) > 0 && (
+        <div className="mt-10 border border-red-200 bg-red-50 p-6">
+          <h2 className="text-sm font-medium text-red-800">Tareas vencidas</h2>
+          <div className="mt-4 flex flex-col gap-2">
+            {overdueTasks!.map((task) => (
+              <div key={task.id} className="flex items-center justify-between text-sm">
+                <span className="text-red-900">
+                  {task.title}
+                  <span className="ml-2 text-xs text-red-700/70">
+                    {(task.projects as unknown as { name: string } | null)?.name}
+                  </span>
+                </span>
+                <span className="text-xs text-red-700">
+                  {new Date(task.due_date!).toLocaleDateString("es-EC")}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-10 border border-carbon/10 bg-white p-6">
         <h2 className="text-sm font-medium text-carbon">Leads por estado</h2>
@@ -56,11 +86,13 @@ export default async function DashboardPage() {
   );
 }
 
-function Kpi({ label, value }: { label: string; value: number }) {
+function Kpi({ label, value, alert }: { label: string; value: number; alert?: boolean }) {
   return (
-    <div className="border border-carbon/10 bg-white p-5">
-      <p className="text-2xl font-semibold text-carbon">{value}</p>
-      <p className="mt-1 text-xs uppercase tracking-wide text-carbon/50">{label}</p>
+    <div className={`border p-5 ${alert ? "border-red-200 bg-red-50" : "border-carbon/10 bg-white"}`}>
+      <p className={`text-2xl font-semibold ${alert ? "text-red-700" : "text-carbon"}`}>{value}</p>
+      <p className={`mt-1 text-xs uppercase tracking-wide ${alert ? "text-red-600/70" : "text-carbon/50"}`}>
+        {label}
+      </p>
     </div>
   );
 }

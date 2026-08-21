@@ -145,6 +145,20 @@ components/dashboard/   ← componentes propios del panel (sidebar, tablas,
                            components/ del sitio público
 ```
 
+## 6b. Fase 2 — Storage y Gantt
+
+Se agregó `lib/supabase/server.ts`'s mismo cliente para hablar con
+**Supabase Storage** (bucket privado `documents`, ver `DATABASE.md`
+§1b) — no hizo falta un cliente nuevo, `supabase.storage.from(...)` usa
+la misma sesión/RLS-equivalente que el resto.
+
+El cronograma (Gantt) de `/dashboard/projects/[id]`
+(`components/dashboard/gantt-chart.tsx`) es una implementación propia con
+divs posicionados por porcentaje según fecha, no una librería de
+terceros — decisión explicada en el plan de Fase 2 (sin dependencia nueva
+que mantener, estilo 100% acorde al resto del panel; el costo es que no
+hay drag-to-resize todavía).
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

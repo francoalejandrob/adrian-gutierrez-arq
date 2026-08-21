@@ -10,29 +10,47 @@ secciones). Cada fase produce algo usable antes de pasar a la siguiente
 `AUDIT.md`, `ARCHITECTURE.md`, `DATABASE.md`, `ROADMAP.md`,
 `INTEGRATION_SETUP.md`.
 
-## Fase 1 — Core 🔵 en progreso (este pase)
+## Fase 1 — Core ✅
 
 - [x] Documentación (Fase 0)
-- [ ] Route groups `(public)` / `(dashboard)`, layout raíz mínimo
-- [ ] Supabase enlazado (`ArqSystem&Website`), migraciones iniciales
-- [ ] Auth (magic link) + middleware de protección de `/dashboard`
-- [ ] `organizations` + `profiles` + `organization_members`, seed del
-      estudio y del usuario admin
-- [ ] CRM — Leads (CRUD + filtro por estado)
-- [ ] CRM — Clients (CRUD + "convertir desde lead")
-- [ ] Dashboard con KPIs reales (leads por estado, total clientes)
-- [ ] `api/contact/route.ts` también crea el lead en Supabase
+- [x] Route groups `(public)` / `(dashboard)`, layout raíz mínimo
+- [x] Supabase enlazado (`ArqSystem&Website`), migraciones iniciales
+- [x] Auth (magic link) + proxy (`middleware.ts` en Next < 16) de
+      protección de `/dashboard`, restringido a un allowlist de emails
+      (`adriangch95@gmail.com`, `franco.bracamonte24@gmail.com`)
+- [x] `organizations` + `profiles` + `organization_members`, seed del
+      estudio y auto-join de los usuarios del allowlist
+- [x] CRM — Leads (CRUD + filtro por estado)
+- [x] CRM — Clients (CRUD + "convertir desde lead")
+- [x] Dashboard con KPIs reales (leads por estado, total clientes)
+- [x] `api/contact/route.ts` también crea el lead en Supabase
 
-**No incluido en este pase** (aunque están en la sección 9-11 del master
+**No incluido en Fase 1** (aunque están en la sección 9-11 del master
 prompt): Kanban con drag-and-drop para el pipeline, roles adicionales,
-`activity_log` expuesto en UI (la tabla se crea, pero el timeline visual
-puede esperar a la siguiente iteración del CRM).
+`activity_log` expuesto en UI para leads/clients (la tabla existía, la UI
+de actividad se sumó recién en Fase 2 y ahora también se usa ahí).
 
-## Fase 2 — Project Management ⬜
+## Fase 2 — Project Management ✅
 
-Projects, phases (configurables), tasks, Gantt, documentos + versionado,
-sección "Documentos" del proyecto. Roles `project_director`/`designer`
-se activan acá.
+- [x] `projects`, `phases`, `tasks`, `documents` + `document_versions`
+      (migración `0004_project_management.sql`), RLS igual que Fase 1
+- [x] Bucket privado de Storage `documents`, descargas por URL firmada
+- [x] CRUD de proyectos (con selector de cliente), fases y tareas
+- [x] Subida de documentos con versionado (nueva versión sobre uno
+      existente o documento nuevo)
+- [x] Cronograma (Gantt) simple, propio (sin librería externa — ver
+      `ARCHITECTURE.md` para el porqué), a partir de fechas de fase
+- [x] Bitácora de actividad reutilizada para proyectos
+- [x] Dashboard: KPI de proyectos activos y tareas vencidas (con alerta)
+- [x] Botón "Nuevo proyecto" desde la ficha de cliente
+
+**No incluido en Fase 2** (queda para cuando haya una necesidad real, no
+por completitud):
+- Dependencias entre tareas / ruta crítica en el Gantt.
+- Roles `project_director`/`designer` — con 2 usuarios y ambos
+  `org_admin`, no hay todavía ninguna diferencia de permisos que
+  justifique el rol (sería UI que promete algo que no hace nada).
+- Reordenar fases arrastrando (hoy: posición fija al crear).
 
 ## Fase 3 — Client Portal ⬜
 

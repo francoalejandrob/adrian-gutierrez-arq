@@ -1,0 +1,381 @@
+import { notFound } from "next/navigation";
+import GanttChart from "@/components/dashboard/gantt-chart";
+import ProjectForm from "@/components/dashboard/project-form";
+import StatusSelect from "@/components/dashboard/status-select";
+import DownloadButton from "@/components/dashboard/download-button";
+import { createClient } from "@/lib/supabase/server";
+import {
+  DOC_CATEGORIES,
+  DOC_CATEGORY_LABELS,
+  PHASE_STATUS_LABELS,
+  PHASE_STATUSES,
+  PROJECT_STATUS_LABELS,
+  PROJECT_STATUSES,
+  TASK_STATUS_LABELS,
+  TASK_STATUSES,
+  type Task,
+} from "@/lib/supabase/types";
+import { addProjectNote, updateProject, updateProjectStatus } from "../actions";
+import {
+  createPhase,
+  createTask,
+  deletePhase,
+  deleteTask,
+  updatePhaseStatus,
+  updateTaskStatus,
+  uploadDocumentVersion,
+} from "./actions";
+
+export default async function ProjectDetailPage(
+  props: PageProps<"/dashboard/projects/[id]">,
+) {
+  const { id } = await props.params;
+  const supabase = await createClient();
+
+  const [{ data: project }, { data: clients }, { data: phases }, { data: tasks }, { data: documents }, { data: activity }] =
+    await Promise.all([
+      supabase.from("projects").select("*, clients(id, name)").eq("id", id).maybeSingle(),
+      supabase.from("clients").select("id, name").order("name"),
+      supabase.from("phases").select("*").eq("project_id", id).order("position"),
+      supabase.from("tasks").select("*").eq("project_id", id).order("created_at"),
+      supabase
+        .from("documents")
+        .select("*, document_versions(*)")
+        .eq("project_id", id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("activity_log")
+        .select("*")
+        .eq("entity_type", "project")
+        .eq("entity_id", id)
+        .order("created_at", { ascending: false }),
+    ]);
+
+  if (!project) notFound();
+
+  const boundUpdateStatus = updateProjectStatus.bind(null, id);
+  const boundUpdate = updateProject.bind(null, id);
+  const boundAddNote = addProjectNote.bind(null, id);
+  const boundCreatePhase = createPhase.bind(null, id);
+  const boundCreateTask = createTask.bind(null, id);
+  const boundUpload = uploadDocumentVersion.bind(null, id);
+
+  const tasksByPhase = new Map<string | null, Task[]>();
+  for (const task of tasks ?? []) {
+    const key = task.phase_id;
+    tasksByPhase.set(key, [...(tasksByPhase.get(key) ?? []), task]);
+  }
+
+  return (
+    <div className="max-w-4xl">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-carbon/50">
+            {project.clients?.name}
+          </p>
+          <h1 className="font-display text-2xl text-carbon">{project.name}</h1>
+        </div>
+        <StatusSelect
+          action={boundUpdateStatus}
+          defaultValue={project.status}
+          options={PROJECT_STATUSES.map((status) => ({
+            value: status,
+            label: PROJECT_STATUS_LABELS[status],
+          }))}
+        />
+      </div>
+
+      {/* Cronograma */}
+      <Section title="Cronograma">
+        <GanttChart phases={phases ?? []} />
+      </Section>
+
+      {/* Fases */}
+      <Section title="Fases">
+        <div className="flex flex-col gap-3">
+          {(phases ?? []).map((phase) => (
+            <div
+              key={phase.id}
+              className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0"
+            >
+              <div>
+                <p className="text-sm font-medium text-carbon">{phase.name}</p>
+                <p className="text-xs text-carbon/50">
+                  {phase.start_date ?? "sin fecha"} → {phase.end_date ?? "sin fecha"}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <StatusSelect
+                  action={updatePhaseStatus.bind(null, id, phase.id)}
+                  defaultValue={phase.status}
+                  options={PHASE_STATUSES.map((status) => ({
+                    value: status,
+                    label: PHASE_STATUS_LABELS[status],
+                  }))}
+                />
+                <form action={deletePhase.bind(null, id, phase.id)}>
+                  <button
+                    type="submit"
+                    className="cursor-pointer text-xs text-carbon/40 hover:text-red-600"
+                  >
+                    Eliminar
+                  </button>
+                </form>
+              </div>
+            </div>
+          ))}
+          {(phases ?? []).length === 0 && (
+            <p className="text-sm text-carbon/40">Sin fases todavía.</p>
+          )}
+        </div>
+
+        <form action={boundCreatePhase} className="mt-4 grid grid-cols-4 gap-2">
+          <input
+            name="name"
+            placeholder="Nombre de la fase"
+            required
+            className="col-span-2 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <input
+            name="start_date"
+            type="date"
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <input
+            name="end_date"
+            type="date"
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <button
+            type="submit"
+            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
+          >
+            Agregar fase
+          </button>
+        </form>
+      </Section>
+
+      {/* Tareas */}
+      <Section title="Tareas">
+        <div className="flex flex-col gap-4">
+          {(phases ?? []).map((phase) => (
+            <TaskGroup
+              key={phase.id}
+              title={phase.name}
+              tasks={tasksByPhase.get(phase.id) ?? []}
+              projectId={id}
+            />
+          ))}
+          <TaskGroup title="Sin fase" tasks={tasksByPhase.get(null) ?? []} projectId={id} />
+        </div>
+
+        <form action={boundCreateTask} className="mt-4 grid grid-cols-4 gap-2">
+          <input
+            name="title"
+            placeholder="Nueva tarea"
+            required
+            className="col-span-2 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <select
+            name="phase_id"
+            className="cursor-pointer border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          >
+            <option value="">Sin fase</option>
+            {(phases ?? []).map((phase) => (
+              <option key={phase.id} value={phase.id}>
+                {phase.name}
+              </option>
+            ))}
+          </select>
+          <input
+            name="due_date"
+            type="date"
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <button
+            type="submit"
+            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
+          >
+            Agregar tarea
+          </button>
+        </form>
+      </Section>
+
+      {/* Documentos */}
+      <Section title="Documentos">
+        <div className="flex flex-col gap-4">
+          {(documents ?? []).map((doc) => (
+            <div key={doc.id} className="border-b border-carbon/5 pb-3 last:border-0">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-carbon">
+                  {doc.name}{" "}
+                  <span className="text-xs font-normal text-carbon/40">
+                    ({DOC_CATEGORY_LABELS[doc.category]})
+                  </span>
+                </p>
+              </div>
+              <ul className="mt-1 flex flex-col gap-1">
+                {doc.document_versions
+                  .sort((a, b) => b.version - a.version)
+                  .map((version) => (
+                    <li
+                      key={version.id}
+                      className="flex items-center justify-between text-xs text-carbon/60"
+                    >
+                      <span>
+                        v{version.version} —{" "}
+                        {new Date(version.created_at).toLocaleDateString("es-EC")}
+                        {version.comment ? ` — ${version.comment}` : ""}
+                      </span>
+                      <DownloadButton storagePath={version.storage_path} />
+                    </li>
+                  ))}
+              </ul>
+              <form action={boundUpload} className="mt-2 flex items-center gap-2">
+                <input type="hidden" name="document_id" value={doc.id} />
+                <input type="file" name="file" required className="text-xs" />
+                <input
+                  name="comment"
+                  placeholder="Comentario (opcional)"
+                  className="flex-1 border border-carbon/20 bg-white px-2 py-1 text-xs outline-none focus:border-carbon"
+                />
+                <button
+                  type="submit"
+                  className="cursor-pointer border border-carbon px-3 py-1 text-xs text-carbon transition-colors hover:bg-carbon hover:text-white"
+                >
+                  Nueva versión
+                </button>
+              </form>
+            </div>
+          ))}
+          {(documents ?? []).length === 0 && (
+            <p className="text-sm text-carbon/40">Sin documentos todavía.</p>
+          )}
+        </div>
+
+        <form action={boundUpload} className="mt-4 grid grid-cols-4 gap-2">
+          <input
+            name="name"
+            placeholder="Nombre del documento"
+            required
+            className="col-span-2 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <select
+            name="category"
+            className="cursor-pointer border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          >
+            {DOC_CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {DOC_CATEGORY_LABELS[category]}
+              </option>
+            ))}
+          </select>
+          <input type="file" name="file" required className="text-sm" />
+          <button
+            type="submit"
+            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
+          >
+            Subir documento nuevo
+          </button>
+        </form>
+      </Section>
+
+      {/* Editar información */}
+      <Section title="Editar información">
+        <ProjectForm action={boundUpdate} clients={clients ?? []} defaultValues={project} />
+      </Section>
+
+      {/* Actividad */}
+      <Section title="Actividad">
+        <form action={boundAddNote} className="flex gap-2">
+          <input
+            name="body"
+            placeholder="Agregar una nota…"
+            className="flex-1 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <button
+            type="submit"
+            className="cursor-pointer border border-carbon px-4 py-2 text-sm text-carbon transition-colors hover:bg-carbon hover:text-white"
+          >
+            Agregar
+          </button>
+        </form>
+        <ul className="mt-4 flex flex-col gap-3">
+          {(activity ?? []).map((item) => (
+            <li key={item.id} className="border-b border-carbon/5 pb-3 text-sm last:border-0">
+              <p className="text-carbon/80">{item.body}</p>
+              <p className="mt-1 text-xs text-carbon/40">
+                {new Date(item.created_at).toLocaleString("es-EC")}
+              </p>
+            </li>
+          ))}
+          {(activity ?? []).length === 0 && (
+            <li className="text-sm text-carbon/40">Sin actividad todavía.</li>
+          )}
+        </ul>
+      </Section>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-8 border border-carbon/10 bg-white p-6">
+      <h2 className="mb-4 text-sm font-medium text-carbon">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function TaskGroup({
+  title,
+  tasks,
+  projectId,
+}: {
+  title: string;
+  tasks: Task[];
+  projectId: string;
+}) {
+  if (tasks.length === 0) return null;
+
+  return (
+    <div>
+      <p className="mb-2 text-xs uppercase tracking-wide text-carbon/40">{title}</p>
+      <div className="flex flex-col gap-2">
+        {tasks.map((task) => (
+          <div
+            key={task.id}
+            className="flex flex-wrap items-center justify-between gap-2 border-b border-carbon/5 pb-2 last:border-0"
+          >
+            <div>
+              <p className="text-sm text-carbon">{task.title}</p>
+              {task.due_date && (
+                <p className="text-xs text-carbon/40">
+                  Vence {new Date(task.due_date).toLocaleDateString("es-EC")}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <StatusSelect
+                action={updateTaskStatus.bind(null, projectId, task.id)}
+                defaultValue={task.status}
+                options={TASK_STATUSES.map((status) => ({
+                  value: status,
+                  label: TASK_STATUS_LABELS[status],
+                }))}
+              />
+              <form action={deleteTask.bind(null, projectId, task.id)}>
+                <button
+                  type="submit"
+                  className="cursor-pointer text-xs text-carbon/40 hover:text-red-600"
+                >
+                  Eliminar
+                </button>
+              </form>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
