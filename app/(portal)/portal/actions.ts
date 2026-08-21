@@ -35,6 +35,23 @@ export async function respondToDocumentVersion(
   revalidatePath(`/portal/projects/${projectId}`);
 }
 
+const quoteResponseSchema = z.enum(["accepted", "rejected"]);
+
+export async function respondToQuote(projectId: string, quoteId: string, formData: FormData) {
+  const status = quoteResponseSchema.parse(formData.get("status"));
+
+  const supabase = await createClient();
+  // RLS ("portal clients respond to sent quotes") only allows this update
+  // to reach a quote in sent/negotiation that belongs to the client's project.
+  const { error } = await supabase
+    .from("quotes")
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq("id", quoteId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/portal/projects/${projectId}`);
+}
+
 export async function addPortalMessage(projectId: string, formData: FormData) {
   const body = String(formData.get("body") ?? "").trim();
   if (!body) return;

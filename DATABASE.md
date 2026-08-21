@@ -199,6 +199,75 @@ columna, es una restricción de la capa de aplicación); SELECT/INSERT en
 cliente — verificado con una sesión real de prueba (ver el pase de Fase
 3), no solo revisando el SQL.
 
+## 1d. Tablas de Fase 4 — Finanzas
+
+Migración `0006_finance.sql`. Todo ligado a `project_id` (se cotiza y
+contrata sobre un proyecto ya creado — crear un proyecto en ARCHI.OS es
+una acción liviana, así que no hace falta un camino paralelo de "quote
+sin proyecto" como sugiere el master prompt para estudios más grandes).
+
+### `quotes`
+| columna | tipo | notas |
+|---|---|---|
+| id, organization_id, project_id | uuid | |
+| status | text | `draft` \| `sent` \| `negotiation` \| `accepted` \| `rejected` \| `expired` |
+| issue_date | date | default `current_date` |
+| valid_until | date | nullable |
+| discount, tax_rate | numeric | default `0`; `subtotal`/`total` se calculan en el cliente desde `quote_items` (`quoteTotal()` en `lib/supabase/types.ts`), no se guardan duplicados |
+| notes | text | nullable |
+| created_at, updated_at | timestamptz | |
+
+### `quote_items`
+| columna | tipo | notas |
+|---|---|---|
+| id, quote_id (FK → quotes, cascade) | uuid | |
+| description | text | |
+| quantity, unit_price | numeric | default `1` / `0` |
+| position | integer | orden de despliegue |
+
+### `contracts`
+| columna | tipo | notas |
+|---|---|---|
+| id, organization_id, project_id | uuid | |
+| quote_id | uuid, FK → quotes, nullable, `on delete set null` | referencia informativa, no obliga a tener cotización previa |
+| value | numeric | |
+| start_date, end_date | date | nullable |
+| payment_terms | text | nullable |
+| status | text | `draft` \| `active` \| `completed` \| `cancelled` |
+| signed_at | timestamptz | nullable — se marca manualmente al pasar a `active`; sin firma digital (diferido, sección 21 del master prompt) |
+| notes | text | nullable |
+
+### `payments`
+| columna | tipo | notas |
+|---|---|---|
+| id, organization_id, project_id | uuid | |
+| amount | numeric | |
+| currency | text | default `USD` |
+| status | text | `pendiente` \| `pagada` \| `vencida` — manual, no se recalcula solo por pasar `due_date` (ver `ROADMAP.md` Fase 4, "no incluido") |
+| due_date, paid_date | date | nullable |
+| method, reference, notes | text | nullable |
+
+### `expenses`
+| columna | tipo | notas |
+|---|---|---|
+| id, organization_id, project_id | uuid | |
+| category | text | `materiales` \| `mano_obra` \| `permisos` \| `subcontrato` \| `otro` |
+| amount | numeric | |
+| date | date | default `current_date` |
+| description, supplier | text | nullable |
+
+### Alcance de portal en estas tablas
+Adicional (no reemplaza) a la RLS org-scoped:
+- `quotes`: SELECT solo si `status` ya no es `draft` (o sea
+  `sent`/`negotiation`/`accepted`/`rejected`/`expired`); UPDATE solo si
+  `status` está en `sent`/`negotiation` (para que el cliente pueda
+  aceptar/rechazar — `respondToQuote()` en `app/(portal)/portal/actions.ts`).
+- `quote_items`: SELECT vía el `quote_id` visible.
+- `payments`: SELECT únicamente — los pagos los crea y edita solo el
+  estudio, el portal es de solo lectura.
+- `contracts` y `expenses`: **sin** policy de portal — el cliente nunca
+  ve el valor del contrato ni los gastos internos del estudio.
+
 ## 2. RLS (todas las tablas de arriba)
 
 Policy única por tabla: el usuario debe estar autenticado y pertenecer
@@ -239,7 +308,7 @@ sin nada que lo use es UI/permiso falso):
 |---|---|
 | `super_admin` | Fase 8 (SaaS multi-organización real) |
 | `project_director`, `designer` | Diferido — ver `ROADMAP.md` Fase 2: con 2 usuarios y ambos `org_admin`, agregar el rol sin ningún permiso que lo distinga sería UI falsa. Se activa cuando haya un tercer usuario con acceso más limitado que justifique la distinción |
-| `accounting` | Fase 4 (Finanzas) |
+| `accounting` | Diferido, igual criterio que `project_director`/`designer` — Fase 4 construyó las tablas/UI de Finanzas pero con 2 usuarios `org_admin` no hay todavía una distinción de permisos real que lo justifique |
 | `client` | Ya resuelto sin este rol — ver §1c: `portal_access` aisla el acceso de cliente sin tocar `organization_members` |
 
 ## 4. Tablas futuras (inventario, sin columnas definitivas)
@@ -255,8 +324,7 @@ detalle cuando se implemente cada fase (`ROADMAP.md`):
   `approved_by` (§1c) en vez de una tabla nueva.
 - **Fase 3 — `portal_messages` como tabla propia**: tampoco hizo falta —
   se resolvió reutilizando `activity_log` con `visible_to_client=true`.
-- **Fase 4 — Comercial/Finanzas**: `quotes`, `quote_items`, `contracts`,
-  `payments`, `expenses`.
+- **Fase 4 — Comercial/Finanzas**: implementado — ver §1d.
 - **Fase 5 — Website Intelligence**: no son tablas de negocio — son datos
   de GA4/Search Console consultados vía API, cacheados si hace falta.
   `leads` sí gana entonces las columnas `utm_source`, `utm_medium`,
@@ -273,6 +341,11 @@ detalle cuando se implemente cada fase (`ROADMAP.md`):
 - `leads (organization_id, created_at desc)` — orden por defecto.
 - `clients (organization_id)`.
 - `activity_log (entity_type, entity_id)`.
+- `quotes (project_id)`, `quote_items (quote_id)`.
+- `contracts (project_id)`.
+- `payments (project_id)`, `payments (organization_id, status)` — para
+  `/dashboard/finance`.
+- `expenses (project_id)`.
 - `projects (organization_id, status)`, `projects (client_id)`.
 - `phases (project_id, position)`.
 - `tasks (project_id)`, `tasks (phase_id)`, `tasks (organization_id, due_date)` —

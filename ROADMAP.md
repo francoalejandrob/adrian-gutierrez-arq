@@ -73,13 +73,43 @@ todavía — Fase 4 los crea, ahí se agrega esa vista), `tasks` no se expone
 al portal (son datos internos), notificaciones de "nuevo mensaje/documento"
 al estudio o al cliente (Fase 6).
 
-## Fase 4 — Finanzas ⬜
+## Fase 4 — Finanzas ✅
 
-Cotizaciones (con PDF), contratos, pagos, gastos, reportes financieros
-(contratado / cobrado / pendiente / gastos / margen). Rol `accounting`.
-Sin firma digital compleja en esta fase (el master prompt lo pide
-explícitamente para después). Sin pasarela de pago real todavía — es
-registro y seguimiento, no cobro automatizado.
+- [x] `quotes` + `quote_items`, `contracts`, `payments`, `expenses`
+      (migración `0006_finance.sql`), RLS igual que las fases anteriores
+- [x] `/dashboard/projects/[id]`: secciones Cotizaciones, Contratos,
+      Pagos, Gastos (mismo patrón de Server Action + `StatusSelect`) y
+      cuadro "Resumen financiero" (contratado/cobrado/pendiente/gastos/
+      margen)
+- [x] `/dashboard/quotes/[id]`: edición de ítems, descuento/impuesto/
+      notas, cambio de estado
+- [x] `/dashboard/quotes/[id]/print`: vista imprimible (sin sidebar, vía
+      `print:hidden`/`print:block` — Ctrl+P del navegador en vez de sumar
+      una librería de PDF, mismo criterio que el Gantt propio de Fase 2)
+- [x] `/dashboard/finance` (nav "Finanzas"): totales globales + tabla de
+      pagos pendientes/vencidos entre todos los proyectos
+- [x] Portal (`/portal/projects/[id]`): sección "Cotización" (si hay una
+      `sent`/`negotiation` — detalle + Aceptar/Rechazar) y "Pagos" de
+      solo lectura
+- [x] Automatización real: al marcar una cotización `accepted` desde el
+      dashboard, si el proyecto no tiene fases todavía se crean 5 fases
+      plantilla (Conceptualización/Diseño/Documentación/Construcción/
+      Entrega) y el proyecto pasa de `planning` a `design`
+
+**No incluido en Fase 4** (igual que Fase 2-3, deliberado):
+- PDF real (librería de generación) — la vista imprimible del navegador
+  cubre el mismo caso de uso a este tamaño de estudio.
+- Firma digital de contratos — el master prompt lo pide explícitamente
+  para después; `contracts.signed_at` existe pero se marca manualmente al
+  pasar el contrato a `active`.
+- Pasarela de pago real (Stripe u otra) — es registro y seguimiento de
+  pagos, no cobro automatizado.
+- Rol `accounting` — con 2 usuarios y ambos `org_admin`, todavía no hay
+  una diferencia de permisos real que lo justifique (mismo criterio que
+  el rol `designer` descartado en Fase 2).
+- Marcado automático de pagos como `vencida` cuando pasa `due_date` — el
+  estado es manual por ahora; `/dashboard/finance` sí resalta en rojo los
+  pagos con `due_date` pasada aunque su estado siga en `pendiente`.
 
 ## Fase 5 — Website Intelligence ⬜
 

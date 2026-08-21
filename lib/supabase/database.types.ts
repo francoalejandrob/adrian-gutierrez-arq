@@ -138,6 +138,73 @@ export type Database = {
           },
         ]
       }
+      contracts: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          payment_terms: string | null
+          project_id: string
+          quote_id: string | null
+          signed_at: string | null
+          start_date: string | null
+          status: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          payment_terms?: string | null
+          project_id: string
+          quote_id?: string | null
+          signed_at?: string | null
+          start_date?: string | null
+          status?: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          payment_terms?: string | null
+          project_id?: string
+          quote_id?: string | null
+          signed_at?: string | null
+          start_date?: string | null
+          status?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_versions: {
         Row: {
           approved_at: string | null
@@ -243,6 +310,57 @@ export type Database = {
           },
           {
             foreignKeyName: "documents_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          organization_id: string
+          project_id: string
+          supplier: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          organization_id: string
+          project_id: string
+          supplier?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          organization_id?: string
+          project_id?: string
+          supplier?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -372,6 +490,66 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          due_date: string | null
+          id: string
+          method: string | null
+          notes: string | null
+          organization_id: string
+          paid_date: string | null
+          project_id: string
+          reference: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          method?: string | null
+          notes?: string | null
+          organization_id: string
+          paid_date?: string | null
+          project_id: string
+          reference?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          method?: string | null
+          notes?: string | null
+          organization_id?: string
+          paid_date?: string | null
+          project_id?: string
+          reference?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       phases: {
         Row: {
@@ -578,6 +756,98 @@ export type Database = {
             columns: ["project_manager"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_items: {
+        Row: {
+          description: string
+          id: string
+          position: number
+          quantity: number
+          quote_id: string
+          unit_price: number
+        }
+        Insert: {
+          description: string
+          id?: string
+          position?: number
+          quantity?: number
+          quote_id: string
+          unit_price?: number
+        }
+        Update: {
+          description?: string
+          id?: string
+          position?: number
+          quantity?: number
+          quote_id?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_items_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          created_at: string
+          discount: number
+          id: string
+          issue_date: string
+          notes: string | null
+          organization_id: string
+          project_id: string
+          status: string
+          tax_rate: number
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          discount?: number
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          organization_id: string
+          project_id: string
+          status?: string
+          tax_rate?: number
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          discount?: number
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          organization_id?: string
+          project_id?: string
+          status?: string
+          tax_rate?: number
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]

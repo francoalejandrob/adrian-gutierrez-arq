@@ -31,6 +31,77 @@ export type DocVersionStatus = DocVersion["status"];
 
 export type PortalAccess = Database["public"]["Tables"]["portal_access"]["Row"];
 
+export type Quote = Database["public"]["Tables"]["quotes"]["Row"];
+export type QuoteStatus = Quote["status"];
+export type QuoteItem = Database["public"]["Tables"]["quote_items"]["Row"];
+
+export type Contract = Database["public"]["Tables"]["contracts"]["Row"];
+export type ContractStatus = Contract["status"];
+
+export type Payment = Database["public"]["Tables"]["payments"]["Row"];
+export type PaymentStatus = Payment["status"];
+
+export type Expense = Database["public"]["Tables"]["expenses"]["Row"];
+export type ExpenseCategory = Expense["category"];
+
+export const QUOTE_STATUSES: QuoteStatus[] = [
+  "draft",
+  "sent",
+  "negotiation",
+  "accepted",
+  "rejected",
+  "expired",
+];
+
+export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
+  draft: "Borrador",
+  sent: "Enviada",
+  negotiation: "En negociación",
+  accepted: "Aceptada",
+  rejected: "Rechazada",
+  expired: "Expirada",
+};
+
+export const CONTRACT_STATUSES: ContractStatus[] = ["draft", "active", "completed", "cancelled"];
+
+export const CONTRACT_STATUS_LABELS: Record<ContractStatus, string> = {
+  draft: "Borrador",
+  active: "Activo",
+  completed: "Completado",
+  cancelled: "Cancelado",
+};
+
+export const PAYMENT_STATUSES: PaymentStatus[] = ["pendiente", "pagada", "vencida"];
+
+export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+  pendiente: "Pendiente",
+  pagada: "Pagada",
+  vencida: "Vencida",
+};
+
+export const EXPENSE_CATEGORIES: ExpenseCategory[] = [
+  "materiales",
+  "mano_obra",
+  "permisos",
+  "subcontrato",
+  "otro",
+];
+
+export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
+  materiales: "Materiales",
+  mano_obra: "Mano de obra",
+  permisos: "Permisos",
+  subcontrato: "Subcontrato",
+  otro: "Otro",
+};
+
+export function quoteTotal(items: Pick<QuoteItem, "quantity" | "unit_price">[], discount: number, taxRate: number) {
+  const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unit_price, 0);
+  const afterDiscount = subtotal - discount;
+  const tax = afterDiscount * (taxRate / 100);
+  return { subtotal, tax, total: afterDiscount + tax };
+}
+
 export const PROJECT_STATUSES: ProjectStatus[] = [
   "planning",
   "design",

@@ -185,6 +185,19 @@ terceros — decisión explicada en el plan de Fase 2 (sin dependencia nueva
 que mantener, estilo 100% acorde al resto del panel; el costo es que no
 hay drag-to-resize todavía).
 
+## 6c. Fase 4 — Vista imprimible sin librería de PDF
+
+`/dashboard/quotes/[id]/print` necesita verse sin el sidebar/topbar del
+dashboard, pero vive bajo `(dashboard)/dashboard/quotes/[id]/print/`, así
+que hereda `dashboard/layout.tsx` igual que cualquier otra ruta (los
+layouts no se pueden "saltar" con un route group anidado como se hizo con
+`/portal/login` en Fase 3 — ahí el problema era otro layout intermedio,
+no el mismo). La solución fue CSS, no reestructurar rutas:
+`dashboard/layout.tsx` envuelve el sidebar en `print:hidden` y el `main`
+en `print:p-0`; el navegador genera el PDF (Ctrl+P) mostrando solo el
+contenido de la página. Mismo criterio que el Gantt propio de Fase 2: sin
+dependencia nueva que mantener.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

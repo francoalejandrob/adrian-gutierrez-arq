@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import GanttChart from "@/components/dashboard/gantt-chart";
 import ProjectForm from "@/components/dashboard/project-form";
@@ -5,14 +6,22 @@ import StatusSelect from "@/components/dashboard/status-select";
 import DownloadButton from "@/components/dashboard/download-button";
 import { createClient } from "@/lib/supabase/server";
 import {
+  CONTRACT_STATUS_LABELS,
+  CONTRACT_STATUSES,
   DOC_CATEGORIES,
   DOC_CATEGORY_LABELS,
+  EXPENSE_CATEGORIES,
+  EXPENSE_CATEGORY_LABELS,
+  PAYMENT_STATUS_LABELS,
+  PAYMENT_STATUSES,
   PHASE_STATUS_LABELS,
   PHASE_STATUSES,
   PROJECT_STATUS_LABELS,
   PROJECT_STATUSES,
+  QUOTE_STATUS_LABELS,
   TASK_STATUS_LABELS,
   TASK_STATUSES,
+  quoteTotal,
   type Task,
 } from "@/lib/supabase/types";
 import { addProjectNote, updateProject, updateProjectStatus } from "../actions";
@@ -27,6 +36,17 @@ import {
   updateTaskStatus,
   uploadDocumentVersion,
 } from "./actions";
+import {
+  createContract,
+  createExpense,
+  createPayment,
+  createQuote,
+  deleteExpense,
+  updateContractStatus,
+  updatePaymentStatus,
+} from "./finance-actions";
+
+const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD" });
 
 export default async function ProjectDetailPage(
   props: PageProps<"/dashboard/projects/[id]">,
@@ -34,8 +54,18 @@ export default async function ProjectDetailPage(
   const { id } = await props.params;
   const supabase = await createClient();
 
-  const [{ data: project }, { data: clients }, { data: phases }, { data: tasks }, { data: documents }, { data: activity }] =
-    await Promise.all([
+  const [
+    { data: project },
+    { data: clients },
+    { data: phases },
+    { data: tasks },
+    { data: documents },
+    { data: activity },
+    { data: quotes },
+    { data: contracts },
+    { data: payments },
+    { data: expenses },
+  ] = await Promise.all([
       supabase.from("projects").select("*, clients(id, name, email)").eq("id", id).maybeSingle(),
       supabase.from("clients").select("id, name").order("name"),
       supabase.from("phases").select("*").eq("project_id", id).order("position"),
@@ -51,9 +81,27 @@ export default async function ProjectDetailPage(
         .eq("entity_type", "project")
         .eq("entity_id", id)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("quotes")
+        .select("*, quote_items(*)")
+        .eq("project_id", id)
+        .order("created_at", { ascending: false }),
+      supabase.from("contracts").select("*").eq("project_id", id).order("created_at", { ascending: false }),
+      supabase.from("payments").select("*").eq("project_id", id).order("due_date"),
+      supabase.from("expenses").select("*").eq("project_id", id).order("date", { ascending: false }),
     ]);
 
   if (!project) notFound();
+
+  const contracted = (contracts ?? []).reduce((sum, c) => sum + c.value, 0);
+  const collected = (payments ?? [])
+    .filter((p) => p.status === "pagada")
+    .reduce((sum, p) => sum + p.amount, 0);
+  const pending = (payments ?? [])
+    .filter((p) => p.status === "pendiente" || p.status === "vencida")
+    .reduce((sum, p) => sum + p.amount, 0);
+  const spent = (expenses ?? []).reduce((sum, e) => sum + e.amount, 0);
+  const margin = collected - spent;
 
   const { data: portalAccess } = await supabase
     .from("portal_access")
@@ -68,6 +116,10 @@ export default async function ProjectDetailPage(
   const boundCreateTask = createTask.bind(null, id);
   const boundUpload = uploadDocumentVersion.bind(null, id);
   const boundInvitePortal = invitePortalAccess.bind(null, id, project.client_id);
+  const boundCreateQuote = createQuote.bind(null, id);
+  const boundCreateContract = createContract.bind(null, id);
+  const boundCreatePayment = createPayment.bind(null, id);
+  const boundCreateExpense = createExpense.bind(null, id);
 
   const tasksByPhase = new Map<string | null, Task[]>();
   for (const task of tasks ?? []) {
@@ -94,9 +146,259 @@ export default async function ProjectDetailPage(
         />
       </div>
 
+      {/* Resumen financiero */}
+      <Section title="Resumen financiero">
+        <div className="grid grid-cols-5 gap-4 text-center">
+          <SummaryStat label="Contratado" value={currency.format(contracted)} />
+          <SummaryStat label="Cobrado" value={currency.format(collected)} />
+          <SummaryStat label="Pendiente" value={currency.format(pending)} />
+          <SummaryStat label="Gastos" value={currency.format(spent)} />
+          <SummaryStat label="Margen" value={currency.format(margin)} />
+        </div>
+      </Section>
+
       {/* Cronograma */}
       <Section title="Cronograma">
         <GanttChart phases={phases ?? []} />
+      </Section>
+
+      {/* Cotizaciones */}
+      <Section title="Cotizaciones">
+        <div className="flex flex-col gap-3">
+          {(quotes ?? []).map((quote) => {
+            const { total } = quoteTotal(quote.quote_items, quote.discount, quote.tax_rate);
+            return (
+              <Link
+                key={quote.id}
+                href={`/dashboard/quotes/${quote.id}`}
+                className="flex items-center justify-between border-b border-carbon/5 pb-3 text-sm last:border-0 hover:text-naranja"
+              >
+                <span>
+                  Cotización del{" "}
+                  {new Date(quote.issue_date).toLocaleDateString("es-EC")} —{" "}
+                  {QUOTE_STATUS_LABELS[quote.status]}
+                </span>
+                <span className="font-medium">{currency.format(total)}</span>
+              </Link>
+            );
+          })}
+          {(quotes ?? []).length === 0 && (
+            <p className="text-sm text-carbon/40">Sin cotizaciones todavía.</p>
+          )}
+        </div>
+        <form action={boundCreateQuote} className="mt-4">
+          <button
+            type="submit"
+            className="cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
+          >
+            Nueva cotización
+          </button>
+        </form>
+      </Section>
+
+      {/* Contratos */}
+      <Section title="Contratos">
+        <div className="flex flex-col gap-3">
+          {(contracts ?? []).map((contract) => (
+            <div
+              key={contract.id}
+              className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0"
+            >
+              <div>
+                <p className="text-sm font-medium text-carbon">{currency.format(contract.value)}</p>
+                <p className="text-xs text-carbon/50">
+                  {contract.start_date ?? "sin fecha"} → {contract.end_date ?? "sin fecha"}
+                  {contract.payment_terms ? ` — ${contract.payment_terms}` : ""}
+                </p>
+              </div>
+              <StatusSelect
+                action={updateContractStatus.bind(null, id, contract.id)}
+                defaultValue={contract.status}
+                options={CONTRACT_STATUSES.map((status) => ({
+                  value: status,
+                  label: CONTRACT_STATUS_LABELS[status],
+                }))}
+              />
+            </div>
+          ))}
+          {(contracts ?? []).length === 0 && (
+            <p className="text-sm text-carbon/40">Sin contratos todavía.</p>
+          )}
+        </div>
+        <form action={boundCreateContract} className="mt-4 grid grid-cols-4 gap-2">
+          <input
+            name="value"
+            type="number"
+            step="0.01"
+            placeholder="Valor"
+            required
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <input
+            name="start_date"
+            type="date"
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <input
+            name="end_date"
+            type="date"
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <input
+            name="payment_terms"
+            placeholder="Condiciones de pago"
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <button
+            type="submit"
+            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
+          >
+            Agregar contrato
+          </button>
+        </form>
+      </Section>
+
+      {/* Pagos */}
+      <Section title="Pagos">
+        <div className="flex flex-col gap-3">
+          {(payments ?? []).map((payment) => (
+            <div
+              key={payment.id}
+              className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0"
+            >
+              <div>
+                <p className="text-sm font-medium text-carbon">{currency.format(payment.amount)}</p>
+                <p className="text-xs text-carbon/50">
+                  Vence {payment.due_date ?? "sin fecha"}
+                  {payment.method ? ` — ${payment.method}` : ""}
+                  {payment.reference ? ` — ${payment.reference}` : ""}
+                </p>
+              </div>
+              <StatusSelect
+                action={updatePaymentStatus.bind(null, id, payment.id)}
+                defaultValue={payment.status}
+                options={PAYMENT_STATUSES.map((status) => ({
+                  value: status,
+                  label: PAYMENT_STATUS_LABELS[status],
+                }))}
+              />
+            </div>
+          ))}
+          {(payments ?? []).length === 0 && (
+            <p className="text-sm text-carbon/40">Sin pagos todavía.</p>
+          )}
+        </div>
+        <form action={boundCreatePayment} className="mt-4 grid grid-cols-4 gap-2">
+          <input
+            name="amount"
+            type="number"
+            step="0.01"
+            placeholder="Monto"
+            required
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <input
+            name="due_date"
+            type="date"
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <input
+            name="method"
+            placeholder="Método"
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <input
+            name="reference"
+            placeholder="Referencia"
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <button
+            type="submit"
+            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
+          >
+            Agregar pago
+          </button>
+        </form>
+      </Section>
+
+      {/* Gastos */}
+      <Section title="Gastos">
+        <div className="flex flex-col gap-3">
+          {(expenses ?? []).map((expense) => (
+            <div
+              key={expense.id}
+              className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0"
+            >
+              <div>
+                <p className="text-sm font-medium text-carbon">
+                  {currency.format(expense.amount)}{" "}
+                  <span className="text-xs font-normal text-carbon/40">
+                    ({EXPENSE_CATEGORY_LABELS[expense.category]})
+                  </span>
+                </p>
+                <p className="text-xs text-carbon/50">
+                  {expense.date}
+                  {expense.supplier ? ` — ${expense.supplier}` : ""}
+                  {expense.description ? ` — ${expense.description}` : ""}
+                </p>
+              </div>
+              <form action={deleteExpense.bind(null, id, expense.id)}>
+                <button
+                  type="submit"
+                  className="cursor-pointer text-xs text-carbon/40 hover:text-red-600"
+                >
+                  Eliminar
+                </button>
+              </form>
+            </div>
+          ))}
+          {(expenses ?? []).length === 0 && (
+            <p className="text-sm text-carbon/40">Sin gastos todavía.</p>
+          )}
+        </div>
+        <form action={boundCreateExpense} className="mt-4 grid grid-cols-4 gap-2">
+          <input
+            name="amount"
+            type="number"
+            step="0.01"
+            placeholder="Monto"
+            required
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <select
+            name="category"
+            className="cursor-pointer border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          >
+            {EXPENSE_CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {EXPENSE_CATEGORY_LABELS[category]}
+              </option>
+            ))}
+          </select>
+          <input
+            name="date"
+            type="date"
+            required
+            defaultValue={new Date().toISOString().slice(0, 10)}
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <input
+            name="supplier"
+            placeholder="Proveedor"
+            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <input
+            name="description"
+            placeholder="Descripción"
+            className="col-span-4 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <button
+            type="submit"
+            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
+          >
+            Agregar gasto
+          </button>
+        </form>
       </Section>
 
       {/* Fases */}
@@ -372,6 +674,15 @@ export default async function ProjectDetailPage(
           )}
         </ul>
       </Section>
+    </div>
+  );
+}
+
+function SummaryStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs uppercase tracking-wide text-carbon/40">{label}</p>
+      <p className="mt-1 font-display text-lg text-carbon">{value}</p>
     </div>
   );
 }
