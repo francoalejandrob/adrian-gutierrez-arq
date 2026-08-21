@@ -30,8 +30,9 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
+    const isPortal = request.nextUrl.pathname.startsWith("/portal");
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = isPortal ? "/portal/login" : "/login";
     url.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }
@@ -40,5 +41,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/portal/:path*"],
 };

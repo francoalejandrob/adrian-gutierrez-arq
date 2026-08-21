@@ -153,6 +153,52 @@ bucket como público; toda descarga pasa por
 válida 60 segundos), generada bajo demanda en el momento de la descarga,
 no guardada ni reutilizada.
 
+## 1c. Tablas de Fase 3 — Client Portal
+
+Migración `0005_client_portal.sql`.
+
+### `portal_access`
+Quién (por email) puede ver qué cliente en `/portal`. Deliberadamente
+separada de `organization_members` — un acceso de portal nunca debe poder
+convertirse por accidente en acceso interno.
+| columna | tipo | notas |
+|---|---|---|
+| id, client_id (FK → clients) | uuid | |
+| email | text | el email con el que el cliente hace login |
+| invited_by | uuid, FK → profiles | quién lo invitó |
+| created_at | timestamptz | |
+| — | | `UNIQUE (client_id, email)` |
+
+Solo miembros de la organización pueden leer/escribir `portal_access` —
+el cliente nunca la ve ni la edita.
+
+### Columnas nuevas en tablas existentes
+- `documents.visibility`: `internal` (default) \| `client`. Solo lo
+  `client` es visible en el portal.
+- `activity_log.visible_to_client`: boolean, default `false`. Las notas
+  internas nunca llegan al portal; los mensajes que el cliente escribe se
+  insertan siempre con `true`.
+- `document_versions.approved_at` / `approved_by` (FK → profiles):
+  quién y cuándo respondió (aprobó o pidió cambios) — puede ser un
+  usuario interno o un usuario de portal, por eso apunta a `profiles` en
+  vez de a `organization_members`.
+
+### Helper `my_portal_client_ids()`
+Mismo patrón que `my_organization_ids()`: los `client_id` de
+`portal_access` cuyo email coincide (case-insensitive) con el email del
+usuario autenticado (`profiles.email` de `auth.uid()`).
+
+### Alcance de lo que un usuario de portal puede ver/hacer
+SELECT en `projects`/`phases` de su(s) cliente(s); SELECT en `documents`
+solo `visibility='client'`; SELECT/UPDATE en `document_versions` solo de
+esos documentos (el UPDATE está pensado para que la Server Action toque
+únicamente `status`/`comment`/`approved_at`/`approved_by` — no hay RLS de
+columna, es una restricción de la capa de aplicación); SELECT/INSERT en
+`activity_log` solo `visible_to_client=true` de su proyecto. **Nunca**
+`clients`, `leads`, `tasks`, ni las tablas de otra organización u otro
+cliente — verificado con una sesión real de prueba (ver el pase de Fase
+3), no solo revisando el SQL.
+
 ## 2. RLS (todas las tablas de arriba)
 
 Policy única por tabla: el usuario debe estar autenticado y pertenecer
@@ -194,7 +240,7 @@ sin nada que lo use es UI/permiso falso):
 | `super_admin` | Fase 8 (SaaS multi-organización real) |
 | `project_director`, `designer` | Diferido — ver `ROADMAP.md` Fase 2: con 2 usuarios y ambos `org_admin`, agregar el rol sin ningún permiso que lo distinga sería UI falsa. Se activa cuando haya un tercer usuario con acceso más limitado que justifique la distinción |
 | `accounting` | Fase 4 (Finanzas) |
-| `client` | Fase 3 (Client Portal) — probablemente ni siquiera vive en `organization_members`, sino en una tabla de acceso de portal separada, por aislarlo de los roles internos |
+| `client` | Ya resuelto sin este rol — ver §1c: `portal_access` aisla el acceso de cliente sin tocar `organization_members` |
 
 ## 4. Tablas futuras (inventario, sin columnas definitivas)
 
@@ -204,13 +250,11 @@ detalle cuando se implemente cada fase (`ROADMAP.md`):
 - **Fase 2 — task_dependencies**: no se implementó junto con el resto de
   Fase 2 (el Gantt de este pase es de fechas, no de ruta crítica) — se
   agrega si/cuando se pide un Gantt con dependencias reales.
-- **Fase 2 — `approvals`**: el master prompt (sección 19) pide un flujo
-  de aprobación cliente↔documento; no se construyó en este pase porque
-  depende del Client Portal (Fase 3) para que el cliente tenga dónde
-  aprobar — se diseña junto con esa fase.
-- **Fase 3 — Client Portal**: `portal_access` (o reutilizar
-  `organization_members` con rol `client` + `client_id` — se decide al
-  diseñar la fase), `portal_messages`.
+- **Fase 3 — `approvals` como tabla propia**: no hizo falta — se resolvió
+  reutilizando `document_versions.status`/`comment`/`approved_at`/
+  `approved_by` (§1c) en vez de una tabla nueva.
+- **Fase 3 — `portal_messages` como tabla propia**: tampoco hizo falta —
+  se resolvió reutilizando `activity_log` con `visible_to_client=true`.
 - **Fase 4 — Comercial/Finanzas**: `quotes`, `quote_items`, `contracts`,
   `payments`, `expenses`.
 - **Fase 5 — Website Intelligence**: no son tablas de negocio — son datos

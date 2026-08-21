@@ -21,6 +21,8 @@ import {
   createTask,
   deletePhase,
   deleteTask,
+  invitePortalAccess,
+  revokePortalAccess,
   updatePhaseStatus,
   updateTaskStatus,
   uploadDocumentVersion,
@@ -34,7 +36,7 @@ export default async function ProjectDetailPage(
 
   const [{ data: project }, { data: clients }, { data: phases }, { data: tasks }, { data: documents }, { data: activity }] =
     await Promise.all([
-      supabase.from("projects").select("*, clients(id, name)").eq("id", id).maybeSingle(),
+      supabase.from("projects").select("*, clients(id, name, email)").eq("id", id).maybeSingle(),
       supabase.from("clients").select("id, name").order("name"),
       supabase.from("phases").select("*").eq("project_id", id).order("position"),
       supabase.from("tasks").select("*").eq("project_id", id).order("created_at"),
@@ -53,12 +55,19 @@ export default async function ProjectDetailPage(
 
   if (!project) notFound();
 
+  const { data: portalAccess } = await supabase
+    .from("portal_access")
+    .select("*")
+    .eq("client_id", project.client_id)
+    .order("created_at");
+
   const boundUpdateStatus = updateProjectStatus.bind(null, id);
   const boundUpdate = updateProject.bind(null, id);
   const boundAddNote = addProjectNote.bind(null, id);
   const boundCreatePhase = createPhase.bind(null, id);
   const boundCreateTask = createTask.bind(null, id);
   const boundUpload = uploadDocumentVersion.bind(null, id);
+  const boundInvitePortal = invitePortalAccess.bind(null, id, project.client_id);
 
   const tasksByPhase = new Map<string | null, Task[]>();
   for (const task of tasks ?? []) {
@@ -212,6 +221,11 @@ export default async function ProjectDetailPage(
                   <span className="text-xs font-normal text-carbon/40">
                     ({DOC_CATEGORY_LABELS[doc.category]})
                   </span>
+                  {doc.visibility === "client" && (
+                    <span className="ml-2 border border-naranja/40 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-naranja">
+                      Visible para el cliente
+                    </span>
+                  )}
                 </p>
               </div>
               <ul className="mt-1 flex flex-col gap-1">
@@ -271,11 +285,55 @@ export default async function ProjectDetailPage(
             ))}
           </select>
           <input type="file" name="file" required className="text-sm" />
+          <label className="col-span-4 flex items-center gap-2 text-xs text-carbon/70">
+            <input type="checkbox" name="visible_to_client" value="1" />
+            Visible para el cliente en su portal
+          </label>
           <button
             type="submit"
             className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
           >
             Subir documento nuevo
+          </button>
+        </form>
+      </Section>
+
+      {/* Acceso al portal del cliente */}
+      <Section title="Acceso del cliente al portal">
+        <div className="flex flex-col gap-2">
+          {(portalAccess ?? []).map((access) => (
+            <div key={access.id} className="flex items-center justify-between text-sm">
+              <span className="text-carbon/80">{access.email}</span>
+              <form action={revokePortalAccess.bind(null, id, access.id)}>
+                <button
+                  type="submit"
+                  className="cursor-pointer text-xs text-carbon/40 hover:text-red-600"
+                >
+                  Quitar acceso
+                </button>
+              </form>
+            </div>
+          ))}
+          {(portalAccess ?? []).length === 0 && (
+            <p className="text-sm text-carbon/40">
+              El cliente todavía no tiene acceso al portal.
+            </p>
+          )}
+        </div>
+        <form action={boundInvitePortal} className="mt-4 flex gap-2">
+          <input
+            name="email"
+            type="email"
+            required
+            defaultValue={project.clients?.email ?? ""}
+            placeholder="email@cliente.com"
+            className="flex-1 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          />
+          <button
+            type="submit"
+            className="cursor-pointer border border-carbon px-4 py-2 text-sm text-carbon transition-colors hover:bg-carbon hover:text-white"
+          >
+            Invitar
           </button>
         </form>
       </Section>

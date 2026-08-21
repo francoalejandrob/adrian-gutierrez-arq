@@ -145,6 +145,32 @@ components/dashboard/   ← componentes propios del panel (sidebar, tablas,
                            components/ del sitio público
 ```
 
+## 6a. Fase 3 — Client Portal como tercer route group
+
+```
+app/(portal)/
+  portal/
+    login/page.tsx            → "/portal/login" (sin layout compartido)
+    (authenticated)/           ← route group anidado: mismas URLs, layout propio
+      layout.tsx                header + cerrar sesión
+      page.tsx                  → "/portal"
+      projects/[id]/page.tsx    → "/portal/projects/[id]"
+```
+
+El anidamiento `portal/(authenticated)/` existe porque `/portal/login` **no**
+debe llevar el header de "sesión iniciada" — un `layout.tsx` en
+`portal/` envolvería también al login (los layouts siguen la jerarquía de
+carpetas, no se puede "saltar" una subcarpeta salvo con otro route group
+adentro). `proxy.ts` protege `/portal/:path*` igual que `/dashboard/:path*`,
+pero redirige a `/portal/login` en vez de `/login` cuando detecta esa
+ruta.
+
+Los clientes de portal **no** son `organization_members` — su acceso vive
+en `portal_access` (email ↔ cliente) y RLS los reconoce con
+`my_portal_client_ids()`, una policy *adicional* (no en reemplazo) sobre
+`projects`/`phases`/`documents`/`document_versions`/`activity_log`. Ver
+`DATABASE.md` §1c.
+
 ## 6b. Fase 2 — Storage y Gantt
 
 Se agregó `lib/supabase/server.ts`'s mismo cliente para hablar con

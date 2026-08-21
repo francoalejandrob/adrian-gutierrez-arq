@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 
 type Status = "idle" | "loading" | "sent" | "error";
 
-export default function LoginForm() {
+export default function LoginForm({ next = "/dashboard" }: { next?: string }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
 
@@ -20,7 +20,7 @@ export default function LoginForm() {
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email: String(email),
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     });
 

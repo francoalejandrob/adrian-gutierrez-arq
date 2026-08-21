@@ -52,11 +52,26 @@ por completitud):
   justifique el rol (sería UI que promete algo que no hace nada).
 - Reordenar fases arrastrando (hoy: posición fija al crear).
 
-## Fase 3 — Client Portal ⬜
+## Fase 3 — Client Portal ✅
 
-`/portal`, acceso de cliente restringido a sus propios proyectos,
-aprobaciones de documentos/diseños, vista de pagos (de solo lectura, la
-Fase 4 es la que crea los pagos).
+- [x] `portal_access` (allowlist por email↔cliente, separado de
+      `organization_members`), helper `my_portal_client_ids()`
+- [x] `documents.visibility` (`internal`/`client`) y
+      `activity_log.visible_to_client`, para que el portal nunca muestre
+      lo que el estudio no marcó como compartible
+- [x] `/portal/login` (magic link, sin allowlist fija — cualquier email en
+      `portal_access` entra), `proxy.ts` extendido a `/portal/:path*`
+- [x] `/portal` (lista o redirect directo si hay un solo proyecto),
+      `/portal/projects/[id]` (progreso, fases de solo lectura,
+      documentos visibles con Aprobar/Solicitar cambios, mensajes)
+- [x] `document_versions.approved_at`/`approved_by`
+- [x] Desde `/dashboard/projects/[id]`: invitar/quitar acceso de portal, y
+      checkbox "visible para el cliente" al subir un documento
+
+**No incluido en Fase 3**: vista de pagos en el portal (no hay pagos
+todavía — Fase 4 los crea, ahí se agrega esa vista), `tasks` no se expone
+al portal (son datos internos), notificaciones de "nuevo mensaje/documento"
+al estudio o al cliente (Fase 6).
 
 ## Fase 4 — Finanzas ⬜
 

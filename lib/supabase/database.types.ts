@@ -48,6 +48,7 @@ export type Database = {
           entity_type: string
           id: string
           organization_id: string
+          visible_to_client: boolean
         }
         Insert: {
           body: string
@@ -57,6 +58,7 @@ export type Database = {
           entity_type: string
           id?: string
           organization_id: string
+          visible_to_client?: boolean
         }
         Update: {
           body?: string
@@ -66,6 +68,7 @@ export type Database = {
           entity_type?: string
           id?: string
           organization_id?: string
+          visible_to_client?: boolean
         }
         Relationships: [
           {
@@ -137,6 +140,8 @@ export type Database = {
       }
       document_versions: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           comment: string | null
           created_at: string
           document_id: string
@@ -149,6 +154,8 @@ export type Database = {
           version: number
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           comment?: string | null
           created_at?: string
           document_id: string
@@ -161,6 +168,8 @@ export type Database = {
           version: number
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           comment?: string | null
           created_at?: string
           document_id?: string
@@ -173,6 +182,13 @@ export type Database = {
           version?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "document_versions_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "document_versions_document_id_fkey"
             columns: ["document_id"]
@@ -197,6 +213,7 @@ export type Database = {
           name: string
           organization_id: string
           project_id: string
+          visibility: string
         }
         Insert: {
           category?: string
@@ -205,6 +222,7 @@ export type Database = {
           name: string
           organization_id: string
           project_id: string
+          visibility?: string
         }
         Update: {
           category?: string
@@ -213,6 +231,7 @@ export type Database = {
           name?: string
           organization_id?: string
           project_id?: string
+          visibility?: string
         }
         Relationships: [
           {
@@ -421,6 +440,45 @@ export type Database = {
           },
         ]
       }
+      portal_access: {
+        Row: {
+          client_id: string
+          created_at: string
+          email: string
+          id: string
+          invited_by: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          email: string
+          id?: string
+          invited_by?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          email?: string
+          id?: string
+          invited_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_access_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_access_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -610,6 +668,7 @@ export type Database = {
     }
     Functions: {
       my_organization_ids: { Args: never; Returns: string[] }
+      my_portal_client_ids: { Args: never; Returns: string[] }
     }
     Enums: {
       [_ in never]: never

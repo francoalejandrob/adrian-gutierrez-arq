@@ -161,10 +161,11 @@ export async function uploadDocumentVersion(projectId: string, formData: FormDat
     const name = String(formData.get("name") ?? "").trim();
     if (!name) throw new Error("El nombre del documento es obligatorio");
     const category = docCategorySchema.parse(formData.get("category") || "otro");
+    const visibility = formData.get("visible_to_client") ? "client" : "internal";
 
     const { data: newDoc, error: docError } = await supabase
       .from("documents")
-      .insert({ organization_id: organizationId, project_id: projectId, name, category })
+      .insert({ organization_id: organizationId, project_id: projectId, name, category, visibility })
       .select("id")
       .single();
     if (docError) throw new Error(docError.message);
@@ -191,6 +192,34 @@ export async function uploadDocumentVersion(projectId: string, formData: FormDat
     uploaded_by: user?.id,
   });
   if (versionError) throw new Error(versionError.message);
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+}
+
+// Portal access ---------------------------------------------------------
+
+const emailSchema = z.string().trim().email("Email inválido");
+
+export async function invitePortalAccess(projectId: string, clientId: string, formData: FormData) {
+  const email = emailSchema.parse(formData.get("email"));
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { error } = await supabase
+    .from("portal_access")
+    .insert({ client_id: clientId, email, invited_by: user?.id });
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+}
+
+export async function revokePortalAccess(projectId: string, accessId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("portal_access").delete().eq("id", accessId);
+  if (error) throw new Error(error.message);
 
   revalidatePath(`/dashboard/projects/${projectId}`);
 }

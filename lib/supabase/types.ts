@@ -25,8 +25,11 @@ export type TaskPriority = Task["priority"];
 
 export type Doc = Database["public"]["Tables"]["documents"]["Row"];
 export type DocCategory = Doc["category"];
+export type DocVisibility = Doc["visibility"];
 export type DocVersion = Database["public"]["Tables"]["document_versions"]["Row"];
 export type DocVersionStatus = DocVersion["status"];
+
+export type PortalAccess = Database["public"]["Tables"]["portal_access"]["Row"];
 
 export const PROJECT_STATUSES: ProjectStatus[] = [
   "planning",
