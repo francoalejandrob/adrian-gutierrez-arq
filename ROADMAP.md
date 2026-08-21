@@ -111,10 +111,38 @@ al estudio o al cliente (Fase 6).
   estado es manual por ahora; `/dashboard/finance` sí resalta en rojo los
   pagos con `due_date` pasada aunque su estado siga en `pendiente`.
 
-## Fase 5 — Website Intelligence ⬜
+## Fase 5 — Website Intelligence ✅
 
-GA4, Search Console, UTM tracking persistente desde la primera visita,
-Core Web Vitals, `leads` gana las columnas de campaña/UTM.
+- [x] `leads` gana `utm_source`/`utm_medium`/`utm_campaign`/`utm_term`/
+      `utm_content`/`landing_page` (migración `0007_marketing.sql`)
+- [x] Captura de atribución de primer contacto en el sitio público
+      (`lib/utm.ts` + `<UtmCapture />` montado en `(public)/layout.tsx`):
+      guarda los UTM de la URL en `localStorage` la primera vez que
+      aparecen, no se sobrescriben en visitas posteriores sin UTM
+- [x] `api/contact/route.ts` guarda esos campos en el lead;
+      `contacto-form.tsx` los manda desde lo guardado en `localStorage`
+- [x] `/dashboard/marketing`: leads/clientes/proyectos/contratado
+      agrupados por fuente (`utm_source` o `source` como fallback),
+      calculado 100% desde datos propios (leads → `clients.
+      converted_from_lead_id` → `projects` → `contracts.value`)
+- [x] `lib/integrations/google-analytics.ts` +
+      `google-search-console.ts`: wiring real contra las REST API de GA4
+      Data API y Search Console (JWT de cuenta de servicio, sin depender
+      de `googleapis`), gateado por variables de entorno — si faltan,
+      devuelven `{ configured: false, reason }` en vez de inventar datos
+- [x] `/dashboard/website`: muestra las tablas si está configurado: si
+      no, un estado vacío honesto con link a `INTEGRATION_SETUP.md`
+
+**No incluido en Fase 5**:
+- Core Web Vitals — normalmente vive dentro de la misma GA4 property
+  (custom report) o de PageSpeed Insights API; se agrega si hace falta
+  cuando GA4 ya esté configurado y en uso.
+- El wiring de GA4/Search Console **no está probado de punta a punta**
+  (no hay credenciales reales todavía) — el request/response sigue la
+  documentación pública de ambas API pero puede necesitar un ajuste la
+  primera vez que corra contra datos reales. Ver `INTEGRATION_SETUP.md`.
+- Cache de las respuestas de Google — tráfico bajo hoy, no justifica la
+  complejidad; se agrega si el uso real lo pide.
 
 ## Fase 6 — Automatizaciones ⬜
 

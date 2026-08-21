@@ -375,6 +375,7 @@ export type Database = {
           email: string
           estimated_value: number | null
           id: string
+          landing_page: string | null
           location: string | null
           message: string | null
           name: string
@@ -384,6 +385,11 @@ export type Database = {
           source: string
           status: string
           updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
         }
         Insert: {
           assigned_to?: string | null
@@ -391,6 +397,7 @@ export type Database = {
           email: string
           estimated_value?: number | null
           id?: string
+          landing_page?: string | null
           location?: string | null
           message?: string | null
           name: string
@@ -400,6 +407,11 @@ export type Database = {
           source?: string
           status?: string
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Update: {
           assigned_to?: string | null
@@ -407,6 +419,7 @@ export type Database = {
           email?: string
           estimated_value?: number | null
           id?: string
+          landing_page?: string | null
           location?: string | null
           message?: string | null
           name?: string
@@ -416,6 +429,11 @@ export type Database = {
           source?: string
           status?: string
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Relationships: [
           {

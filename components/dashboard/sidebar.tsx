@@ -7,6 +7,8 @@ const NAV_LINKS = [
   { href: "/dashboard/clients", label: "Clientes" },
   { href: "/dashboard/projects", label: "Proyectos" },
   { href: "/dashboard/finance", label: "Finanzas" },
+  { href: "/dashboard/marketing", label: "Marketing" },
+  { href: "/dashboard/website", label: "Website" },
 ];
 
 export default function Sidebar() {

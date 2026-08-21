@@ -9,6 +9,12 @@ type ContactPayload = {
   location?: string;
   need?: string;
   message?: string;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_term?: string | null;
+  utm_content?: string | null;
+  landing_page?: string | null;
 };
 
 function escapeHtml(value: string) {
@@ -74,6 +80,12 @@ export async function POST(request: Request) {
         need: need || null,
         message,
         source: "web",
+        utm_source: payload.utm_source || null,
+        utm_medium: payload.utm_medium || null,
+        utm_campaign: payload.utm_campaign || null,
+        utm_term: payload.utm_term || null,
+        utm_content: payload.utm_content || null,
+        landing_page: payload.landing_page || null,
       });
       if (leadError) console.error("Lead insert error:", leadError);
     }

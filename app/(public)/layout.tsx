@@ -3,6 +3,7 @@ import { MotionConfig } from "framer-motion";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import ScrollProgress from "@/components/scroll-progress";
+import UtmCapture from "@/components/utm-capture";
 import { LocaleProvider } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -15,6 +16,7 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
   return (
     <LocaleProvider>
       <MotionConfig reducedMotion="user">
+        <UtmCapture />
         <ScrollProgress />
         <Navbar />
         <main className="flex-1">{children}</main>

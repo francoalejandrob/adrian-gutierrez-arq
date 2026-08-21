@@ -25,14 +25,29 @@ credenciales reales (regla del master prompt, sección 53).
 No se necesita todavía — es para la Fase 7, lejos en el roadmap.
 
 ### Google Analytics 4 + Search Console (Fase 5)
+El código ya está escrito y listo para activarse
+(`lib/integrations/google-analytics.ts`,
+`lib/integrations/google-search-console.ts`, `/dashboard/website`) — solo
+falta la configuración. **No probado de punta a punta** (no tengo una
+propiedad real contra la cual probar); el formato de request/response
+sigue la documentación pública de la GA4 Data API v1beta y de la Search
+Console API v3, pero puede necesitar un ajuste menor la primera vez que
+corra contra datos reales.
+
 1. Tener el sitio verificado en Search Console (si no lo está).
 2. Crear una propiedad de GA4 para el sitio si no existe.
 3. En Google Cloud Console: crear un proyecto, habilitar
    "Google Analytics Data API" y "Search Console API", crear una cuenta
    de servicio, y darle acceso de lectura a la propiedad de GA4 y a la
    propiedad de Search Console.
-4. Me pasas el `client_email` y la `private_key` de esa cuenta de
-   servicio (o el JSON completo) para las env vars correspondientes.
+4. Agregar en Vercel (nunca en el chat):
+   - `GOOGLE_SERVICE_ACCOUNT_EMAIL` — el `client_email` de la cuenta de servicio.
+   - `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` — la `private_key` (con los
+     saltos de línea como `\n` literales, es como Vercel guarda PEMs
+     multilínea en una sola variable).
+   - `GOOGLE_ANALYTICS_PROPERTY_ID` — el ID numérico de la propiedad GA4.
+   - `GOOGLE_SEARCH_CONSOLE_SITE_URL` — la URL de la propiedad tal como
+     aparece en Search Console (p. ej. `https://adrian-gutierrez-arq.vercel.app/` o `sc-domain:...`).
 
 ### Stripe (Fase 8 — SaaS billing)
 Solo si el objetivo pasa a ser vender ARCHI.OS a otros estudios (ver

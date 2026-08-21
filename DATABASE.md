@@ -325,10 +325,13 @@ detalle cuando se implemente cada fase (`ROADMAP.md`):
 - **Fase 3 — `portal_messages` como tabla propia**: tampoco hizo falta —
   se resolvió reutilizando `activity_log` con `visible_to_client=true`.
 - **Fase 4 — Comercial/Finanzas**: implementado — ver §1d.
-- **Fase 5 — Website Intelligence**: no son tablas de negocio — son datos
-  de GA4/Search Console consultados vía API, cacheados si hace falta.
-  `leads` sí gana entonces las columnas `utm_source`, `utm_medium`,
-  `utm_campaign`, `landing_page`.
+- **Fase 5 — Website Intelligence**: implementado — migración
+  `0007_marketing.sql` agrega a `leads` las columnas `utm_source`,
+  `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`,
+  `landing_page` (todas `text`, nullable). GA4/Search Console no son
+  tablas de negocio — se consultan vía API en cada carga de
+  `/dashboard/website`, sin cachear todavía (tráfico bajo, no hace falta
+  aún).
 - **Fase 6 — Automatizaciones**: `notifications`, y probablemente una
   tabla de definición de workflows si no se resuelve en código.
 - **Fase 7 — IA**: sin tablas propias necesariamente; depende de tools que

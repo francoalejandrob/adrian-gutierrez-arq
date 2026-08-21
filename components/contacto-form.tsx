@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { contactNeeds } from "@/lib/content";
 import { useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
+import { getStoredAttribution } from "@/lib/utm";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -38,6 +39,7 @@ export default function ContactoForm() {
           location: data.get("location"),
           need: data.get("need"),
           message: data.get("message"),
+          ...getStoredAttribution(),
         }),
       });
 
