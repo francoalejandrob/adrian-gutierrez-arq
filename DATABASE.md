@@ -380,9 +380,16 @@ detalle cuando se implemente cada fase (`ROADMAP.md`):
   una tabla de definición de workflows: los eventos que disparan una
   notificación se resolvieron en código, dentro de la misma Server Action
   que ya hacía la mutación (ver `lib/notifications.ts`).
-- **Fase 7 — IA**: sin tablas propias necesariamente; depende de tools que
-  leen las tablas existentes respetando RLS (sección 34 — nunca acceso
-  directo sin pasar por los mismos permisos que un usuario).
+- **Fase 7 — IA**: implementado, sin tablas propias — confirmado que no
+  hacían falta. `lib/ai/tools.ts` son funciones que reciben el cliente de
+  sesión del usuario que pregunta y consultan `tasks`, `payments`,
+  `leads`, `projects`, `contracts`, `expenses`, `clients` con ese mismo
+  cliente — RLS se aplica igual que en cualquier página del dashboard
+  (sección 34 del master prompt: nunca acceso directo sin pasar por los
+  mismos permisos que un usuario). No se guarda historial de
+  conversación en base de datos todavía (vive solo en el estado del
+  chat del navegador) — se agrega si hace falta seguimiento entre
+  sesiones.
 
 ## 5. Índices previstos (además de las FKs)
 

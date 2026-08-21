@@ -181,12 +181,34 @@ al estudio o al cliente (Fase 6).
   probado de punta a punta** y nada en la UI lo llama todavía (no hay un
   caso de uso concreto que lo dispare esta fase).
 
-## Fase 7 — IA (Archi AI) ⬜
+## Fase 7 — IA (Archi AI) ✅
 
-Capa de IA vía tools/functions que respetan `organization_id`, rol y RLS
-del usuario que pregunta — nunca acceso directo a la base de datos.
-Casos de uso: resúmenes de proyecto, pagos vencidos, leads a contactar,
-borradores de email, creación de tareas por lenguaje natural.
+- [x] `lib/ai/tools.ts`: `getOverdueTasks`, `getPendingPayments`,
+      `getLeadsToContact`, `getProjectSummary`, `getRevenue`,
+      `getMarketingPerformance` — consultas reales con el cliente de
+      sesión del usuario que pregunta (nunca el cliente admin), así que
+      quedan sujetas exactamente a la misma RLS que el resto del
+      dashboard; no hay una puerta más ancha para la IA
+- [x] `app/api/ai/chat/route.ts`: wiring real de tool-calling contra la
+      Chat Completions API de OpenAI (fetch directo, sin sumar el SDK
+      `openai` — mismo criterio que las integraciones de Google), con
+      hasta 4 rondas de llamadas a herramientas antes de responder
+- [x] `/dashboard/ai`: interfaz de chat
+
+**No incluido en Fase 7**:
+- Probado de punta a punta — no hay `OPENAI_API_KEY` real todavía. El
+  request/response sigue el contrato documentado de la API, pero podría
+  necesitar un ajuste menor la primera vez que corra contra la API real.
+  Ver `INTEGRATION_SETUP.md`.
+- Streaming de la respuesta — con la interfaz esperando una sola
+  respuesta corta por pregunta, el costo de implementar y probar SSE sin
+  poder verificarlo end-to-end no se justificaba en esta fase.
+- Borradores de email o creación de tareas por lenguaje natural (acciones
+  de escritura, no solo lectura) — el master prompt las menciona como
+  casos de uso, pero una IA que *escribe* en la base de datos es una
+  superficie de riesgo distinta (¿qué pasa si inventa una tarea, o
+  entiende mal a quién facturar?) que merece su propio diseño explícito
+  en vez de sumarse de paso a la primera versión de lectura.
 
 ## Fase 8 — SaaS ⬜
 

@@ -16,13 +16,21 @@ credenciales reales (regla del master prompt, sección 53).
 ## Necesitan que tú hagas algo primero
 
 ### OpenAI (Fase 7 — Archi AI)
+El código ya está escrito y listo para activarse
+(`lib/ai/tools.ts`, `app/api/ai/chat/route.ts`, `/dashboard/ai`) — el
+wiring de tool-calling sigue el contrato documentado de la Chat
+Completions API (fetch directo, sin el SDK `openai`, mismo criterio que
+las integraciones de Google). **No probado de punta a punta**: no tengo
+una key real contra la cual probarlo, así que no lo reporto como
+"listo y probado" — puede necesitar un ajuste menor la primera vez que
+corra contra la API real.
+
 1. Crear cuenta en [platform.openai.com](https://platform.openai.com) si
    no tienes.
 2. Generar una API key.
-3. Pásamela para ponerla como `OPENAI_API_KEY` (en Vercel, no en el chat
-   — igual que hicimos con el token de Instagram).
-
-No se necesita todavía — es para la Fase 7, lejos en el roadmap.
+3. Agregar en Vercel: `OPENAI_API_KEY` (nunca en el chat — igual que con
+   el token de Instagram). Opcional: `OPENAI_MODEL` si querés un modelo
+   distinto al default (`gpt-4o-mini`).
 
 ### Google Analytics 4 + Search Console (Fase 5)
 El código ya está escrito y listo para activarse

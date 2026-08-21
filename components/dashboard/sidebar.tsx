@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/dashboard/finance", label: "Finanzas" },
   { href: "/dashboard/marketing", label: "Marketing" },
   { href: "/dashboard/website", label: "Website" },
+  { href: "/dashboard/ai", label: "Archi AI" },
 ];
 
 export default async function Sidebar() {
