@@ -1,3 +1,5 @@
+import SubmitButton from "@/components/dashboard/ui/submit-button";
+import { TextField, TextareaField } from "@/components/dashboard/ui/field";
 import type { Client } from "@/lib/supabase/types";
 
 export default function ClientForm({
@@ -9,61 +11,17 @@ export default function ClientForm({
 }) {
   return (
     <form action={action} className="flex flex-col gap-4">
-      <Field label="Nombre" name="name" defaultValue={defaultValues?.name} required />
+      <TextField label="Nombre" name="name" defaultValue={defaultValues?.name} required />
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Email" name="email" type="email" defaultValue={defaultValues?.email ?? ""} />
-        <Field label="Teléfono" name="phone" defaultValue={defaultValues?.phone ?? ""} />
+        <TextField label="Email" name="email" type="email" defaultValue={defaultValues?.email ?? ""} />
+        <TextField label="Teléfono" name="phone" defaultValue={defaultValues?.phone ?? ""} />
       </div>
-      <Field label="Empresa" name="company" defaultValue={defaultValues?.company ?? ""} />
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="notes" className="text-xs uppercase tracking-wide text-carbon/60">
-          Notas
-        </label>
-        <textarea
-          id="notes"
-          name="notes"
-          rows={3}
-          defaultValue={defaultValues?.notes ?? ""}
-          className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-        />
-      </div>
+      <TextField label="Empresa" name="company" defaultValue={defaultValues?.company ?? ""} />
+      <TextareaField label="Notas" name="notes" rows={3} defaultValue={defaultValues?.notes ?? ""} />
 
-      <button
-        type="submit"
-        className="w-fit cursor-pointer bg-carbon px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
-      >
+      <SubmitButton size="lg" pendingLabel="Guardando…" className="w-fit">
         Guardar
-      </button>
+      </SubmitButton>
     </form>
-  );
-}
-
-function Field({
-  label,
-  name,
-  type = "text",
-  defaultValue,
-  required,
-}: {
-  label: string;
-  name: string;
-  type?: string;
-  defaultValue?: string | null;
-  required?: boolean;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={name} className="text-xs uppercase tracking-wide text-carbon/60">
-        {label}
-      </label>
-      <input
-        id={name}
-        name={name}
-        type={type}
-        required={required}
-        defaultValue={defaultValue ?? ""}
-        className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-      />
-    </div>
   );
 }

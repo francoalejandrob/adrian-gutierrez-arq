@@ -1,3 +1,7 @@
+import { Megaphone } from "lucide-react";
+import EmptyState from "@/components/dashboard/ui/empty-state";
+import PageHeader from "@/components/dashboard/ui/page-header";
+import Section from "@/components/dashboard/ui/section";
 import { createClient } from "@/lib/supabase/server";
 
 const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD" });
@@ -66,58 +70,67 @@ export default async function MarketingPage() {
   const rows = [...bySource.values()].sort((a, b) => b.leads - a.leads);
   const totalLeads = rows.reduce((sum, r) => sum + r.leads, 0);
   const totalContracted = rows.reduce((sum, r) => sum + r.contractedValue, 0);
+  const maxLeads = Math.max(1, ...rows.map((r) => r.leads));
 
   return (
     <div className="max-w-4xl">
-      <h1 className="font-display text-2xl text-carbon">Marketing</h1>
-      <p className="mt-1 text-sm text-carbon/60">
-        Atribución de leads por fuente, calculada desde datos propios (sin GA4/Search
-        Console todavía — ver <code>/dashboard/website</code>).
-      </p>
+      <PageHeader
+        title="Marketing"
+        description="Atribución de leads por fuente, calculada desde datos propios (sin GA4/Search Console todavía — ver /dashboard/website)."
+      />
 
-      <div className="mt-8 border border-carbon/10 bg-white p-6">
-        <h2 className="mb-4 text-sm font-medium text-carbon">Fuentes de leads</h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-carbon/10 text-left text-xs uppercase tracking-wide text-carbon/40">
-              <th className="pb-2">Fuente</th>
-              <th className="pb-2 text-right">Leads</th>
-              <th className="pb-2 text-right">Clientes</th>
-              <th className="pb-2 text-right">Proyectos</th>
-              <th className="pb-2 text-right">Contratado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.source} className="border-b border-carbon/5">
-                <td className="py-2 font-medium text-carbon">{row.source}</td>
-                <td className="py-2 text-right">{row.leads}</td>
-                <td className="py-2 text-right">{row.clients}</td>
-                <td className="py-2 text-right">{row.projects}</td>
-                <td className="py-2 text-right">{currency.format(row.contractedValue)}</td>
+      <Section title="Fuentes de leads">
+        {rows.length > 0 ? (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-carbon/10 text-left text-xs uppercase tracking-wide text-carbon/40">
+                <th className="pb-2">Fuente</th>
+                <th className="pb-2 text-right">Leads</th>
+                <th className="pb-2 text-right">Clientes</th>
+                <th className="pb-2 text-right">Proyectos</th>
+                <th className="pb-2 text-right">Contratado</th>
               </tr>
-            ))}
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={5} className="py-3 text-sm text-carbon/40">
-                  Sin leads todavía.
-                </td>
-              </tr>
-            )}
-          </tbody>
-          {rows.length > 0 && (
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr
+                  key={row.source}
+                  className="border-b border-carbon/5 transition-colors duration-100 last:border-0 hover:bg-hueso/60"
+                >
+                  <td className="py-2.5">
+                    <p className="font-medium text-carbon">{row.source}</p>
+                    <div className="mt-1 h-1 w-24 overflow-hidden bg-carbon/10">
+                      <div
+                        className="h-full bg-naranja"
+                        style={{ width: `${(row.leads / maxLeads) * 100}%` }}
+                      />
+                    </div>
+                  </td>
+                  <td className="py-2.5 text-right font-mono">{row.leads}</td>
+                  <td className="py-2.5 text-right font-mono">{row.clients}</td>
+                  <td className="py-2.5 text-right font-mono">{row.projects}</td>
+                  <td className="py-2.5 text-right font-mono">{currency.format(row.contractedValue)}</td>
+                </tr>
+              ))}
+            </tbody>
             <tfoot>
               <tr className="border-t border-carbon/10 font-medium text-carbon">
-                <td className="pt-2">Total</td>
-                <td className="pt-2 text-right">{totalLeads}</td>
-                <td className="pt-2 text-right"></td>
-                <td className="pt-2 text-right"></td>
-                <td className="pt-2 text-right">{currency.format(totalContracted)}</td>
+                <td className="pt-2.5">Total</td>
+                <td className="pt-2.5 text-right font-mono">{totalLeads}</td>
+                <td className="pt-2.5 text-right"></td>
+                <td className="pt-2.5 text-right"></td>
+                <td className="pt-2.5 text-right font-mono">{currency.format(totalContracted)}</td>
               </tr>
             </tfoot>
-          )}
-        </table>
-      </div>
+          </table>
+        ) : (
+          <EmptyState
+            icon={Megaphone}
+            title="Sin leads todavía"
+            description="En cuanto lleguen leads (web o manuales) vas a ver de dónde vienen acá."
+          />
+        )}
+      </Section>
     </div>
   );
 }

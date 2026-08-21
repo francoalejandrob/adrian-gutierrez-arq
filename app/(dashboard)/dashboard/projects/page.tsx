@@ -1,6 +1,12 @@
 import Link from "next/link";
+import { FolderKanban, Plus } from "lucide-react";
+import { buttonClass } from "@/components/dashboard/ui/button";
+import EmptyState from "@/components/dashboard/ui/empty-state";
+import PageHeader from "@/components/dashboard/ui/page-header";
+import ProgressBar from "@/components/dashboard/ui/progress-bar";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
-import { PROJECT_STATUS_LABELS, PROJECT_STATUSES, type ProjectStatus } from "@/lib/supabase/types";
+import { PROJECT_STATUS_LABELS, PROJECT_STATUS_TONE, PROJECT_STATUSES, type ProjectStatus } from "@/lib/supabase/types";
 
 export default async function ProjectsPage(
   props: PageProps<"/dashboard/projects">,
@@ -24,15 +30,15 @@ export default async function ProjectsPage(
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl text-carbon">Proyectos</h1>
-        <Link
-          href="/dashboard/projects/new"
-          className="cursor-pointer bg-carbon px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-        >
-          Nuevo proyecto
-        </Link>
-      </div>
+      <PageHeader
+        title="Proyectos"
+        action={
+          <Link href="/dashboard/projects/new" className={buttonClass("primary", "md")}>
+            <Plus size={16} strokeWidth={2} aria-hidden="true" />
+            Nuevo proyecto
+          </Link>
+        }
+      />
 
       <div className="mt-6 flex flex-wrap gap-2">
         <FilterPill href="/dashboard/projects" label="Todos" active={!statusFilter} />
@@ -59,38 +65,52 @@ export default async function ProjectsPage(
           </thead>
           <tbody>
             {(projects ?? []).map((project) => (
-              <tr key={project.id} className="border-b border-carbon/5 last:border-0">
+              <tr
+                key={project.id}
+                className="border-b border-carbon/5 transition-colors duration-100 last:border-0 hover:bg-hueso/60"
+              >
                 <td className="px-4 py-3">
                   <Link
                     href={`/dashboard/projects/${project.id}`}
-                    className="font-medium text-carbon hover:underline"
+                    className="font-medium text-carbon hover:text-naranja hover:underline"
                   >
                     {project.name}
                   </Link>
                 </td>
                 <td className="px-4 py-3 text-carbon/70">{project.clients?.name ?? "—"}</td>
                 <td className="px-4 py-3">
-                  <span className="inline-block border border-carbon/15 px-2 py-0.5 text-xs text-carbon/70">
-                    {PROJECT_STATUS_LABELS[project.status as ProjectStatus]}
-                  </span>
+                  <StatusBadge
+                    label={PROJECT_STATUS_LABELS[project.status as ProjectStatus]}
+                    tone={PROJECT_STATUS_TONE[project.status as ProjectStatus]}
+                  />
                 </td>
-                <td className="px-4 py-3 text-carbon/70">{project.progress}%</td>
-                <td className="px-4 py-3 text-carbon/50">
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <ProgressBar value={project.progress} className="w-16" />
+                    <span className="font-mono text-xs text-carbon/60">{project.progress}%</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3 font-mono text-xs text-carbon/50">
                   {project.estimated_end_date
                     ? new Date(project.estimated_end_date).toLocaleDateString("es-EC")
                     : "—"}
                 </td>
               </tr>
             ))}
-            {(projects ?? []).length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-carbon/50">
-                  Todavía no hay proyectos.
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
+        {(projects ?? []).length === 0 && (
+          <EmptyState
+            icon={FolderKanban}
+            title="Todavía no hay proyectos"
+            description="Creá un proyecto directamente o desde la ficha de un cliente."
+            action={
+              <Link href="/dashboard/projects/new" className={buttonClass("secondary", "sm")}>
+                Crear el primero
+              </Link>
+            }
+          />
+        )}
       </div>
     </div>
   );
@@ -108,7 +128,7 @@ function FilterPill({
   return (
     <Link
       href={href}
-      className={`px-3 py-1.5 text-xs uppercase tracking-wide transition-colors ${
+      className={`px-3 py-1.5 text-xs uppercase tracking-wide transition-colors duration-150 ${
         active
           ? "bg-carbon text-white"
           : "border border-carbon/20 text-carbon/60 hover:border-carbon hover:text-carbon"

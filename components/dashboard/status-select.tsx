@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useTransition } from "react";
+import { selectClass } from "@/components/dashboard/ui/styles";
 
 export default function StatusSelect({
   action,
@@ -12,6 +13,8 @@ export default function StatusSelect({
   options: { value: string; label: string }[];
 }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const [isPending, startTransition] = useTransition();
+  const [value, setValue] = useState(defaultValue);
 
   return (
     <form ref={formRef} action={action} className="flex items-center gap-3">
@@ -21,9 +24,13 @@ export default function StatusSelect({
       <select
         id="status"
         name="status"
-        defaultValue={defaultValue}
-        onChange={() => formRef.current?.requestSubmit()}
-        className="cursor-pointer border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+        value={value}
+        disabled={isPending}
+        onChange={(e) => {
+          setValue(e.target.value);
+          startTransition(() => formRef.current?.requestSubmit());
+        }}
+        className={`${selectClass} ${isPending ? "opacity-60" : ""}`}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

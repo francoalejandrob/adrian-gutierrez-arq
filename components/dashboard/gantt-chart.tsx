@@ -1,6 +1,12 @@
-import type { Phase } from "@/lib/supabase/types";
+import type { Phase, PhaseStatus } from "@/lib/supabase/types";
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+const TRACK_TONE: Record<PhaseStatus, string> = {
+  pendiente: "bg-carbon/25",
+  en_progreso: "bg-carbon/70",
+  completada: "bg-emerald-600/70",
+};
 
 export default function GanttChart({ phases }: { phases: Phase[] }) {
   const dated = phases.filter((p) => p.start_date && p.end_date);
@@ -64,14 +70,14 @@ export default function GanttChart({ phases }: { phases: Phase[] }) {
                 <span className="w-36 shrink-0 truncate text-xs text-carbon/70" title={phase.name}>
                   {phase.name}
                 </span>
-                <div className="relative h-5 flex-1 bg-hueso">
+                <div className="relative h-5 flex-1 bg-hueso" title={`${phase.name}: ${phase.progress}%`}>
                   <div
                     style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
-                    className="absolute inset-y-0 bg-carbon/80"
+                    className={`absolute inset-y-0 transition-colors duration-200 ${TRACK_TONE[phase.status]}`}
                   >
                     <div
                       style={{ width: `${phase.progress}%` }}
-                      className="h-full bg-naranja"
+                      className="h-full bg-naranja transition-[width] duration-300"
                     />
                   </div>
                 </div>

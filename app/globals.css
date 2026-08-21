@@ -34,6 +34,19 @@ body {
   color: var(--color-hueso);
 }
 
+/* Keyboard-only focus ring. Only fires for :focus-visible, so mouse/touch
+   users never see it — safe to apply globally without changing the look
+   of either the public site or the dashboard for the common case. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-naranja);
+  outline-offset: 2px;
+}
+
 .press {
   transition: transform 150ms var(--ease-out-strong);
 }

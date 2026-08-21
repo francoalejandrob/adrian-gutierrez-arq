@@ -4,21 +4,28 @@ import GanttChart from "@/components/dashboard/gantt-chart";
 import ProjectForm from "@/components/dashboard/project-form";
 import StatusSelect from "@/components/dashboard/status-select";
 import DownloadButton from "@/components/dashboard/download-button";
+import Section from "@/components/dashboard/ui/section";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
+import SubmitButton from "@/components/dashboard/ui/submit-button";
+import { inputClass, selectClass } from "@/components/dashboard/ui/styles";
 import { createClient } from "@/lib/supabase/server";
 import {
   CONTRACT_STATUS_LABELS,
+  CONTRACT_STATUS_TONE,
   CONTRACT_STATUSES,
   DOC_CATEGORIES,
   DOC_CATEGORY_LABELS,
   EXPENSE_CATEGORIES,
   EXPENSE_CATEGORY_LABELS,
   PAYMENT_STATUS_LABELS,
+  PAYMENT_STATUS_TONE,
   PAYMENT_STATUSES,
   PHASE_STATUS_LABELS,
   PHASE_STATUSES,
   PROJECT_STATUS_LABELS,
   PROJECT_STATUSES,
   QUOTE_STATUS_LABELS,
+  QUOTE_STATUS_TONE,
   TASK_STATUS_LABELS,
   TASK_STATUSES,
   quoteTotal,
@@ -171,14 +178,13 @@ export default async function ProjectDetailPage(
               <Link
                 key={quote.id}
                 href={`/dashboard/quotes/${quote.id}`}
-                className="flex items-center justify-between border-b border-carbon/5 pb-3 text-sm last:border-0 hover:text-naranja"
+                className="flex items-center justify-between gap-3 border-b border-carbon/5 pb-3 text-sm transition-colors duration-100 last:border-0 hover:text-naranja"
               >
-                <span>
-                  Cotización del{" "}
-                  {new Date(quote.issue_date).toLocaleDateString("es-EC")} —{" "}
-                  {QUOTE_STATUS_LABELS[quote.status]}
+                <span className="flex items-center gap-2">
+                  Cotización del {new Date(quote.issue_date).toLocaleDateString("es-EC")}
+                  <StatusBadge label={QUOTE_STATUS_LABELS[quote.status]} tone={QUOTE_STATUS_TONE[quote.status]} />
                 </span>
-                <span className="font-medium">{currency.format(total)}</span>
+                <span className="font-mono font-medium">{currency.format(total)}</span>
               </Link>
             );
           })}
@@ -187,12 +193,9 @@ export default async function ProjectDetailPage(
           )}
         </div>
         <form action={boundCreateQuote} className="mt-4">
-          <button
-            type="submit"
-            className="cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <SubmitButton variant="secondary" size="sm" pendingLabel="Creando…">
             Nueva cotización
-          </button>
+          </SubmitButton>
         </form>
       </Section>
 
@@ -205,20 +208,26 @@ export default async function ProjectDetailPage(
               className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0"
             >
               <div>
-                <p className="text-sm font-medium text-carbon">{currency.format(contract.value)}</p>
+                <p className="font-mono text-sm font-medium text-carbon">{currency.format(contract.value)}</p>
                 <p className="text-xs text-carbon/50">
                   {contract.start_date ?? "sin fecha"} → {contract.end_date ?? "sin fecha"}
                   {contract.payment_terms ? ` — ${contract.payment_terms}` : ""}
                 </p>
               </div>
-              <StatusSelect
-                action={updateContractStatus.bind(null, id, contract.id)}
-                defaultValue={contract.status}
-                options={CONTRACT_STATUSES.map((status) => ({
-                  value: status,
-                  label: CONTRACT_STATUS_LABELS[status],
-                }))}
-              />
+              <div className="flex items-center gap-2">
+                <StatusBadge
+                  label={CONTRACT_STATUS_LABELS[contract.status]}
+                  tone={CONTRACT_STATUS_TONE[contract.status]}
+                />
+                <StatusSelect
+                  action={updateContractStatus.bind(null, id, contract.id)}
+                  defaultValue={contract.status}
+                  options={CONTRACT_STATUSES.map((status) => ({
+                    value: status,
+                    label: CONTRACT_STATUS_LABELS[status],
+                  }))}
+                />
+              </div>
             </div>
           ))}
           {(contracts ?? []).length === 0 && (
@@ -226,35 +235,13 @@ export default async function ProjectDetailPage(
           )}
         </div>
         <form action={boundCreateContract} className="mt-4 grid grid-cols-4 gap-2">
-          <input
-            name="value"
-            type="number"
-            step="0.01"
-            placeholder="Valor"
-            required
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <input
-            name="start_date"
-            type="date"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <input
-            name="end_date"
-            type="date"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <input
-            name="payment_terms"
-            placeholder="Condiciones de pago"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <button
-            type="submit"
-            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <input name="value" type="number" step="0.01" placeholder="Valor" required className={inputClass} />
+          <input name="start_date" type="date" className={inputClass} />
+          <input name="end_date" type="date" className={inputClass} />
+          <input name="payment_terms" placeholder="Condiciones de pago" className={inputClass} />
+          <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
             Agregar contrato
-          </button>
+          </SubmitButton>
         </form>
       </Section>
 
@@ -267,21 +254,27 @@ export default async function ProjectDetailPage(
               className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0"
             >
               <div>
-                <p className="text-sm font-medium text-carbon">{currency.format(payment.amount)}</p>
+                <p className="font-mono text-sm font-medium text-carbon">{currency.format(payment.amount)}</p>
                 <p className="text-xs text-carbon/50">
                   Vence {payment.due_date ?? "sin fecha"}
                   {payment.method ? ` — ${payment.method}` : ""}
                   {payment.reference ? ` — ${payment.reference}` : ""}
                 </p>
               </div>
-              <StatusSelect
-                action={updatePaymentStatus.bind(null, id, payment.id)}
-                defaultValue={payment.status}
-                options={PAYMENT_STATUSES.map((status) => ({
-                  value: status,
-                  label: PAYMENT_STATUS_LABELS[status],
-                }))}
-              />
+              <div className="flex items-center gap-2">
+                <StatusBadge
+                  label={PAYMENT_STATUS_LABELS[payment.status]}
+                  tone={PAYMENT_STATUS_TONE[payment.status]}
+                />
+                <StatusSelect
+                  action={updatePaymentStatus.bind(null, id, payment.id)}
+                  defaultValue={payment.status}
+                  options={PAYMENT_STATUSES.map((status) => ({
+                    value: status,
+                    label: PAYMENT_STATUS_LABELS[status],
+                  }))}
+                />
+              </div>
             </div>
           ))}
           {(payments ?? []).length === 0 && (
@@ -289,35 +282,13 @@ export default async function ProjectDetailPage(
           )}
         </div>
         <form action={boundCreatePayment} className="mt-4 grid grid-cols-4 gap-2">
-          <input
-            name="amount"
-            type="number"
-            step="0.01"
-            placeholder="Monto"
-            required
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <input
-            name="due_date"
-            type="date"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <input
-            name="method"
-            placeholder="Método"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <input
-            name="reference"
-            placeholder="Referencia"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <button
-            type="submit"
-            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <input name="amount" type="number" step="0.01" placeholder="Monto" required className={inputClass} />
+          <input name="due_date" type="date" className={inputClass} />
+          <input name="method" placeholder="Método" className={inputClass} />
+          <input name="reference" placeholder="Referencia" className={inputClass} />
+          <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
             Agregar pago
-          </button>
+          </SubmitButton>
         </form>
       </Section>
 
@@ -330,9 +301,9 @@ export default async function ProjectDetailPage(
               className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0"
             >
               <div>
-                <p className="text-sm font-medium text-carbon">
+                <p className="font-mono text-sm font-medium text-carbon">
                   {currency.format(expense.amount)}{" "}
-                  <span className="text-xs font-normal text-carbon/40">
+                  <span className="font-sans text-xs font-normal text-carbon/40">
                     ({EXPENSE_CATEGORY_LABELS[expense.category]})
                   </span>
                 </p>
@@ -343,12 +314,9 @@ export default async function ProjectDetailPage(
                 </p>
               </div>
               <form action={deleteExpense.bind(null, id, expense.id)}>
-                <button
-                  type="submit"
-                  className="cursor-pointer text-xs text-carbon/40 hover:text-red-600"
-                >
+                <SubmitButton variant="danger" size="sm" className="normal-case tracking-normal">
                   Eliminar
-                </button>
+                </SubmitButton>
               </form>
             </div>
           ))}
@@ -357,18 +325,8 @@ export default async function ProjectDetailPage(
           )}
         </div>
         <form action={boundCreateExpense} className="mt-4 grid grid-cols-4 gap-2">
-          <input
-            name="amount"
-            type="number"
-            step="0.01"
-            placeholder="Monto"
-            required
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <select
-            name="category"
-            className="cursor-pointer border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          >
+          <input name="amount" type="number" step="0.01" placeholder="Monto" required className={inputClass} />
+          <select name="category" className={selectClass}>
             {EXPENSE_CATEGORIES.map((category) => (
               <option key={category} value={category}>
                 {EXPENSE_CATEGORY_LABELS[category]}
@@ -380,24 +338,13 @@ export default async function ProjectDetailPage(
             type="date"
             required
             defaultValue={new Date().toISOString().slice(0, 10)}
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+            className={inputClass}
           />
-          <input
-            name="supplier"
-            placeholder="Proveedor"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <input
-            name="description"
-            placeholder="Descripción"
-            className="col-span-4 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <button
-            type="submit"
-            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <input name="supplier" placeholder="Proveedor" className={inputClass} />
+          <input name="description" placeholder="Descripción" className={`col-span-4 ${inputClass}`} />
+          <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
             Agregar gasto
-          </button>
+          </SubmitButton>
         </form>
       </Section>
 
@@ -411,7 +358,7 @@ export default async function ProjectDetailPage(
             >
               <div>
                 <p className="text-sm font-medium text-carbon">{phase.name}</p>
-                <p className="text-xs text-carbon/50">
+                <p className="font-mono text-xs text-carbon/50">
                   {phase.start_date ?? "sin fecha"} → {phase.end_date ?? "sin fecha"}
                 </p>
               </div>
@@ -425,12 +372,9 @@ export default async function ProjectDetailPage(
                   }))}
                 />
                 <form action={deletePhase.bind(null, id, phase.id)}>
-                  <button
-                    type="submit"
-                    className="cursor-pointer text-xs text-carbon/40 hover:text-red-600"
-                  >
+                  <SubmitButton variant="danger" size="sm" className="normal-case tracking-normal">
                     Eliminar
-                  </button>
+                  </SubmitButton>
                 </form>
               </div>
             </div>
@@ -441,28 +385,12 @@ export default async function ProjectDetailPage(
         </div>
 
         <form action={boundCreatePhase} className="mt-4 grid grid-cols-4 gap-2">
-          <input
-            name="name"
-            placeholder="Nombre de la fase"
-            required
-            className="col-span-2 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <input
-            name="start_date"
-            type="date"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <input
-            name="end_date"
-            type="date"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <button
-            type="submit"
-            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <input name="name" placeholder="Nombre de la fase" required className={`col-span-2 ${inputClass}`} />
+          <input name="start_date" type="date" className={inputClass} />
+          <input name="end_date" type="date" className={inputClass} />
+          <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
             Agregar fase
-          </button>
+          </SubmitButton>
         </form>
       </Section>
 
@@ -481,16 +409,8 @@ export default async function ProjectDetailPage(
         </div>
 
         <form action={boundCreateTask} className="mt-4 grid grid-cols-4 gap-2">
-          <input
-            name="title"
-            placeholder="Nueva tarea"
-            required
-            className="col-span-2 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <select
-            name="phase_id"
-            className="cursor-pointer border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          >
+          <input name="title" placeholder="Nueva tarea" required className={`col-span-2 ${inputClass}`} />
+          <select name="phase_id" className={selectClass}>
             <option value="">Sin fase</option>
             {(phases ?? []).map((phase) => (
               <option key={phase.id} value={phase.id}>
@@ -498,17 +418,10 @@ export default async function ProjectDetailPage(
               </option>
             ))}
           </select>
-          <input
-            name="due_date"
-            type="date"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <button
-            type="submit"
-            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <input name="due_date" type="date" className={inputClass} />
+          <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
             Agregar tarea
-          </button>
+          </SubmitButton>
         </form>
       </Section>
 
@@ -553,14 +466,11 @@ export default async function ProjectDetailPage(
                 <input
                   name="comment"
                   placeholder="Comentario (opcional)"
-                  className="flex-1 border border-carbon/20 bg-white px-2 py-1 text-xs outline-none focus:border-carbon"
+                  className={`flex-1 px-2 py-1 text-xs ${inputClass}`}
                 />
-                <button
-                  type="submit"
-                  className="cursor-pointer border border-carbon px-3 py-1 text-xs text-carbon transition-colors hover:bg-carbon hover:text-white"
-                >
+                <SubmitButton variant="secondary" size="sm" pendingLabel="Subiendo…">
                   Nueva versión
-                </button>
+                </SubmitButton>
               </form>
             </div>
           ))}
@@ -570,16 +480,8 @@ export default async function ProjectDetailPage(
         </div>
 
         <form action={boundUpload} className="mt-4 grid grid-cols-4 gap-2">
-          <input
-            name="name"
-            placeholder="Nombre del documento"
-            required
-            className="col-span-2 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <select
-            name="category"
-            className="cursor-pointer border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          >
+          <input name="name" placeholder="Nombre del documento" required className={`col-span-2 ${inputClass}`} />
+          <select name="category" className={selectClass}>
             {DOC_CATEGORIES.map((category) => (
               <option key={category} value={category}>
                 {DOC_CATEGORY_LABELS[category]}
@@ -591,12 +493,9 @@ export default async function ProjectDetailPage(
             <input type="checkbox" name="visible_to_client" value="1" />
             Visible para el cliente en su portal
           </label>
-          <button
-            type="submit"
-            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <SubmitButton variant="secondary" size="sm" pendingLabel="Subiendo…" className="col-span-4 w-fit">
             Subir documento nuevo
-          </button>
+          </SubmitButton>
         </form>
       </Section>
 
@@ -607,12 +506,9 @@ export default async function ProjectDetailPage(
             <div key={access.id} className="flex items-center justify-between text-sm">
               <span className="text-carbon/80">{access.email}</span>
               <form action={revokePortalAccess.bind(null, id, access.id)}>
-                <button
-                  type="submit"
-                  className="cursor-pointer text-xs text-carbon/40 hover:text-red-600"
-                >
+                <SubmitButton variant="danger" size="sm" className="normal-case tracking-normal">
                   Quitar acceso
-                </button>
+                </SubmitButton>
               </form>
             </div>
           ))}
@@ -629,14 +525,11 @@ export default async function ProjectDetailPage(
             required
             defaultValue={project.clients?.email ?? ""}
             placeholder="email@cliente.com"
-            className="flex-1 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+            className={`flex-1 ${inputClass}`}
           />
-          <button
-            type="submit"
-            className="cursor-pointer border border-carbon px-4 py-2 text-sm text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <SubmitButton variant="secondary" pendingLabel="Invitando…">
             Invitar
-          </button>
+          </SubmitButton>
         </form>
       </Section>
 
@@ -648,17 +541,10 @@ export default async function ProjectDetailPage(
       {/* Actividad */}
       <Section title="Actividad">
         <form action={boundAddNote} className="flex gap-2">
-          <input
-            name="body"
-            placeholder="Agregar una nota…"
-            className="flex-1 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <button
-            type="submit"
-            className="cursor-pointer border border-carbon px-4 py-2 text-sm text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <input name="body" placeholder="Agregar una nota…" className={`flex-1 ${inputClass}`} />
+          <SubmitButton variant="secondary" pendingLabel="Agregando…">
             Agregar
-          </button>
+          </SubmitButton>
         </form>
         <ul className="mt-4 flex flex-col gap-3">
           {(activity ?? []).map((item) => (
@@ -682,16 +568,7 @@ function SummaryStat({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-xs uppercase tracking-wide text-carbon/40">{label}</p>
-      <p className="mt-1 font-display text-lg text-carbon">{value}</p>
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="mt-8 border border-carbon/10 bg-white p-6">
-      <h2 className="mb-4 text-sm font-medium text-carbon">{title}</h2>
-      {children}
+      <p className="mt-1 font-mono text-lg font-medium text-carbon">{value}</p>
     </div>
   );
 }
@@ -719,7 +596,7 @@ function TaskGroup({
             <div>
               <p className="text-sm text-carbon">{task.title}</p>
               {task.due_date && (
-                <p className="text-xs text-carbon/40">
+                <p className="font-mono text-xs text-carbon/40">
                   Vence {new Date(task.due_date).toLocaleDateString("es-EC")}
                 </p>
               )}
@@ -734,12 +611,9 @@ function TaskGroup({
                 }))}
               />
               <form action={deleteTask.bind(null, projectId, task.id)}>
-                <button
-                  type="submit"
-                  className="cursor-pointer text-xs text-carbon/40 hover:text-red-600"
-                >
+                <SubmitButton variant="danger" size="sm" className="normal-case tracking-normal">
                   Eliminar
-                </button>
+                </SubmitButton>
               </form>
             </div>
           </div>

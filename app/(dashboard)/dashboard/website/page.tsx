@@ -1,3 +1,6 @@
+import { PlugZap } from "lucide-react";
+import PageHeader from "@/components/dashboard/ui/page-header";
+import Section from "@/components/dashboard/ui/section";
 import { getTrafficSummary } from "@/lib/integrations/google-analytics";
 import { getSearchPerformance } from "@/lib/integrations/google-search-console";
 
@@ -9,14 +12,12 @@ export default async function WebsitePage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="font-display text-2xl text-carbon">Website</h1>
-      <p className="mt-1 text-sm text-carbon/60">
-        Tráfico y posicionamiento del sitio público, vía Google Analytics 4 y Search
-        Console.
-      </p>
+      <PageHeader
+        title="Website"
+        description="Tráfico y posicionamiento del sitio público, vía Google Analytics 4 y Search Console."
+      />
 
-      <div className="mt-8 border border-carbon/10 bg-white p-6">
-        <h2 className="mb-4 text-sm font-medium text-carbon">Tráfico (Google Analytics 4)</h2>
+      <Section title="Tráfico (Google Analytics 4)">
         {traffic.configured ? (
           <table className="w-full text-sm">
             <thead>
@@ -28,10 +29,13 @@ export default async function WebsitePage() {
             </thead>
             <tbody>
               {traffic.data.byChannel.map((row) => (
-                <tr key={row.channel} className="border-b border-carbon/5">
-                  <td className="py-2">{row.channel}</td>
-                  <td className="py-2 text-right">{row.activeUsers}</td>
-                  <td className="py-2 text-right">{row.sessions}</td>
+                <tr
+                  key={row.channel}
+                  className="border-b border-carbon/5 transition-colors duration-100 last:border-0 hover:bg-hueso/60"
+                >
+                  <td className="py-2.5">{row.channel}</td>
+                  <td className="py-2.5 text-right font-mono">{row.activeUsers}</td>
+                  <td className="py-2.5 text-right font-mono">{row.sessions}</td>
                 </tr>
               ))}
             </tbody>
@@ -39,10 +43,9 @@ export default async function WebsitePage() {
         ) : (
           <NotConfigured reason={traffic.reason} />
         )}
-      </div>
+      </Section>
 
-      <div className="mt-8 border border-carbon/10 bg-white p-6">
-        <h2 className="mb-4 text-sm font-medium text-carbon">Búsqueda (Search Console)</h2>
+      <Section title="Búsqueda (Search Console)">
         {search.configured ? (
           <table className="w-full text-sm">
             <thead>
@@ -56,12 +59,15 @@ export default async function WebsitePage() {
             </thead>
             <tbody>
               {search.data.topQueries.map((row) => (
-                <tr key={row.query} className="border-b border-carbon/5">
-                  <td className="py-2">{row.query}</td>
-                  <td className="py-2 text-right">{row.clicks}</td>
-                  <td className="py-2 text-right">{row.impressions}</td>
-                  <td className="py-2 text-right">{(row.ctr * 100).toFixed(1)}%</td>
-                  <td className="py-2 text-right">{row.position.toFixed(1)}</td>
+                <tr
+                  key={row.query}
+                  className="border-b border-carbon/5 transition-colors duration-100 last:border-0 hover:bg-hueso/60"
+                >
+                  <td className="py-2.5">{row.query}</td>
+                  <td className="py-2.5 text-right font-mono">{row.clicks}</td>
+                  <td className="py-2.5 text-right font-mono">{row.impressions}</td>
+                  <td className="py-2.5 text-right font-mono">{(row.ctr * 100).toFixed(1)}%</td>
+                  <td className="py-2.5 text-right font-mono">{row.position.toFixed(1)}</td>
                 </tr>
               ))}
             </tbody>
@@ -69,7 +75,7 @@ export default async function WebsitePage() {
         ) : (
           <NotConfigured reason={search.reason} />
         )}
-      </div>
+      </Section>
     </div>
   );
 }
@@ -89,11 +95,14 @@ async function safeCall<T extends { configured: boolean }>(
 
 function NotConfigured({ reason }: { reason: string }) {
   return (
-    <div className="border border-dashed border-carbon/20 bg-hueso/50 p-4 text-sm text-carbon/60">
-      <p>{reason}</p>
-      <p className="mt-2 text-xs text-carbon/40">
-        Ver INTEGRATION_SETUP.md en el repositorio para los pasos de configuración.
-      </p>
+    <div className="flex flex-col items-center gap-3 border border-dashed border-carbon/20 bg-hueso/50 px-4 py-10 text-center">
+      <PlugZap size={20} strokeWidth={1.5} className="text-carbon/30" aria-hidden="true" />
+      <div>
+        <p className="text-sm text-carbon/60">{reason}</p>
+        <p className="mt-2 text-xs text-carbon/40">
+          Ver INTEGRATION_SETUP.md en el repositorio para los pasos de configuración.
+        </p>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,11 @@
 import Link from "next/link";
+import { Plus, Target } from "lucide-react";
+import { buttonClass } from "@/components/dashboard/ui/button";
+import EmptyState from "@/components/dashboard/ui/empty-state";
+import PageHeader from "@/components/dashboard/ui/page-header";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
-import { LEAD_STATUS_LABELS, LEAD_STATUSES, type LeadStatus } from "@/lib/supabase/types";
+import { LEAD_STATUS_LABELS, LEAD_STATUS_TONE, LEAD_STATUSES, type LeadStatus } from "@/lib/supabase/types";
 
 export default async function LeadsPage(
   props: PageProps<"/dashboard/leads">,
@@ -24,15 +29,15 @@ export default async function LeadsPage(
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl text-carbon">Leads</h1>
-        <Link
-          href="/dashboard/leads/new"
-          className="cursor-pointer bg-carbon px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-        >
-          Nuevo lead
-        </Link>
-      </div>
+      <PageHeader
+        title="Leads"
+        action={
+          <Link href="/dashboard/leads/new" className={buttonClass("primary", "md")}>
+            <Plus size={16} strokeWidth={2} aria-hidden="true" />
+            Nuevo lead
+          </Link>
+        }
+      />
 
       <div className="mt-6 flex flex-wrap gap-2">
         <FilterPill href="/dashboard/leads" label="Todos" active={!statusFilter} />
@@ -59,11 +64,14 @@ export default async function LeadsPage(
           </thead>
           <tbody>
             {(leads ?? []).map((lead) => (
-              <tr key={lead.id} className="border-b border-carbon/5 last:border-0">
+              <tr
+                key={lead.id}
+                className="border-b border-carbon/5 transition-colors duration-100 last:border-0 hover:bg-hueso/60"
+              >
                 <td className="px-4 py-3">
                   <Link
                     href={`/dashboard/leads/${lead.id}`}
-                    className="font-medium text-carbon hover:underline"
+                    className="font-medium text-carbon hover:text-naranja hover:underline"
                   >
                     {lead.name}
                   </Link>
@@ -71,22 +79,30 @@ export default async function LeadsPage(
                 <td className="px-4 py-3 text-carbon/70">{lead.email}</td>
                 <td className="px-4 py-3 text-carbon/70">{lead.location || "—"}</td>
                 <td className="px-4 py-3">
-                  <StatusBadge status={lead.status as LeadStatus} />
+                  <StatusBadge
+                    label={LEAD_STATUS_LABELS[lead.status as LeadStatus]}
+                    tone={LEAD_STATUS_TONE[lead.status as LeadStatus]}
+                  />
                 </td>
-                <td className="px-4 py-3 text-carbon/50">
+                <td className="px-4 py-3 font-mono text-xs text-carbon/50">
                   {new Date(lead.created_at).toLocaleDateString("es-EC")}
                 </td>
               </tr>
             ))}
-            {(leads ?? []).length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-carbon/50">
-                  Todavía no hay leads.
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
+        {(leads ?? []).length === 0 && (
+          <EmptyState
+            icon={Target}
+            title="Todavía no hay leads"
+            description="Los leads que lleguen desde el sitio web o que cargues manualmente aparecerán aquí."
+            action={
+              <Link href="/dashboard/leads/new" className={buttonClass("secondary", "sm")}>
+                Crear el primero
+              </Link>
+            }
+          />
+        )}
       </div>
     </div>
   );
@@ -104,7 +120,7 @@ function FilterPill({
   return (
     <Link
       href={href}
-      className={`px-3 py-1.5 text-xs uppercase tracking-wide transition-colors ${
+      className={`px-3 py-1.5 text-xs uppercase tracking-wide transition-colors duration-150 ${
         active
           ? "bg-carbon text-white"
           : "border border-carbon/20 text-carbon/60 hover:border-carbon hover:text-carbon"
@@ -112,13 +128,5 @@ function FilterPill({
     >
       {label}
     </Link>
-  );
-}
-
-function StatusBadge({ status }: { status: LeadStatus }) {
-  return (
-    <span className="inline-block border border-carbon/15 px-2 py-0.5 text-xs text-carbon/70">
-      {LEAD_STATUS_LABELS[status]}
-    </span>
   );
 }

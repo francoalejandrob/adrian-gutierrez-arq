@@ -1,6 +1,11 @@
+import { ArrowRightCircle } from "lucide-react";
 import { notFound } from "next/navigation";
 import LeadForm from "@/components/dashboard/lead-form";
 import StatusSelect from "@/components/dashboard/status-select";
+import Button from "@/components/dashboard/ui/button";
+import Section from "@/components/dashboard/ui/section";
+import SubmitButton from "@/components/dashboard/ui/submit-button";
+import { inputClass } from "@/components/dashboard/ui/styles";
 import { createClient } from "@/lib/supabase/server";
 import { LEAD_STATUS_LABELS, LEAD_STATUSES } from "@/lib/supabase/types";
 import { addLeadNote, convertLeadToClient, updateLead, updateLeadStatus } from "../actions";
@@ -37,12 +42,10 @@ export default async function LeadDetailPage(
         </div>
         {lead.status !== "ganado" && (
           <form action={boundConvert}>
-            <button
-              type="submit"
-              className="cursor-pointer bg-carbon px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-            >
+            <Button type="submit">
+              <ArrowRightCircle size={16} strokeWidth={2} aria-hidden="true" />
               Convertir en cliente
-            </button>
+            </Button>
           </form>
         )}
       </div>
@@ -58,25 +61,16 @@ export default async function LeadDetailPage(
         />
       </div>
 
-      <div className="mt-8 border border-carbon/10 bg-white p-6">
-        <h2 className="mb-4 text-sm font-medium text-carbon">Editar información</h2>
+      <Section title="Editar información">
         <LeadForm action={boundUpdate} defaultValues={lead} />
-      </div>
+      </Section>
 
-      <div className="mt-8 border border-carbon/10 bg-white p-6">
-        <h2 className="mb-4 text-sm font-medium text-carbon">Actividad</h2>
+      <Section title="Actividad">
         <form action={boundAddNote} className="flex gap-2">
-          <input
-            name="body"
-            placeholder="Agregar una nota…"
-            className="flex-1 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
-          <button
-            type="submit"
-            className="cursor-pointer border border-carbon px-4 py-2 text-sm text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <input name="body" placeholder="Agregar una nota…" className={`flex-1 ${inputClass}`} />
+          <SubmitButton variant="secondary" pendingLabel="Agregando…">
             Agregar
-          </button>
+          </SubmitButton>
         </form>
         <ul className="mt-4 flex flex-col gap-3">
           {(activity ?? []).map((item) => (
@@ -91,7 +85,7 @@ export default async function LeadDetailPage(
             <li className="text-sm text-carbon/40">Sin actividad todavía.</li>
           )}
         </ul>
-      </div>
+      </Section>
     </div>
   );
 }

@@ -1,7 +1,10 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { CheckCircle2, Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import Button from "@/components/dashboard/ui/button";
+import { inputClass, labelClass } from "@/components/dashboard/ui/styles";
 
 type Status = "idle" | "loading" | "sent" | "error";
 
@@ -35,17 +38,20 @@ export default function LoginForm({ next = "/dashboard" }: { next?: string }) {
 
   if (status === "sent") {
     return (
-      <p className="text-sm text-carbon/70">
-        Te enviamos un enlace de acceso. Revisa tu correo y ábrelo en este
-        mismo navegador.
-      </p>
+      <div className="flex items-start gap-3">
+        <CheckCircle2 size={20} strokeWidth={1.75} className="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" />
+        <p className="text-sm text-carbon/70">
+          Te enviamos un enlace de acceso. Revisa tu correo y ábrelo en este
+          mismo navegador.
+        </p>
+      </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-xs uppercase tracking-wide text-carbon/60">
+        <label htmlFor="email" className={labelClass}>
           Email
         </label>
         <input
@@ -54,7 +60,7 @@ export default function LoginForm({ next = "/dashboard" }: { next?: string }) {
           type="email"
           required
           autoComplete="email"
-          className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+          className={inputClass}
         />
       </div>
 
@@ -64,13 +70,10 @@ export default function LoginForm({ next = "/dashboard" }: { next?: string }) {
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={status === "loading"}
-        className="cursor-pointer bg-carbon px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-      >
+      <Button type="submit" disabled={status === "loading"} className="w-full">
+        {status !== "loading" && <Send size={15} strokeWidth={1.75} aria-hidden="true" />}
         {status === "loading" ? "Enviando…" : "Enviar enlace de acceso"}
-      </button>
+      </Button>
     </form>
   );
 }

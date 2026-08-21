@@ -55,9 +55,9 @@ export default async function QuotePrintPage(props: PageProps<"/dashboard/quotes
           {items.map((item) => (
             <tr key={item.id} className="border-b border-carbon/10">
               <td className="py-2">{item.description}</td>
-              <td className="py-2 text-right">{item.quantity}</td>
-              <td className="py-2 text-right">{currency.format(item.unit_price)}</td>
-              <td className="py-2 text-right">{currency.format(item.quantity * item.unit_price)}</td>
+              <td className="py-2 text-right font-mono">{item.quantity}</td>
+              <td className="py-2 text-right font-mono">{currency.format(item.unit_price)}</td>
+              <td className="py-2 text-right font-mono">{currency.format(item.quantity * item.unit_price)}</td>
             </tr>
           ))}
         </tbody>
@@ -67,19 +67,19 @@ export default async function QuotePrintPage(props: PageProps<"/dashboard/quotes
         <div className="w-64 text-sm">
           <div className="flex justify-between py-1">
             <span className="text-carbon/60">Subtotal</span>
-            <span>{currency.format(subtotal)}</span>
+            <span className="font-mono">{currency.format(subtotal)}</span>
           </div>
           <div className="flex justify-between py-1">
             <span className="text-carbon/60">Descuento</span>
-            <span>-{currency.format(quote.discount)}</span>
+            <span className="font-mono">-{currency.format(quote.discount)}</span>
           </div>
           <div className="flex justify-between py-1">
             <span className="text-carbon/60">Impuesto ({quote.tax_rate}%)</span>
-            <span>{currency.format(tax)}</span>
+            <span className="font-mono">{currency.format(tax)}</span>
           </div>
           <div className="flex justify-between border-t border-carbon/20 py-2 font-medium">
             <span>Total</span>
-            <span>{currency.format(total)}</span>
+            <span className="font-mono">{currency.format(total)}</span>
           </div>
         </div>
       </div>

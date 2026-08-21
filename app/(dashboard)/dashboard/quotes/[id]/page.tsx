@@ -1,6 +1,11 @@
 import Link from "next/link";
+import { Printer } from "lucide-react";
 import { notFound } from "next/navigation";
 import StatusSelect from "@/components/dashboard/status-select";
+import { buttonClass } from "@/components/dashboard/ui/button";
+import Section from "@/components/dashboard/ui/section";
+import SubmitButton from "@/components/dashboard/ui/submit-button";
+import { inputClass, labelClass, textareaClass } from "@/components/dashboard/ui/styles";
 import { createClient } from "@/lib/supabase/server";
 import { QUOTE_STATUS_LABELS, QUOTE_STATUSES, quoteTotal } from "@/lib/supabase/types";
 import {
@@ -36,7 +41,7 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs uppercase tracking-wide text-carbon/50">
-            <Link href={`/dashboard/projects/${quote.project_id}`} className="hover:text-naranja">
+            <Link href={`/dashboard/projects/${quote.project_id}`} className="transition-colors hover:text-naranja">
               {quote.projects?.clients?.name} — {quote.projects?.name}
             </Link>
           </p>
@@ -45,11 +50,8 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <Link
-            href={`/dashboard/quotes/${id}/print`}
-            target="_blank"
-            className="cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <Link href={`/dashboard/quotes/${id}/print`} target="_blank" className={buttonClass("secondary", "sm")}>
+            <Printer size={14} strokeWidth={1.75} aria-hidden="true" />
             Vista imprimible
           </Link>
           <StatusSelect
@@ -63,8 +65,7 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
         </div>
       </div>
 
-      <div className="mt-8 border border-carbon/10 bg-white p-6">
-        <h2 className="mb-4 text-sm font-medium text-carbon">Ítems</h2>
+      <Section title="Ítems">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-carbon/10 text-left text-xs uppercase tracking-wide text-carbon/40">
@@ -77,19 +78,19 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
           </thead>
           <tbody>
             {items.map((item) => (
-              <tr key={item.id} className="border-b border-carbon/5">
-                <td className="py-2">{item.description}</td>
-                <td className="py-2 text-right">{item.quantity}</td>
-                <td className="py-2 text-right">{currency.format(item.unit_price)}</td>
-                <td className="py-2 text-right">{currency.format(item.quantity * item.unit_price)}</td>
-                <td className="py-2 text-right">
+              <tr
+                key={item.id}
+                className="border-b border-carbon/5 transition-colors duration-100 last:border-0 hover:bg-hueso/60"
+              >
+                <td className="py-2.5">{item.description}</td>
+                <td className="py-2.5 text-right font-mono">{item.quantity}</td>
+                <td className="py-2.5 text-right font-mono">{currency.format(item.unit_price)}</td>
+                <td className="py-2.5 text-right font-mono">{currency.format(item.quantity * item.unit_price)}</td>
+                <td className="py-2.5 text-right">
                   <form action={deleteQuoteItem.bind(null, id, item.id)}>
-                    <button
-                      type="submit"
-                      className="cursor-pointer text-xs text-carbon/40 hover:text-red-600"
-                    >
+                    <SubmitButton variant="danger" size="sm" className="normal-case tracking-normal">
                       Eliminar
-                    </button>
+                    </SubmitButton>
                   </form>
                 </td>
               </tr>
@@ -105,19 +106,14 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
         </table>
 
         <form action={boundAddItem} className="mt-4 grid grid-cols-4 gap-2">
-          <input
-            name="description"
-            placeholder="Descripción"
-            required
-            className="col-span-2 border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
-          />
+          <input name="description" placeholder="Descripción" required className={`col-span-2 ${inputClass}`} />
           <input
             name="quantity"
             type="number"
             step="0.01"
             placeholder="Cantidad"
             defaultValue="1"
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+            className={inputClass}
           />
           <input
             name="unit_price"
@@ -125,87 +121,92 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
             step="0.01"
             placeholder="Precio unitario"
             required
-            className="border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+            className={inputClass}
           />
-          <button
-            type="submit"
-            className="col-span-4 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
             Agregar ítem
-          </button>
+          </SubmitButton>
         </form>
 
         <div className="mt-6 flex justify-end">
           <div className="w-64 text-sm">
             <div className="flex justify-between py-1">
               <span className="text-carbon/60">Subtotal</span>
-              <span>{currency.format(subtotal)}</span>
+              <span className="font-mono">{currency.format(subtotal)}</span>
             </div>
             <div className="flex justify-between py-1">
               <span className="text-carbon/60">Descuento</span>
-              <span>-{currency.format(quote.discount)}</span>
+              <span className="font-mono">-{currency.format(quote.discount)}</span>
             </div>
             <div className="flex justify-between py-1">
               <span className="text-carbon/60">Impuesto ({quote.tax_rate}%)</span>
-              <span>{currency.format(tax)}</span>
+              <span className="font-mono">{currency.format(tax)}</span>
             </div>
             <div className="flex justify-between border-t border-carbon/10 py-2 font-medium">
               <span>Total</span>
-              <span>{currency.format(total)}</span>
+              <span className="font-mono">{currency.format(total)}</span>
             </div>
           </div>
         </div>
-      </div>
+      </Section>
 
-      <div className="mt-8 border border-carbon/10 bg-white p-6">
-        <h2 className="mb-4 text-sm font-medium text-carbon">Detalles</h2>
+      <Section title="Detalles">
         <form action={boundUpdateMeta} className="grid grid-cols-2 gap-3">
-          <label className="text-xs text-carbon/60">
-            Descuento
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="discount" className={labelClass}>
+              Descuento
+            </label>
             <input
+              id="discount"
               name="discount"
               type="number"
               step="0.01"
               defaultValue={quote.discount}
-              className="mt-1 w-full border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+              className={inputClass}
             />
-          </label>
-          <label className="text-xs text-carbon/60">
-            Impuesto (%)
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="tax_rate" className={labelClass}>
+              Impuesto (%)
+            </label>
             <input
+              id="tax_rate"
               name="tax_rate"
               type="number"
               step="0.01"
               defaultValue={quote.tax_rate}
-              className="mt-1 w-full border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+              className={inputClass}
             />
-          </label>
-          <label className="text-xs text-carbon/60">
-            Válida hasta
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="valid_until" className={labelClass}>
+              Válida hasta
+            </label>
             <input
+              id="valid_until"
               name="valid_until"
               type="date"
               defaultValue={quote.valid_until ?? ""}
-              className="mt-1 w-full border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+              className={inputClass}
             />
-          </label>
-          <label className="col-span-2 text-xs text-carbon/60">
-            Notas
+          </div>
+          <div className="col-span-2 flex flex-col gap-1.5">
+            <label htmlFor="notes" className={labelClass}>
+              Notas
+            </label>
             <textarea
+              id="notes"
               name="notes"
               defaultValue={quote.notes ?? ""}
               rows={3}
-              className="mt-1 w-full border border-carbon/20 bg-white px-3 py-2 text-sm outline-none focus:border-carbon"
+              className={textareaClass}
             />
-          </label>
-          <button
-            type="submit"
-            className="col-span-2 w-fit cursor-pointer border border-carbon px-4 py-2 text-xs uppercase tracking-wide text-carbon transition-colors hover:bg-carbon hover:text-white"
-          >
+          </div>
+          <SubmitButton size="md" pendingLabel="Guardando…" className="col-span-2 w-fit">
             Guardar
-          </button>
+          </SubmitButton>
         </form>
-      </div>
+      </Section>
     </div>
   );
 }
