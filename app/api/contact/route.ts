@@ -5,6 +5,7 @@ type ContactPayload = {
   name?: string;
   email?: string;
   phone?: string;
+  location?: string;
   need?: string;
   message?: string;
 };
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
   const name = payload.name?.trim();
   const email = payload.email?.trim();
   const phone = payload.phone?.trim() ?? "";
+  const location = payload.location?.trim() ?? "";
   const need = payload.need?.trim() ?? "";
   const message = payload.message?.trim();
 
@@ -61,6 +63,7 @@ export async function POST(request: Request) {
         <p><strong>Nombre:</strong> ${escapeHtml(name)}</p>
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
         <p><strong>Teléfono:</strong> ${escapeHtml(phone || "No proporcionado")}</p>
+        <p><strong>Ciudad y país del proyecto:</strong> ${escapeHtml(location || "No especificado")}</p>
         <p><strong>¿Qué necesita?:</strong> ${escapeHtml(need || "No especificado")}</p>
         <p><strong>Mensaje:</strong></p>
         <p>${escapeHtml(message).replace(/\n/g, "<br />")}</p>

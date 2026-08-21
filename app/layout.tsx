@@ -32,7 +32,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Adrián Gutiérrez — Arquitectura & Diseño",
   description:
-    "Estudio de arquitectura, diseño y construcción con más de 50 proyectos entregados en Ecuador y Estados Unidos. Diseñamos y acompañamos cada obra desde la idea hasta la entrega.",
+    "Estudio de arquitectura, diseño y construcción con más de 50 proyectos entregados en Ecuador y Estados Unidos, abierto a proyectos internacionales. Diseñamos y acompañamos cada obra desde la idea hasta la entrega.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -35,6 +35,7 @@ export default function ContactoForm() {
           name: data.get("name"),
           email: data.get("email"),
           phone: data.get("phone"),
+          location: data.get("location"),
           need: data.get("need"),
           message: data.get("message"),
         }),
@@ -115,6 +116,17 @@ export default function ContactoForm() {
             type="tel"
             autoComplete="tel"
             className="w-full bg-transparent py-3 text-hueso outline-none"
+          />
+        </Field>
+
+        <Field label={t.contactoForm.location} htmlFor="location">
+          <input
+            id="location"
+            name="location"
+            type="text"
+            autoComplete="address-level2"
+            placeholder={t.contactoForm.locationPlaceholder}
+            className="w-full bg-transparent py-3 text-hueso placeholder:text-hueso/30 outline-none"
           />
         </Field>
 

@@ -319,7 +319,7 @@ export const architectBio = {
     "La buena arquitectura no se define únicamente por lo que vemos, sino por la manera en que transforma la experiencia de quienes la habitan.",
   bio: [
     "Adrián Gutiérrez es arquitecto y diseñador, con experiencia en el desarrollo de proyectos de diversas escalas y tipologías. Durante los últimos años ha desarrollado proyectos de arquitectura, diseño y remodelación en la costa ecuatoriana, explorando una arquitectura sensible al contexto, al entorno y a las necesidades particulares de cada proyecto.",
-    "Su trabajo parte de una convicción: la arquitectura debe responder al lugar, al clima, a la luz y a la manera en que las personas viven y experimentan los espacios. Desde esta perspectiva, cada proyecto busca establecer un equilibrio entre funcionalidad, identidad y expresión estética, creando espacios con carácter, propósito y una visión pensada para trascender.",
+    "Su trabajo parte de una convicción: la arquitectura debe responder al lugar, al clima, a la luz y a la manera en que las personas viven y experimentan los espacios. Desde esta perspectiva, cada proyecto busca establecer un equilibrio entre funcionalidad, identidad y expresión estética, creando espacios con carácter, propósito y una visión pensada para trascender. Hoy ese trabajo trasciende fronteras: además de Ecuador, el estudio desarrolla proyectos en Estados Unidos y está abierto a comisiones internacionales.",
   ],
 };
 

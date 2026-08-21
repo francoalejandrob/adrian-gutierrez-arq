@@ -105,9 +105,9 @@ export const dict = {
       ctaAll: "Ver todos los proyectos",
     },
     contacto: {
-      heading: "Conversemos sobre tu próximo proyecto.",
+      heading: "Conversemos sobre tu próximo proyecto, esté donde esté.",
       subheading:
-        "Cuéntanos qué necesitas y te contactaremos para agendar una primera conversación.",
+        "Trabajamos en Ecuador, Estados Unidos y con clientes en cualquier parte del mundo. Cuéntanos qué necesitas y te contactaremos para agendar una primera conversación.",
     },
     contactoCta: {
       cta: "Solicitar información",
@@ -116,6 +116,8 @@ export const dict = {
       name: "Nombre",
       email: "Email",
       phone: "Teléfono",
+      location: "Ciudad y país del proyecto",
+      locationPlaceholder: "Ej. Miami, Estados Unidos",
       need: "¿Qué necesitas?",
       needPlaceholder: "Selecciona una opción",
       message: "Mensaje",
@@ -135,7 +137,7 @@ export const dict = {
       follow: "Seguir en Instagram",
     },
     footer: {
-      tagline: "Arquitectura, diseño y construcción de proyectos en Ecuador y Estados Unidos.",
+      tagline: "Arquitectura, diseño y construcción de proyectos en Ecuador, Estados Unidos y el resto del mundo.",
       rights: "Todos los derechos reservados.",
     },
     categories: {
@@ -200,9 +202,9 @@ export const dict = {
       ctaAll: "View all projects",
     },
     contacto: {
-      heading: "Let's talk about your next project.",
+      heading: "Let's talk about your next project, wherever it is.",
       subheading:
-        "Tell us what you need and we'll reach out to schedule an initial conversation.",
+        "We work in Ecuador, the United States, and with clients anywhere in the world. Tell us what you need and we'll reach out to schedule an initial conversation.",
     },
     contactoCta: {
       cta: "Request information",
@@ -211,6 +213,8 @@ export const dict = {
       name: "Name",
       email: "Email",
       phone: "Phone",
+      location: "Project city & country",
+      locationPlaceholder: "E.g. Miami, United States",
       need: "What do you need?",
       needPlaceholder: "Select an option",
       message: "Message",
@@ -229,7 +233,7 @@ export const dict = {
       follow: "Follow on Instagram",
     },
     footer: {
-      tagline: "Architecture, design, and construction of projects in Ecuador and the United States.",
+      tagline: "Architecture, design, and construction of projects in Ecuador, the United States, and worldwide.",
       rights: "All rights reserved.",
     },
     categories: {
@@ -363,7 +367,7 @@ export const architectBioEn = {
     "Good architecture isn't defined solely by what we see, but by the way it transforms the experience of those who inhabit it.",
   bio: [
     "Adrián Gutiérrez is an architect and designer with experience developing projects of varying scale and typology. In recent years he has developed architecture, design, and renovation projects along the Ecuadorian coast, exploring an architecture sensitive to context, environment, and the particular needs of each project.",
-    "His work starts from one conviction: architecture must respond to place, climate, light, and the way people live in and experience spaces. From this perspective, every project seeks a balance between functionality, identity, and aesthetic expression, creating spaces with character, purpose, and a vision built to last.",
+    "His work starts from one conviction: architecture must respond to place, climate, light, and the way people live in and experience spaces. From this perspective, every project seeks a balance between functionality, identity, and aesthetic expression, creating spaces with character, purpose, and a vision built to last. Today that work crosses borders: alongside Ecuador, the studio develops projects in the United States and is open to international commissions.",
   ],
 };
 
