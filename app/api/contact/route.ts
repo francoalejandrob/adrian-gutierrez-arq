@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL, getResendClient } from "@/lib/resend";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 type ContactPayload = {
   name?: string;
@@ -49,6 +50,35 @@ export async function POST(request: Request) {
       { error: "El email no es válido." },
       { status: 400 },
     );
+  }
+
+  // Best-effort: create the lead in ARCHI.OS. Never blocks or fails the
+  // email send below — if Supabase is down, the lead just isn't recorded,
+  // but the studio still gets the email like before.
+  try {
+    const supabase = createAdminClient();
+    const { data: organization } = await supabase
+      .from("organizations")
+      .select("id")
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    if (organization) {
+      const { error: leadError } = await supabase.from("leads").insert({
+        organization_id: organization.id,
+        name,
+        email,
+        phone: phone || null,
+        location: location || null,
+        need: need || null,
+        message,
+        source: "web",
+      });
+      if (leadError) console.error("Lead insert error:", leadError);
+    }
+  } catch (error) {
+    console.error("Lead insert failed:", error);
   }
 
   try {

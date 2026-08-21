@@ -9,6 +9,21 @@ Framer Motion.
 `RESEND_API_KEY` en las variables de entorno del proyecto en Vercel — ver
 más abajo).
 
+## ARCHI.OS — panel privado
+
+Este repo también aloja el panel interno del estudio (CRM) bajo `/dashboard`
+y `/login`, separado del sitio público por route groups de Next.js — ver
+`ARCHITECTURE.md` para el porqué. Estado actual, alcance de esta primera
+fase y lo que falta: `AUDIT.md`, `ARCHITECTURE.md`, `DATABASE.md`,
+`ROADMAP.md`, `INTEGRATION_SETUP.md`.
+
+Requiere las variables `NEXT_PUBLIC_SUPABASE_URL`,
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` (proyecto
+Supabase `ArqSystem&Website`) — ver `.env.local.example`. El login es por
+enlace mágico a tu email; el primer usuario que inicia sesión queda
+automáticamente como `org_admin` del estudio (ver la migración
+`supabase/migrations/0002_seed_and_bootstrap.sql`).
+
 ## Contenido de demostración
 
 Este proyecto está en desarrollo. Los 7 proyectos reales (`lib/content.ts`,
@@ -133,12 +148,17 @@ Abre [http://localhost:3000](http://localhost:3000).
 
 ```
 app/
-├─ page.tsx                 → compone todas las secciones de la home
-├─ proyectos/page.tsx       → listado de proyectos (ruta preparada)
-└─ api/contact/route.ts     → endpoint que envía el email vía Resend
-components/                 → una sección/pieza de UI por archivo
-lib/content.ts              → todo el contenido de texto del sitio
+├─ (public)/                → sitio público (mismas URLs de siempre: /, /proyectos, ...)
+├─ (dashboard)/              → panel privado: /login, /dashboard/*
+├─ auth/callback/route.ts   → callback del enlace mágico de Supabase
+└─ api/contact/route.ts     → envía el email (Resend) y crea el lead en Supabase
+components/                 → una sección/pieza de UI por archivo (sitio público)
+components/dashboard/       → componentes del panel privado
+lib/content.ts              → todo el contenido de texto del sitio público
 lib/resend.ts               → cliente de Resend
+lib/supabase/                → clientes de Supabase (server/browser/admin) + tipos
+supabase/migrations/         → esquema de la base de datos, versionado
+proxy.ts                     → protege /dashboard/* (antes "middleware.ts")
 ```
 
 ## Despliegue en Vercel
@@ -148,7 +168,8 @@ El código ya está en GitHub: https://github.com/francoalejandrob/adrian-gutier
 1. Sube el repositorio a GitHub.
 2. Importa el proyecto en [Vercel](https://vercel.com/new).
 3. Agrega las variables de entorno (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
-   `CONTACT_FROM_EMAIL` y, si ya tienes el feed de Instagram configurado,
-   `IG_ACCESS_TOKEN` e `IG_USER_ID`) en la configuración del proyecto en
-   Vercel.
+   `CONTACT_FROM_EMAIL`, `NEXT_PUBLIC_SUPABASE_URL`,
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y, si ya
+   tienes el feed de Instagram configurado, `IG_ACCESS_TOKEN` e
+   `IG_USER_ID`) en la configuración del proyecto en Vercel.
 4. Despliega.
