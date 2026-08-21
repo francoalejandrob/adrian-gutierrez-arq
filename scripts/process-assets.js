@@ -108,30 +108,33 @@ const PROJECTS = [
   },
 ];
 
-const INSTAGRAM_IMAGES = ["2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.png", "7.png", "8.png"];
-const INSTAGRAM_VIDEO = "1.mp4";
+const INSTAGRAM_IMAGES = [
+  "foto 1.png",
+  "foto 2.png",
+  "foto 3.png",
+  "foto 4.png",
+  "FOTO 5.jpg",
+  "FOTO 6.jpg",
+  "FOTO 7.jpg",
+  "FOTO 8.jpg",
+];
 
 async function processInstagram() {
   const srcDir = path.join(ROOT, "Instagram");
   const outDir = path.join(PUBLIC, "instagram");
   fs.mkdirSync(outDir, { recursive: true });
+  for (const old of fs.readdirSync(outDir)) fs.rmSync(path.join(outDir, old));
 
-  for (const file of INSTAGRAM_IMAGES) {
-    const outFile = path.join(outDir, `${path.parse(file).name}.jpg`);
-    await sharp(path.join(srcDir, file))
+  for (let i = 0; i < INSTAGRAM_IMAGES.length; i++) {
+    const outFile = path.join(outDir, `${i + 1}.jpg`);
+    await sharp(path.join(srcDir, INSTAGRAM_IMAGES[i]))
       .resize({ width: 1600, withoutEnlargement: true })
       .flatten({ background: "#ffffff" })
       .jpeg({ quality: 90, mozjpeg: true })
       .toFile(outFile);
     const stat = fs.statSync(outFile);
-    console.log(`instagram/${path.parse(file).name}.jpg  ${(stat.size / 1024).toFixed(0)}KB`);
+    console.log(`instagram/${i + 1}.jpg  ${(stat.size / 1024).toFixed(0)}KB`);
   }
-
-  fs.copyFileSync(
-    path.join(srcDir, INSTAGRAM_VIDEO),
-    path.join(outDir, INSTAGRAM_VIDEO),
-  );
-  console.log(`instagram/${INSTAGRAM_VIDEO} copied`);
 }
 
 async function processProjects() {
