@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { notifyStudio } from "@/lib/notifications";
 import { createClient } from "@/lib/supabase/server";
+import { DOC_VERSION_STATUS_LABELS, QUOTE_STATUS_LABELS } from "@/lib/supabase/types";
 
 const responseSchema = z.enum(["aprobado", "cambios_solicitados"]);
 
@@ -32,6 +34,22 @@ export async function respondToDocumentVersion(
     .eq("id", versionId);
   if (error) throw new Error(error.message);
 
+  const { data: project } = await supabase
+    .from("projects")
+    .select("organization_id, name")
+    .eq("id", projectId)
+    .single();
+  if (project) {
+    await notifyStudio({
+      organizationId: project.organization_id,
+      type: "document.responded",
+      title: `${project.name}: documento ${DOC_VERSION_STATUS_LABELS[status].toLowerCase()}`,
+      body: comment,
+      entityType: "project",
+      entityId: projectId,
+    });
+  }
+
   revalidatePath(`/portal/projects/${projectId}`);
 }
 
@@ -49,6 +67,21 @@ export async function respondToQuote(projectId: string, quoteId: string, formDat
     .eq("id", quoteId);
   if (error) throw new Error(error.message);
 
+  const { data: project } = await supabase
+    .from("projects")
+    .select("organization_id, name")
+    .eq("id", projectId)
+    .single();
+  if (project) {
+    await notifyStudio({
+      organizationId: project.organization_id,
+      type: "quote.responded",
+      title: `${project.name}: cotización ${QUOTE_STATUS_LABELS[status].toLowerCase()}`,
+      entityType: "project",
+      entityId: projectId,
+    });
+  }
+
   revalidatePath(`/portal/projects/${projectId}`);
 }
 
@@ -63,7 +96,7 @@ export async function addPortalMessage(projectId: string, formData: FormData) {
 
   const { data: project } = await supabase
     .from("projects")
-    .select("organization_id")
+    .select("organization_id, name")
     .eq("id", projectId)
     .single();
   if (!project) throw new Error("Proyecto no encontrado");
@@ -77,6 +110,15 @@ export async function addPortalMessage(projectId: string, formData: FormData) {
     visible_to_client: true,
   });
   if (error) throw new Error(error.message);
+
+  await notifyStudio({
+    organizationId: project.organization_id,
+    type: "message.received",
+    title: `Nuevo mensaje en ${project.name}`,
+    body,
+    entityType: "project",
+    entityId: projectId,
+  });
 
   revalidatePath(`/portal/projects/${projectId}`);
 }

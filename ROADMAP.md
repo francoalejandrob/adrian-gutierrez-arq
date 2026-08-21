@@ -144,12 +144,42 @@ al estudio o al cliente (Fase 6).
 - Cache de las respuestas de Google — tráfico bajo hoy, no justifica la
   complejidad; se agrega si el uso real lo pide.
 
-## Fase 6 — Automatizaciones ⬜
+## Fase 6 — Automatizaciones ✅
 
-Workflows por evento (`quote.accepted` → crea proyecto + fases +
-carpetas...; `website.lead_created` → asigna + notifica), notificaciones
-in-app/email, integración con Google Calendar, arquitectura preparada
-para WhatsApp Business Cloud API.
+- [x] `notifications` (migración `0008_notifications.sql`), RLS de solo
+      lectura/marcar-leída desde la sesión — los inserts siempre van por
+      `lib/notifications.ts` (cliente admin), ver `DATABASE.md` §1e
+- [x] Eventos reales conectados: nuevo lead desde la web, cliente
+      responde/aprueba un documento, cliente acepta/rechaza una
+      cotización, cliente escribe un mensaje en el portal — cada uno ya
+      generaba una mutación real (Fases 2-4); Fase 6 le agregó el aviso,
+      no inventó el evento
+- [x] Centro de notificaciones: `/dashboard/notifications` (marcar una o
+      todas como leídas) + contador de no leídas en el sidebar
+- [x] Email real a `CONTACT_TO_EMAIL` (Resend, ya configurado) cuando el
+      cliente responde/acepta/escribe en el portal — best-effort, nunca
+      rompe la acción del cliente si el envío falla
+- [x] `quote.accepted` → 5 fases plantilla: se adelantó en Fase 4 (era la
+      pieza de automatización real más obviamente útil de ahí, y quotes
+      ya existían) en vez de reimplementarla aquí como un "workflow"
+      genérico separado
+
+**No incluido en Fase 6**:
+- Motor de workflows configurable (if this → that por UI) — con un único
+  automatismo real (`quote.accepted`) y 4 tipos de notificación fijos,
+  un motor genérico sería la abstracción prematura que la sección 55 del
+  master prompt pide evitar. Se reconsidera si aparece un tercer patrón
+  de automatización con forma distinta.
+- Estado de lectura por notificación *por usuario* — ver "simplificación
+  deliberada" en `DATABASE.md` §1e.
+- `lib/integrations/google-calendar.ts`: solo interfaz de
+  detección de configuración — el flujo OAuth por usuario (necesario
+  porque Calendar no admite cuenta de servicio como GA4/Search Console)
+  no está implementado todavía. Documentado en `INTEGRATION_SETUP.md`.
+- `lib/integrations/whatsapp.ts`: wiring real contra la Graph API
+  (`sendWhatsAppMessage`), gateado por credenciales — escrito pero **no
+  probado de punta a punta** y nada en la UI lo llama todavía (no hay un
+  caso de uso concreto que lo dispare esta fase).
 
 ## Fase 7 — IA (Archi AI) ⬜
 

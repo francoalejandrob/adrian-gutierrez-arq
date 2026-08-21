@@ -31,6 +31,8 @@ export type DocVersionStatus = DocVersion["status"];
 
 export type PortalAccess = Database["public"]["Tables"]["portal_access"]["Row"];
 
+export type Notification = Database["public"]["Tables"]["notifications"]["Row"];
+
 export type Quote = Database["public"]["Tables"]["quotes"]["Row"];
 export type QuoteStatus = Quote["status"];
 export type QuoteItem = Database["public"]["Tables"]["quote_items"]["Row"];

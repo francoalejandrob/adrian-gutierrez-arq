@@ -268,6 +268,50 @@ Adicional (no reemplaza) a la RLS org-scoped:
 - `contracts` y `expenses`: **sin** policy de portal — el cliente nunca
   ve el valor del contrato ni los gastos internos del estudio.
 
+## 1e. Tablas de Fase 6 — Automatizaciones
+
+Migración `0008_notifications.sql`.
+
+### `notifications`
+| columna | tipo | notas |
+|---|---|---|
+| id, organization_id | uuid | |
+| user_id | uuid, FK → profiles, nullable | `null` = visible a todos los miembros de la organización. Hoy **siempre** `null` — con 2 usuarios `org_admin` no hay todavía una razón real para dirigir una notificación a uno y no al otro (mismo criterio de "no roles sin necesidad real" que el resto del esquema) |
+| type | text | libre, p. ej. `lead.created`, `document.responded`, `quote.responded`, `message.received` |
+| title, body | text | `body` nullable |
+| entity_type, entity_id | text / uuid | nullable, para enlazar a la entidad relacionada (hoy siempre `project` o `lead`) |
+| read_at | timestamptz | nullable = no leída |
+| created_at | timestamptz | |
+
+**Simplificación deliberada**: no hay estado de lectura por usuario. Con
+`user_id` casi siempre `null` (broadcast), marcar una notificación como
+leída la marca leída para *todos* los miembros de la organización — no
+hay una tabla intermedia `notification_reads`. Aceptable con 2 usuarios;
+se revisita si se agrega un tercer usuario y la falta de estado
+individual empieza a molestar en la práctica.
+
+### Inserts: siempre vía cliente admin
+Ningún usuario —ni de dashboard ni de portal— tiene permiso de insertar
+directamente en `notifications` (no hay policy de insert). El insert
+siempre pasa por `lib/notifications.ts` (`notifyStudio()`), que usa el
+cliente service-role. Es la única forma práctica de que una acción de un
+usuario de **portal** (que no es `organization_member`) pueda dejarle un
+aviso al estudio sin necesitar una policy nueva y más permisiva sobre una
+tabla que el resto de la organización sí puede leer.
+
+### Eventos que disparan una notificación (Fase 6)
+- Nuevo lead desde el sitio web (`app/api/contact/route.ts`, sin email
+  duplicado — el estudio ya recibe el correo de siempre).
+- Cliente responde/aprueba un documento en el portal
+  (`respondToDocumentVersion` en `app/(portal)/portal/actions.ts`).
+- Cliente acepta/rechaza una cotización en el portal (`respondToQuote`).
+- Cliente escribe un mensaje en el portal (`addPortalMessage`).
+
+Las tres acciones de portal además envían un email al estudio vía Resend
+(reutilizando `lib/resend.ts`, mismo patrón que `api/contact`) —
+best-effort: si Resend falla, la acción del cliente en el portal igual
+se guarda, solo se pierde el aviso por correo.
+
 ## 2. RLS (todas las tablas de arriba)
 
 Policy única por tabla: el usuario debe estar autenticado y pertenecer
@@ -332,8 +376,10 @@ detalle cuando se implemente cada fase (`ROADMAP.md`):
   tablas de negocio — se consultan vía API en cada carga de
   `/dashboard/website`, sin cachear todavía (tráfico bajo, no hace falta
   aún).
-- **Fase 6 — Automatizaciones**: `notifications`, y probablemente una
-  tabla de definición de workflows si no se resuelve en código.
+- **Fase 6 — Automatizaciones**: implementado — ver §1e. No hizo falta
+  una tabla de definición de workflows: los eventos que disparan una
+  notificación se resolvieron en código, dentro de la misma Server Action
+  que ya hacía la mutación (ver `lib/notifications.ts`).
 - **Fase 7 — IA**: sin tablas propias necesariamente; depende de tools que
   leen las tablas existentes respetando RLS (sección 34 — nunca acceso
   directo sin pasar por los mismos permisos que un usuario).

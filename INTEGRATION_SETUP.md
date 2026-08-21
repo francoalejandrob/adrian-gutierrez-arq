@@ -56,14 +56,36 @@ productos/precios creados, y las keys (`STRIPE_SECRET_KEY`,
 `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`).
 
 ### WhatsApp Business Cloud API (Fase 6)
-Requiere una cuenta de WhatsApp Business verificada y una app en Meta for
-Developers con el producto WhatsApp agregado (proceso similar al que ya
-hicimos para el token de Instagram). Se documenta con más detalle cuando
-se llegue a esa fase.
+El código ya está escrito y listo para activarse
+(`lib/integrations/whatsapp.ts`) — **no probado de punta a punta** (sin
+número de prueba todavía) y nada en la UI lo dispara todavía (no hay
+todavía un evento concreto que lo necesite).
+
+1. Cuenta de WhatsApp Business verificada + app en Meta for Developers
+   con el producto WhatsApp agregado (proceso similar al que ya hicimos
+   para el token de Instagram).
+2. Agregar en Vercel: `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`.
+
+Importante: fuera de la ventana de 24h de una conversación iniciada por
+el cliente, Meta exige usar un mensaje de plantilla pre-aprobado en vez
+de texto libre — `sendWhatsAppMessage()` solo implementa el caso de texto
+libre por ahora.
 
 ### Google Calendar (Fase 6)
-OAuth de Google (client ID/secret) para que ARCHI.OS pueda leer/escribir
-en tu calendario. Se configura cuando se implemente la Fase 6.
+A diferencia de GA4/Search Console, Calendar necesita que **cada
+usuario** autorice el acceso a su propio calendario (OAuth de 3 patas),
+no una cuenta de servicio — es una app cliente OAuth (consent screen +
+ruta de callback + guardar el refresh token por usuario), no solo una
+credencial. Por eso `lib/integrations/google-calendar.ts` de esta fase es
+solo la interfaz de detección de configuración; el flujo de autorización
+en sí **no está implementado todavía** — se construye cuando haya un caso
+de uso concreto (p. ej. sincronizar el cronograma de un proyecto) que
+justifique el trabajo de esa integración completa.
+
+1. En Google Cloud Console: crear credenciales OAuth 2.0 de tipo "Web
+   application" con la URL de callback que se decida en ese momento.
+2. Agregar en Vercel: `GOOGLE_CALENDAR_CLIENT_ID`,
+   `GOOGLE_CALENDAR_CLIENT_SECRET`.
 
 ## Convención para pasarme credenciales
 

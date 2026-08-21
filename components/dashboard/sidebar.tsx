@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signOut } from "@/app/(dashboard)/dashboard/auth-actions";
+import { createClient } from "@/lib/supabase/server";
 
 const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard" },
@@ -11,7 +12,13 @@ const NAV_LINKS = [
   { href: "/dashboard/website", label: "Website" },
 ];
 
-export default function Sidebar() {
+export default async function Sidebar() {
+  const supabase = await createClient();
+  const { count: unreadCount } = await supabase
+    .from("notifications")
+    .select("*", { count: "exact", head: true })
+    .is("read_at", null);
+
   return (
     <aside className="flex w-56 shrink-0 flex-col justify-between border-r border-carbon/10 bg-white px-4 py-6">
       <div>
@@ -29,6 +36,17 @@ export default function Sidebar() {
               {link.label}
             </Link>
           ))}
+          <Link
+            href="/dashboard/notifications"
+            className="flex items-center justify-between px-3 py-2 text-sm text-carbon/80 transition-colors hover:bg-hueso hover:text-carbon"
+          >
+            Notificaciones
+            {Boolean(unreadCount) && (
+              <span className="flex h-5 min-w-5 items-center justify-center bg-naranja px-1.5 text-[11px] font-medium text-carbon">
+                {unreadCount}
+              </span>
+            )}
+          </Link>
         </nav>
       </div>
 

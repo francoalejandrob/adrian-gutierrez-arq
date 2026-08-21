@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { notifyStudio } from "@/lib/notifications";
 import { CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL, getResendClient } from "@/lib/resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -71,23 +72,41 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (organization) {
-      const { error: leadError } = await supabase.from("leads").insert({
-        organization_id: organization.id,
-        name,
-        email,
-        phone: phone || null,
-        location: location || null,
-        need: need || null,
-        message,
-        source: "web",
-        utm_source: payload.utm_source || null,
-        utm_medium: payload.utm_medium || null,
-        utm_campaign: payload.utm_campaign || null,
-        utm_term: payload.utm_term || null,
-        utm_content: payload.utm_content || null,
-        landing_page: payload.landing_page || null,
-      });
+      const { data: lead, error: leadError } = await supabase
+        .from("leads")
+        .insert({
+          organization_id: organization.id,
+          name,
+          email,
+          phone: phone || null,
+          location: location || null,
+          need: need || null,
+          message,
+          source: "web",
+          utm_source: payload.utm_source || null,
+          utm_medium: payload.utm_medium || null,
+          utm_campaign: payload.utm_campaign || null,
+          utm_term: payload.utm_term || null,
+          utm_content: payload.utm_content || null,
+          landing_page: payload.landing_page || null,
+        })
+        .select("id")
+        .single();
       if (leadError) console.error("Lead insert error:", leadError);
+
+      // Best-effort in-app notification. No email here — the studio
+      // already gets the email below (this branch would just duplicate it).
+      if (lead) {
+        await notifyStudio({
+          organizationId: organization.id,
+          type: "lead.created",
+          title: `Nuevo lead: ${name}`,
+          body: message,
+          entityType: "lead",
+          entityId: lead.id,
+          email: false,
+        });
+      }
     }
   } catch (error) {
     console.error("Lead insert failed:", error);
