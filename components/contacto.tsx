@@ -22,16 +22,16 @@ export default function Contacto() {
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-gradient-to-t from-carbon via-carbon/10 to-transparent"
+            className="absolute inset-0 bg-gradient-to-t from-hueso via-hueso/55 to-transparent"
           />
           <div className="absolute inset-x-0 bottom-0 p-8">
-            <h2 className="font-display text-3xl sm:text-4xl">
+            <h2 className="font-display text-3xl text-carbon sm:text-4xl">
               <RevealText text={t.contacto.heading} />
             </h2>
-            <p className="mt-6 max-w-sm text-base leading-relaxed text-hueso/70">
+            <p className="mt-6 max-w-sm text-base leading-relaxed text-carbon/70">
               {t.contacto.subheading}
             </p>
-            <div className="mt-8 flex flex-col gap-2 text-base text-hueso/80">
+            <div className="mt-8 flex flex-col gap-2 text-base text-carbon/80">
               <a
                 href={`mailto:${studio.email}`}
                 className="w-fit transition-colors hover:text-naranja"
