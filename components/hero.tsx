@@ -10,9 +10,11 @@ import {
 } from "framer-motion";
 import RevealText from "@/components/reveal-text";
 import { studio } from "@/lib/content";
+import { useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
 
 export default function Hero() {
+  const t = useT();
   const sectionRef = useRef<HTMLElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
@@ -78,13 +80,13 @@ export default function Hero() {
         </motion.p>
         <h1 className="font-display text-5xl leading-[1.15] tracking-normal sm:text-6xl md:text-7xl">
           <span className="block">
-            <RevealText text="Diseñamos y construimos" triggerOnMount delay={0.15} />
+            <RevealText text={t.hero.line1} triggerOnMount delay={0.15} />
           </span>
           <span className="block">
-            <RevealText text="proyectos que buscan" triggerOnMount delay={0.3} />
+            <RevealText text={t.hero.line2} triggerOnMount delay={0.3} />
           </span>
           <span className="block">
-            <RevealText text="trascender." triggerOnMount delay={0.45} />
+            <RevealText text={t.hero.line3} triggerOnMount delay={0.45} />
           </span>
         </h1>
         <motion.p
@@ -93,8 +95,7 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.85, ease: EASE_OUT }}
           className="mt-8 max-w-xl text-xl text-hueso/85"
         >
-          Arquitectura, diseño y construcción concebidos para crear espacios
-          con identidad, propósito y permanencia.
+          {t.hero.subtext}
         </motion.p>
       </motion.div>
 

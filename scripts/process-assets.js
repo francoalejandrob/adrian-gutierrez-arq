@@ -126,21 +126,26 @@ async function processProjects() {
   }
 }
 
-async function cropIcon(logoFile, width) {
+// Crop heights were measured per-file from the alpha-channel row profile
+// (icon glyph ends, then a gap, then the "ADRIAN GUTIERREZ..." wordmark
+// starts) so the crop lands in that gap and never clips the icon itself.
+async function cropIcon(logoFile, cropHeight, width) {
   const src = path.join(ROOT, "logos", "LOGOS", logoFile);
   const cropped = await sharp(src)
-    .extract({ left: 0, top: 0, width: 4921, height: 3550 })
+    .extract({ left: 0, top: 0, width: 4921, height: cropHeight })
     .toBuffer();
   return sharp(cropped).trim().resize({ width });
 }
 
 async function processLogo() {
-  await (await cropIcon("blanco.png", 480)).toFile(
+  await (await cropIcon("blanco.png", 4030, 480)).toFile(
     path.join(PUBLIC, "logo-icon.png"),
   );
   console.log("public/logo-icon.png written");
 
-  const orangeIcon = await (await cropIcon("negro naranja.png", 512)).toBuffer();
+  const orangeIcon = await (
+    await cropIcon("negro naranja.png", 3850, 512)
+  ).toBuffer();
   await sharp(orangeIcon).toFile(path.join(ROOT, "app", "icon.png"));
   console.log("app/icon.png written");
 

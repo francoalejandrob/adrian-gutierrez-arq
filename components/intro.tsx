@@ -3,18 +3,17 @@
 import { motion } from "framer-motion";
 import CountUp from "@/components/count-up";
 import { studio } from "@/lib/content";
+import { useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
 
-const stats = [
-  {
-    to: studio.projectCount,
-    suffix: "+",
-    label: "Proyectos entregados en Ecuador y Estados Unidos",
-  },
-  { to: 100, suffix: "%", label: "Supervisión directa en obra" },
-];
-
 export default function Intro() {
+  const t = useT();
+
+  const stats = [
+    { to: studio.projectCount, suffix: "+", label: t.intro.statProjects },
+    { to: 100, suffix: "%", label: t.intro.statSupervision },
+  ];
+
   return (
     <section className="bg-carbon py-14 text-hueso md:py-20">
       <div className="mx-auto flex max-w-4xl flex-col items-center px-6 text-center md:px-10">
@@ -25,10 +24,9 @@ export default function Intro() {
           transition={{ duration: 0.7, ease: EASE_OUT }}
           className="font-display text-3xl leading-[1.3] sm:text-4xl md:text-5xl"
         >
-          Cada proyecto empieza por entender cómo entra el sol, de dónde
-          viene el viento y cómo se va a{" "}
-          <span className="font-semibold">vivir el espacio</span>, mucho
-          antes de dibujar una fachada.
+          {t.intro.headingBefore}
+          <span className="font-semibold">{t.intro.headingBold}</span>
+          {t.intro.headingAfter}
         </motion.h2>
 
         <motion.div

@@ -131,7 +131,6 @@ export const projects: Project[] = [
     code: "PROY. 06",
     image: "/proyectos/hotel-palmar/1.jpg",
     imageAlt: "Sala de una suite de Hotel Palmar con arco de piedra texturizada y mobiliario boho",
-    featured: true,
     gallery: [
       { src: "/proyectos/hotel-palmar/1.jpg", alt: "Sala de estar de una suite de Hotel Palmar" },
       { src: "/proyectos/hotel-palmar/2.jpg", alt: "Cocineta de una suite de Hotel Palmar" },
@@ -299,8 +298,6 @@ export type ProcessStep = {
   title: string;
   description: string;
 };
-
-export const processEyebrow = "AG Arquitectura";
 
 export const process: ProcessStep[] = [
   {

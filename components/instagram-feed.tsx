@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import InstagramIcon from "@/components/icons/instagram-icon";
 import { studio } from "@/lib/content";
+import { useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
 
 const HANDLE = studio.instagram;
@@ -14,6 +15,8 @@ const POSTS = Array.from({ length: 8 }, (_, i) => ({
 }));
 
 export default function InstagramFeed() {
+  const t = useT();
+
   return (
     <section className="border-t border-hueso/10 bg-carbon py-14 md:py-20">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
@@ -33,7 +36,7 @@ export default function InstagramFeed() {
             rel="noopener noreferrer"
             className="press hidden font-mono text-xs uppercase tracking-[0.15em] text-hueso/60 transition-colors duration-200 hover:text-naranja sm:inline"
           >
-            Seguir en Instagram
+            {t.instagram.follow}
           </a>
         </div>
 

@@ -1,9 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import ContactoForm from "@/components/contacto-form";
 import RevealText from "@/components/reveal-text";
 import { studio } from "@/lib/content";
+import { useT } from "@/lib/i18n";
 
 export default function Contacto() {
+  const t = useT();
+
   return (
     <section id="contacto" className="bg-carbon py-14 text-hueso md:py-20">
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-16 px-6 md:grid-cols-12 md:px-10">
@@ -21,11 +26,10 @@ export default function Contacto() {
           />
           <div className="absolute inset-x-0 bottom-0 p-8">
             <h2 className="font-display text-3xl sm:text-4xl">
-              <RevealText text="Conversemos sobre tu próximo proyecto." />
+              <RevealText text={t.contacto.heading} />
             </h2>
             <p className="mt-6 max-w-sm text-base leading-relaxed text-hueso/70">
-              Cuéntanos qué necesitas y te contactaremos para agendar una
-              primera conversación.
+              {t.contacto.subheading}
             </p>
             <div className="mt-8 flex flex-col gap-2 text-base text-hueso/80">
               <a

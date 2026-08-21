@@ -1,16 +1,21 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import InstagramIcon from "@/components/icons/instagram-icon";
 import { studio } from "@/lib/content";
+import { useT } from "@/lib/i18n";
 
 const SECONDARY_LINKS = [
-  { href: "/#proyectos", label: "Proyectos" },
-  { href: "/#estudio", label: "Estudio" },
-  { href: "/#proceso", label: "Proceso" },
-  { href: "/#contacto", label: "Contacto" },
-];
+  { href: "/#proyectos", key: "proyectos" },
+  { href: "/#estudio", key: "estudio" },
+  { href: "/#proceso", key: "proceso" },
+  { href: "/#contacto", key: "contacto" },
+] as const;
 
 export default function Footer() {
+  const t = useT();
+
   return (
     <footer className="bg-carbon text-hueso">
       <div className="mx-auto max-w-[1600px] px-6 py-16 md:px-10">
@@ -18,14 +23,13 @@ export default function Footer() {
           <div>
             <Image
               src="/logo-icon.png"
-              alt="Adrián Gutiérrez — Arquitectura & Diseño"
-              width={55}
+              alt={`Adrián Gutiérrez — ${t.sobreEstudio.role}`}
+              width={49}
               height={48}
               className="h-12 w-auto"
             />
             <p className="mt-4 max-w-xs text-sm text-hueso/60">
-              Arquitectura, diseño y construcción de proyectos en Ecuador y
-              Estados Unidos.
+              {t.footer.tagline}
             </p>
           </div>
 
@@ -36,7 +40,7 @@ export default function Footer() {
                 href={link.href}
                 className="font-mono text-xs uppercase tracking-[0.15em] text-hueso/70 transition-colors hover:text-naranja"
               >
-                {link.label}
+                {t.nav[link.key]}
               </Link>
             ))}
           </nav>
@@ -63,10 +67,9 @@ export default function Footer() {
 
         <div className="mt-16 flex flex-col gap-4 border-t border-hueso/10 pt-8 text-xs text-hueso/40 sm:flex-row sm:items-center sm:justify-between">
           <span>
-            © {new Date().getFullYear()} {studio.name}. Todos los derechos
-            reservados.
+            © {new Date().getFullYear()} {studio.name}. {t.footer.rights}
           </span>
-          <span>{studio.role}</span>
+          <span>{t.sobreEstudio.role}</span>
         </div>
       </div>
     </footer>

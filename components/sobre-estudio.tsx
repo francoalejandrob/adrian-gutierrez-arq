@@ -3,17 +3,22 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import BlueprintArt, { BlueprintVariant } from "@/components/blueprint-art";
-import { architectBio, studio } from "@/lib/content";
+import { architectBio as architectBioEs, studio } from "@/lib/content";
+import { architectBioEn, useLocale, useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
 
-const detailStrip: { label: string; art: BlueprintVariant }[] = [
-  { label: "Boceto inicial", art: "estudio" },
-  { label: "Materiales", art: "materiales" },
-  { label: "Luz natural", art: "luz" },
-  { label: "Obra en sitio", art: "sostenibilidad" },
+const detailStripArt: BlueprintVariant[] = [
+  "estudio",
+  "materiales",
+  "luz",
+  "sostenibilidad",
 ];
 
 export default function SobreEstudio() {
+  const t = useT();
+  const { locale } = useLocale();
+  const architectBio = locale === "es" ? architectBioEs : architectBioEn;
+
   return (
     <section id="estudio" className="bg-carbon py-14 text-hueso md:py-20">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
@@ -30,14 +35,14 @@ export default function SobreEstudio() {
                 src="/logo-icon.png"
                 alt=""
                 width={480}
-                height={422}
+                height={473}
                 className="h-full w-full object-contain"
               />
             </div>
             <p className="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-hueso/60">
               {studio.name}
             </p>
-            <p className="text-base text-hueso/60">{studio.role}</p>
+            <p className="text-base text-hueso/60">{t.sobreEstudio.role}</p>
           </motion.div>
 
           <motion.div
@@ -62,9 +67,9 @@ export default function SobreEstudio() {
         </div>
 
         <div className="mt-20 flex gap-px overflow-x-auto border border-hueso/10 bg-hueso/10">
-          {detailStrip.map((item, i) => (
+          {t.sobreEstudio.detailStrip.map((label, i) => (
             <motion.div
-              key={item.label}
+              key={label}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10%" }}
@@ -73,13 +78,13 @@ export default function SobreEstudio() {
             >
               <div className="transition-transform duration-300 ease-out-strong group-hover:scale-110">
                 <BlueprintArt
-                  variant={item.art}
+                  variant={detailStripArt[i]}
                   className="h-14 w-14"
                   strokeClassName="text-hueso/60"
                 />
               </div>
               <span className="font-mono text-xs uppercase tracking-[0.15em] text-hueso/60">
-                {item.label}
+                {label}
               </span>
             </motion.div>
           ))}

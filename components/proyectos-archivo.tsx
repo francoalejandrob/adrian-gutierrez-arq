@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Project, projects } from "@/lib/content";
+import { useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
 
 const CATEGORIES = [
@@ -13,6 +14,7 @@ const CATEGORIES = [
 ] as const;
 
 export default function ProyectosArchivo() {
+  const t = useT();
   const [active, setActive] = useState<(typeof CATEGORIES)[number]>("Todos");
 
   const filtered = useMemo(
@@ -24,8 +26,16 @@ export default function ProyectosArchivo() {
   );
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-3">
+    <section className="mx-auto max-w-[1600px] px-6 pb-28 pt-40 md:px-10">
+      <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-piedra">
+        {t.proyectosPage.eyebrow}
+      </p>
+      <h1 className="max-w-2xl font-display text-4xl text-carbon sm:text-5xl">
+        {t.proyectosPage.heading}
+      </h1>
+      <p className="mt-6 max-w-xl text-piedra">{t.proyectosPage.subheading}</p>
+
+      <div className="mt-16 flex flex-wrap gap-3">
         {CATEGORIES.map((category) => (
           <button
             key={category}
@@ -37,7 +47,7 @@ export default function ProyectosArchivo() {
                 : "border-piedra/30 text-piedra hover:border-carbon hover:text-carbon"
             }`}
           >
-            {category}
+            {category === "Todos" ? t.proyectosArchivo.todos : t.categories[category]}
           </button>
         ))}
       </div>
@@ -47,11 +57,20 @@ export default function ProyectosArchivo() {
           <ArchiveCard key={project.id} project={project} index={i} />
         ))}
       </div>
-    </div>
+
+      <Link
+        href="/#contacto"
+        className="press mt-16 inline-block cursor-pointer bg-naranja px-8 py-4 font-mono text-xs uppercase tracking-[0.2em] text-carbon transition-colors duration-200 hover:bg-naranja-oscuro"
+      >
+        {t.proyectosPage.cta}
+      </Link>
+    </section>
   );
 }
 
 function ArchiveCard({ project, index }: { project: Project; index: number }) {
+  const t = useT();
+
   return (
     <motion.div
       layout
@@ -76,7 +95,7 @@ function ArchiveCard({ project, index }: { project: Project; index: number }) {
         />
         <div className="absolute inset-x-0 bottom-0 p-4">
           <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-hueso/70 transition-colors duration-300 group-hover:text-naranja">
-            {project.category}
+            {t.categories[project.category]}
           </span>
           <h2 className="mt-1 font-display text-lg leading-tight text-hueso sm:text-xl">
             {project.name}

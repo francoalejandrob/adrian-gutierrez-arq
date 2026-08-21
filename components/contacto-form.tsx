@@ -3,11 +3,13 @@
 import { FormEvent, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { contactNeeds } from "@/lib/content";
+import { useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
 
 type Status = "idle" | "loading" | "success" | "error";
 
 export default function ContactoForm() {
+  const t = useT();
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -40,7 +42,7 @@ export default function ContactoForm() {
 
       if (!response.ok) {
         const body = await response.json().catch(() => null);
-        throw new Error(body?.error ?? "No se pudo enviar el mensaje.");
+        throw new Error(body?.error ?? t.contactoForm.genericError);
       }
 
       setStatus("success");
@@ -48,9 +50,7 @@ export default function ContactoForm() {
     } catch (error) {
       setStatus("error");
       setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "No se pudo enviar el mensaje. Intenta de nuevo.",
+        error instanceof Error ? error.message : t.contactoForm.genericError,
       );
     }
   }
@@ -65,11 +65,10 @@ export default function ContactoForm() {
         className="border border-naranja/40 bg-carbon/40 p-10 text-center"
       >
         <p className="font-display text-2xl text-hueso">
-          Mensaje enviado.
+          {t.contactoForm.successTitle}
         </p>
         <p className="mt-3 text-sm text-hueso/70">
-          Gracias por escribir. Te contactaremos en las próximas 24-48 horas
-          hábiles.
+          {t.contactoForm.successBody}
         </p>
       </motion.div>
     );
@@ -87,7 +86,7 @@ export default function ContactoForm() {
       />
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <Field label="Nombre" htmlFor="name">
+        <Field label={t.contactoForm.name} htmlFor="name">
           <input
             id="name"
             name="name"
@@ -98,7 +97,7 @@ export default function ContactoForm() {
           />
         </Field>
 
-        <Field label="Email" htmlFor="email">
+        <Field label={t.contactoForm.email} htmlFor="email">
           <input
             id="email"
             name="email"
@@ -109,7 +108,7 @@ export default function ContactoForm() {
           />
         </Field>
 
-        <Field label="Teléfono" htmlFor="phone">
+        <Field label={t.contactoForm.phone} htmlFor="phone">
           <input
             id="phone"
             name="phone"
@@ -119,7 +118,7 @@ export default function ContactoForm() {
           />
         </Field>
 
-        <Field label="¿Qué necesitas?" htmlFor="need">
+        <Field label={t.contactoForm.need} htmlFor="need">
           <select
             id="need"
             name="need"
@@ -128,18 +127,18 @@ export default function ContactoForm() {
             className="w-full cursor-pointer bg-transparent py-3 text-hueso outline-none"
           >
             <option value="" disabled className="text-carbon">
-              Selecciona una opción
+              {t.contactoForm.needPlaceholder}
             </option>
             {contactNeeds.map((need) => (
               <option key={need} value={need} className="text-carbon">
-                {need}
+                {t.contactoForm.needOptions[need]}
               </option>
             ))}
           </select>
         </Field>
       </div>
 
-      <Field label="Mensaje" htmlFor="message">
+      <Field label={t.contactoForm.message} htmlFor="message">
         <textarea
           id="message"
           name="message"
@@ -178,7 +177,7 @@ export default function ContactoForm() {
             transition={{ duration: 0.2, ease: EASE_OUT }}
             className="inline-block"
           >
-            {status === "loading" ? "Enviando…" : "Enviar mensaje"}
+            {status === "loading" ? t.contactoForm.sending : t.contactoForm.send}
           </motion.span>
         </AnimatePresence>
       </button>

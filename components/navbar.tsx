@@ -6,15 +6,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE_OUT } from "@/lib/motion";
+import { useLocale, useT } from "@/lib/i18n";
 
 const NAV_LINKS = [
-  { href: "/#proyectos", label: "Proyectos" },
-  { href: "/#estudio", label: "Estudio" },
-  { href: "/#proceso", label: "Proceso" },
-  { href: "/#contacto", label: "Contacto" },
-];
+  { href: "/#proyectos", key: "proyectos" },
+  { href: "/#estudio", key: "estudio" },
+  { href: "/#proceso", key: "proceso" },
+  { href: "/#contacto", key: "contacto" },
+] as const;
 
 export default function Navbar() {
+  const t = useT();
+  const { locale, toggle } = useLocale();
   const pathname = usePathname();
   const hasDarkHero = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
@@ -50,8 +53,8 @@ export default function Navbar() {
         >
           <Image
             src="/logo-icon.png"
-            alt="Adrián Gutiérrez — Arquitectura & Diseño"
-            width={45}
+            alt={`Adrián Gutiérrez — ${t.sobreEstudio.role}`}
+            width={41}
             height={40}
             className="h-10 w-auto"
             priority
@@ -61,36 +64,42 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="nav-link font-mono text-xs uppercase tracking-[0.15em] text-hueso/80 transition-colors duration-200 hover:text-naranja"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="hidden items-center gap-8 md:flex">
+          <nav className="flex items-center gap-8">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="nav-link font-mono text-xs uppercase tracking-[0.15em] text-hueso/80 transition-colors duration-200 hover:text-naranja"
+              >
+                {t.nav[link.key]}
+              </Link>
+            ))}
+          </nav>
+          <LocaleToggle locale={locale} onToggle={toggle} />
+        </div>
 
-        <button
-          type="button"
-          onClick={() => setMenuOpen((v) => !v)}
-          className="press flex h-10 w-10 cursor-pointer flex-col items-center justify-center gap-1.5 md:hidden"
-          aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
-          aria-expanded={menuOpen}
-        >
-          <span
-            className={`h-px w-6 bg-hueso transition-transform duration-300 ease-out-strong ${
-              menuOpen ? "translate-y-[3.5px] rotate-45" : ""
-            }`}
-          />
-          <span
-            className={`h-px w-6 bg-hueso transition-transform duration-300 ease-out-strong ${
-              menuOpen ? "-translate-y-[3.5px] -rotate-45" : ""
-            }`}
-          />
-        </button>
+        <div className="flex items-center gap-4 md:hidden">
+          <LocaleToggle locale={locale} onToggle={toggle} />
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            className="press flex h-10 w-10 cursor-pointer flex-col items-center justify-center gap-1.5"
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={menuOpen}
+          >
+            <span
+              className={`h-px w-6 bg-hueso transition-transform duration-300 ease-out-strong ${
+                menuOpen ? "translate-y-[3.5px] rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`h-px w-6 bg-hueso transition-transform duration-300 ease-out-strong ${
+                menuOpen ? "-translate-y-[3.5px] -rotate-45" : ""
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -114,7 +123,7 @@ export default function Navbar() {
                   onClick={() => setMenuOpen(false)}
                   className="press inline-block font-display text-4xl text-hueso transition-colors duration-200 hover:text-naranja"
                 >
-                  {link.label}
+                  {t.nav[link.key]}
                 </Link>
               </motion.div>
             ))}
@@ -122,5 +131,26 @@ export default function Navbar() {
         )}
       </AnimatePresence>
     </header>
+  );
+}
+
+function LocaleToggle({
+  locale,
+  onToggle,
+}: {
+  locale: "es" | "en";
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label="Cambiar idioma / Switch language"
+      className="press flex cursor-pointer items-center gap-1 border border-hueso/25 px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-hueso/80 transition-colors duration-200 hover:border-naranja hover:text-naranja"
+    >
+      <span className={locale === "es" ? "text-naranja" : ""}>ES</span>
+      <span className="text-hueso/30">/</span>
+      <span className={locale === "en" ? "text-naranja" : ""}>EN</span>
+    </button>
   );
 }

@@ -2,10 +2,14 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
-import { process, processEyebrow } from "@/lib/content";
+import { process } from "@/lib/content";
+import { processEn, useLocale, useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
 
 export default function Proceso() {
+  const t = useT();
+  const { locale } = useLocale();
+  const steps = locale === "es" ? process : processEn;
   const trackRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: trackRef,
@@ -27,7 +31,7 @@ export default function Proceso() {
           transition={{ duration: 0.6, ease: EASE_OUT }}
           className="font-mono text-xs uppercase tracking-[0.2em] text-piedra"
         >
-          {processEyebrow}
+          {t.proceso.eyebrow}
         </motion.p>
         <motion.h2
           initial={{ opacity: 0, y: 24 }}
@@ -36,7 +40,7 @@ export default function Proceso() {
           transition={{ duration: 0.7, delay: 0.05, ease: EASE_OUT }}
           className="mt-3 max-w-2xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl"
         >
-          De la conceptualización a la consolidación de tu patrimonio.
+          {t.proceso.heading}
         </motion.h2>
 
         <div ref={trackRef} className="relative mt-10">
@@ -47,7 +51,7 @@ export default function Proceso() {
           />
 
           <div className="divide-y divide-carbon/10 border-b border-carbon/10">
-            {process.map((step, i) => (
+            {steps.map((step, i) => (
               <motion.div
                 key={step.title}
                 initial={{ opacity: 0, y: 24 }}

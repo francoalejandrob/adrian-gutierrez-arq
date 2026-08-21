@@ -12,19 +12,22 @@ import Link from "next/link";
 import ArrowIcon from "@/components/icons/arrow-icon";
 import RevealText from "@/components/reveal-text";
 import { Project, projects } from "@/lib/content";
+import { translateLocation, translateProject, useLocale, useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
 
 const featuredProjects = projects.filter((project) => project.featured);
 
 export default function ProyectosGrid() {
+  const t = useT();
+
   return (
     <section id="proyectos" className="bg-hueso py-14 md:py-20">
       <div className="mx-auto max-w-[1600px] px-6 md:px-10">
         <h2 className="max-w-xl font-display text-3xl text-carbon sm:text-4xl md:text-5xl">
-          <RevealText text="Proyectos" />
+          <RevealText text={t.proyectosGrid.heading} />
         </h2>
         <p className="mb-10 mt-3 text-lg text-piedra">
-          Conoce nuestro trabajo.
+          {t.proyectosGrid.subheading}
         </p>
 
         <div
@@ -41,7 +44,7 @@ export default function ProyectosGrid() {
             href="/proyectos"
             className="press inline-flex cursor-pointer items-center gap-3 border border-carbon bg-hueso px-8 py-4 font-mono text-xs font-semibold uppercase tracking-[0.15em] text-carbon transition-colors duration-200 hover:bg-carbon hover:text-hueso"
           >
-            Ver todos nuestros proyectos
+            {t.proyectosGrid.cta}
             <ArrowIcon className="h-4 w-4 shrink-0" />
           </Link>
         </div>
@@ -51,6 +54,9 @@ export default function ProyectosGrid() {
 }
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const t = useT();
+  const { locale } = useLocale();
+  const { tagline } = translateProject(project, locale);
   const shouldReduceMotion = useReducedMotion();
   const [tiltEnabled] = useState(
     () =>
@@ -115,15 +121,17 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             {project.code}
           </span>
           <span className="font-mono text-xs uppercase tracking-[0.15em] text-hueso/80">
-            {project.category}
+            {t.categories[project.category]}
           </span>
         </div>
 
         <div className="relative">
           <h3 className="font-display text-3xl text-hueso">{project.name}</h3>
-          <p className="mt-1 text-base text-hueso/70">{project.location}</p>
+          <p className="mt-1 text-base text-hueso/70">
+            {translateLocation(project.location, locale)}
+          </p>
           <p className="mt-3 max-w-sm text-base text-hueso/80 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-            {project.tagline}
+            {tagline}
           </p>
         </div>
       </Link>
