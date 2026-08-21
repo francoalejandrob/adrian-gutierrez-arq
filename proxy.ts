@@ -2,6 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
+  // /portal/login lives under the /portal/:path* matcher (so its own
+  // nested layout doesn't also wrap the authenticated portal pages — see
+  // ARCHITECTURE.md §6a) but must stay reachable without a session, or an
+  // unauthenticated visit redirects to itself forever.
+  if (request.nextUrl.pathname === "/portal/login") {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
