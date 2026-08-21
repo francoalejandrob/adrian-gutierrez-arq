@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- plain CJS Node script */
 const sharp = require("sharp");
 const fs = require("fs");
 const path = require("path");
@@ -202,10 +203,20 @@ async function processLogo() {
   console.log("app/apple-icon.png written");
 }
 
+async function processHero() {
+  const src = path.join(ROOT, "Nueva carpeta", "newhero.mp4");
+  if (!fs.existsSync(src)) return;
+  const outDir = path.join(PUBLIC, "videos");
+  fs.mkdirSync(outDir, { recursive: true });
+  fs.copyFileSync(src, path.join(outDir, "hero-banner.mp4"));
+  console.log("public/videos/hero-banner.mp4 replaced with newhero.mp4");
+}
+
 (async () => {
   await processProjects();
   await processLogo();
   await processInstagram();
+  await processHero();
 })().catch((e) => {
   console.error(e);
   process.exit(1);
