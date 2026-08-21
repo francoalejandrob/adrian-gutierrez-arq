@@ -108,6 +108,32 @@ const PROJECTS = [
   },
 ];
 
+const INSTAGRAM_IMAGES = ["2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.png", "7.png", "8.png"];
+const INSTAGRAM_VIDEO = "1.mp4";
+
+async function processInstagram() {
+  const srcDir = path.join(ROOT, "Instagram");
+  const outDir = path.join(PUBLIC, "instagram");
+  fs.mkdirSync(outDir, { recursive: true });
+
+  for (const file of INSTAGRAM_IMAGES) {
+    const outFile = path.join(outDir, `${path.parse(file).name}.jpg`);
+    await sharp(path.join(srcDir, file))
+      .resize({ width: 1600, withoutEnlargement: true })
+      .flatten({ background: "#ffffff" })
+      .jpeg({ quality: 90, mozjpeg: true })
+      .toFile(outFile);
+    const stat = fs.statSync(outFile);
+    console.log(`instagram/${path.parse(file).name}.jpg  ${(stat.size / 1024).toFixed(0)}KB`);
+  }
+
+  fs.copyFileSync(
+    path.join(srcDir, INSTAGRAM_VIDEO),
+    path.join(outDir, INSTAGRAM_VIDEO),
+  );
+  console.log(`instagram/${INSTAGRAM_VIDEO} copied`);
+}
+
 async function processProjects() {
   for (const project of PROJECTS) {
     const outDir = path.join(PUBLIC, "proyectos", project.slug);
@@ -176,6 +202,7 @@ async function processLogo() {
 (async () => {
   await processProjects();
   await processLogo();
+  await processInstagram();
 })().catch((e) => {
   console.error(e);
   process.exit(1);
