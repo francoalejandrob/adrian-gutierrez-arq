@@ -1,11 +1,17 @@
 import Link from "next/link";
 import { computePipeline } from "@/lib/pipeline";
 import { createClient } from "@/lib/supabase/server";
+import { getTrafficSummary } from "@/lib/integrations/google-analytics";
+import { bucketTopN, TINTA_BG_SCALE, TINTA_STROKE_SCALE } from "@/lib/chart-colors";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import Section from "@/components/dashboard/ui/section";
 import ProgressBar from "@/components/dashboard/ui/progress-bar";
+import BarChart from "@/components/dashboard/ui/bar-chart";
+import DonutChart from "@/components/dashboard/ui/donut-chart";
+import { PROJECT_STATUS_TONE, TASK_STATUS_LABELS, TASK_STATUS_TONE, TASK_STATUSES } from "@/lib/supabase/types";
 
 const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const currencyCompact = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 });
 
 // Ecuador (UTC-5) — the studio's only timezone. A fixed offset is a
 // reasonable simplification for a single-tenant, single-country app
@@ -15,6 +21,14 @@ function greeting() {
   if (localHour < 12) return "Buenos días";
   if (localHour < 19) return "Buenas tardes";
   return "Buenas noches";
+}
+
+async function safeTraffic() {
+  try {
+    return await getTrafficSummary();
+  } catch (error) {
+    return { configured: false as const, reason: error instanceof Error ? error.message : "Error inesperado." };
+  }
 }
 
 export default async function DashboardPage() {
@@ -34,8 +48,14 @@ export default async function DashboardPage() {
     { count: pendingApprovalsCount },
     { data: todayEvents },
     { data: activeProjects },
+    { count: activeProjectsCount },
     { data: allLeads },
+    { data: allProjects },
+    { data: allTasks },
+    { data: contracts },
+    { count: clientsCount },
     { data: activity },
+    traffic,
   ] = await Promise.all([
     supabase.auth.getUser(),
     supabase
@@ -59,8 +79,17 @@ export default async function DashboardPage() {
       .not("status", "in", "(completed,cancelled,on_hold)")
       .order("created_at", { ascending: false })
       .limit(4),
-    supabase.from("leads").select("status, estimated_value"),
+    supabase
+      .from("projects")
+      .select("*", { count: "exact", head: true })
+      .not("status", "in", "(completed,cancelled,on_hold)"),
+    supabase.from("leads").select("status, estimated_value, source, utm_source"),
+    supabase.from("projects").select("status"),
+    supabase.from("tasks").select("status"),
+    supabase.from("contracts").select("value"),
+    supabase.from("clients").select("*", { count: "exact", head: true }),
     supabase.from("activity_log").select("*").order("created_at", { ascending: false }).limit(6),
+    safeTraffic(),
   ]);
 
   const { data: profile } = userRes?.user
@@ -72,7 +101,9 @@ export default async function DashboardPage() {
   const pendingCollection = (payments ?? [])
     .filter((p) => p.status === "pendiente" || p.status === "vencida")
     .reduce((sum, p) => sum + p.amount, 0);
+  const collected = (payments ?? []).filter((p) => p.status === "pagada").reduce((sum, p) => sum + p.amount, 0);
   const overduePaymentsCount = (payments ?? []).filter((p) => p.status === "vencida").length;
+  const contracted = (contracts ?? []).reduce((sum, c) => sum + c.value, 0);
 
   const projectIds = (activeProjects ?? []).map((p) => p.id);
   const { data: phasesForActive } = projectIds.length
@@ -89,13 +120,19 @@ export default async function DashboardPage() {
 
   const pipeline = computePipeline(allLeads ?? []);
   const pipelineTotal = pipeline.reduce((sum, s) => sum + s.value, 0);
-  const maxStageValue = Math.max(1, ...pipeline.map((s) => s.value));
 
   const instruments = [
     { label: "Tareas críticas", value: String(overdueCount), attention: overdueCount > 0 },
     { label: "Reuniones hoy", value: String((todayEvents ?? []).length), attention: false },
     { label: "Leads nuevos", value: String(newLeadsCount ?? 0), attention: false },
     { label: "Por cobrar", value: currency.format(pendingCollection), attention: pendingCollection > 0 },
+  ];
+
+  const summary = [
+    { label: "Contratado", value: currencyCompact.format(contracted) },
+    { label: "Cobrado", value: currencyCompact.format(collected), tone: "positive" as const },
+    { label: "Clientes", value: String(clientsCount ?? 0) },
+    { label: "Proyectos activos", value: String(activeProjectsCount ?? 0) },
   ];
 
   const attentionRows = [
@@ -107,6 +144,51 @@ export default async function DashboardPage() {
       ? `${pendingApprovalsCount} aprobación${pendingApprovalsCount === 1 ? "" : "es"} pendiente${pendingApprovalsCount === 1 ? "" : "s"}`
       : null,
   ].filter((row): row is string => row !== null);
+
+  // Leads por fuente — misma agrupación que el embudo de marketing
+  // (utm_source si existe, si no el source manual), capada a 5 rebanadas.
+  const leadsBySource = new Map<string, number>();
+  for (const lead of allLeads ?? []) {
+    const source = lead.utm_source || lead.source;
+    leadsBySource.set(source, (leadsBySource.get(source) ?? 0) + 1);
+  }
+  const leadSourceData = bucketTopN(
+    [...leadsBySource.entries()].map(([label, value]) => ({ label, value })),
+    5,
+  ).map((row, i) => ({ ...row, colorClass: TINTA_STROKE_SCALE[i] }));
+
+  // Proyectos por estado — reusa la misma semántica resolved/attention/
+  // neutral que StatusLabel/StatusMark en el resto del producto, en vez
+  // de un color por cada uno de los 10 estados posibles.
+  const projectBuckets = { resolved: 0, attention: 0, neutral: 0 };
+  for (const project of allProjects ?? []) {
+    projectBuckets[PROJECT_STATUS_TONE[project.status]] += 1;
+  }
+  const projectStatusData = [
+    { label: "Completados", value: projectBuckets.resolved, colorClass: "stroke-verde" },
+    { label: "En curso", value: projectBuckets.neutral, colorClass: "stroke-tinta" },
+    { label: "Pausados / cancelados", value: projectBuckets.attention, colorClass: "stroke-acento" },
+  ].filter((row) => row.value > 0);
+
+  // Tareas por estado — todas las tareas de todos los proyectos, mismo
+  // mapeo de tono que TASK_STATUS_TONE usa en el workspace de proyecto.
+  const taskCounts = new Map<string, number>();
+  for (const task of allTasks ?? []) {
+    taskCounts.set(task.status, (taskCounts.get(task.status) ?? 0) + 1);
+  }
+  const TASK_TONE_COLOR = { resolved: "bg-verde", attention: "bg-acento", neutral: "bg-tinta" } as const;
+  const taskStatusData = TASK_STATUSES.map((status) => ({
+    label: TASK_STATUS_LABELS[status],
+    value: taskCounts.get(status) ?? 0,
+    colorClass: TASK_TONE_COLOR[TASK_STATUS_TONE[status]],
+  }));
+
+  const trafficChannelData = traffic.configured
+    ? bucketTopN(
+        traffic.data.byChannel.map((row) => ({ label: row.channel, value: row.sessions })),
+        6,
+      ).map((row, i) => ({ ...row, colorClass: TINTA_BG_SCALE[i] }))
+    : [];
 
   return (
     <div>
@@ -121,6 +203,15 @@ export default async function DashboardPage() {
               {item.value}
             </p>
             <p className="mt-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-grafito">{item.label}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="dp-card mx-12 mt-6 grid grid-cols-2 lg:grid-cols-4">
+        {summary.map((item, i) => (
+          <div key={item.label} className={`p-6 ${i > 0 ? "border-l border-filete" : ""}`}>
+            <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">{item.label}</p>
+            <p className={`mt-2.5 font-dp-mono text-xl ${item.tone === "positive" ? "text-verde" : "text-tinta"}`}>{item.value}</p>
           </div>
         ))}
       </div>
@@ -176,32 +267,6 @@ export default async function DashboardPage() {
             </div>
           </Section>
 
-          <Section title="Pipeline">
-            <p className="mb-4 font-dp-mono text-2xl text-tinta">{currency.format(pipelineTotal)}</p>
-            <div className="mb-4 flex h-[3px] w-full gap-px bg-filete">
-              {pipeline.map((stage) => (
-                <div
-                  key={stage.status}
-                  className={stage.status === "ganado" ? "h-[3px] bg-verde" : "h-[3px] bg-tinta"}
-                  style={{
-                    width: pipelineTotal > 0 ? `${(stage.value / pipelineTotal) * 100}%` : `${100 / pipeline.length}%`,
-                    opacity: stage.status === "ganado" ? 1 : 0.35 + (0.65 * stage.value) / maxStageValue,
-                  }}
-                />
-              ))}
-            </div>
-            <div className="flex flex-col gap-2">
-              {pipeline.map((stage) => (
-                <div key={stage.status} className="flex items-center justify-between font-dp-sans text-[12.5px]">
-                  <span className="text-grafito">{stage.label}</span>
-                  <span className={`font-dp-mono ${stage.status === "ganado" ? "text-verde" : "text-tinta"}`}>
-                    {currency.format(stage.value)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Section>
-
           <Section title="Atención">
             <div className="flex flex-col gap-2.5">
               {attentionRows.map((row) => (
@@ -212,6 +277,62 @@ export default async function DashboardPage() {
               {attentionRows.length === 0 && <p className="font-dp-sans text-[13px] text-concreto">Sin pendientes por ahora.</p>}
             </div>
           </Section>
+        </div>
+      </div>
+
+      <div className="border-t border-corte px-12 py-10">
+        <p className="mb-6 font-dp-mono text-[10px] uppercase tracking-[0.16em] text-concreto">Analíticas</p>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <Section title="Pipeline por etapa">
+            <p className="mb-5 font-dp-mono text-2xl text-tinta">{currency.format(pipelineTotal)}</p>
+            <BarChart
+              data={pipeline.map((stage) => ({
+                label: stage.label,
+                value: stage.value,
+                displayValue: currency.format(stage.value),
+                colorClass: stage.status === "ganado" ? "bg-verde" : "bg-tinta",
+              }))}
+            />
+          </Section>
+
+          <Section title="Leads por fuente">
+            <DonutChart data={leadSourceData} centerValue={String(allLeads?.length ?? 0)} centerLabel="Leads" />
+          </Section>
+
+          <Section title="Proyectos por estado">
+            <DonutChart data={projectStatusData} centerValue={String((allProjects ?? []).length)} centerLabel="Total" />
+          </Section>
+
+          <Section title="Tareas por estado">
+            <BarChart data={taskStatusData} />
+          </Section>
+
+          {traffic.configured && trafficChannelData.length > 0 && (
+            <Section title="Tráfico del sitio por canal" className="lg:col-span-2">
+              <div className="mb-5 flex gap-10">
+                <div>
+                  <p className="font-dp-mono text-2xl text-tinta">{traffic.data.totals.sessions.toLocaleString("es-EC")}</p>
+                  <p className="mt-1.5 font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">Sesiones · 28 días</p>
+                </div>
+                <div>
+                  <p className="font-dp-mono text-2xl text-tinta">{traffic.data.totals.activeUsers.toLocaleString("es-EC")}</p>
+                  <p className="mt-1.5 font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">Usuarios activos</p>
+                </div>
+              </div>
+              <BarChart data={trafficChannelData} />
+            </Section>
+          )}
+
+          {!traffic.configured && (
+            <Section title="Tráfico del sitio" className="lg:col-span-2">
+              <p className="font-dp-sans text-[13px] text-concreto">
+                Conectá Google Analytics para ver tráfico por canal acá.{" "}
+                <Link href="/dashboard/website" className="text-tinta underline underline-offset-2 hover:text-acento">
+                  Ver Observatorio digital →
+                </Link>
+              </p>
+            </Section>
+          )}
         </div>
       </div>
 
