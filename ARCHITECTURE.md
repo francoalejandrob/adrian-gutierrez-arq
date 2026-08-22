@@ -353,6 +353,89 @@ en prosa:
   tarjetas de aprobación) también se redondearon para que todo el
   sistema comparta una sola esquina.
 
+## 6g. Quinto pase: adoptar el look de un dashboard SaaS de referencia
+
+El usuario mandó una captura de un dashboard SaaS de tickets/soporte
+("Kravio") y pidió "algo así en términos de diseño", con "más colores
+que se vean elegantes". Esa referencia usa iconos en todo (nav, header,
+badges), pastillas de color por estado y avatares — lo opuesto a las
+dos decisiones más citadas de §6e (cero íconos, estado como texto/marca
+en vez de pastilla). Antes de tocar el sistema otra vez se le preguntó
+al usuario qué tan literal quería el parecido (3 opciones); eligió
+adoptar el look SaaS completo. Igual que §6e/§6f, es un pase completo
+ejecutado en 8 etapas con checkpoint (build+lint+commit+deploy) cada
+una — no un commit gigante.
+
+Qué se mantiene a propósito (no es una adopción ciega de la referencia):
+tipografía Instrument Serif en títulos/nombres (la seña de identidad más
+elogiada en las 3 vueltas de feedback previas — la referencia usa
+sans-serif genérico en todo, pero cambiar eso no fue parte del pedido);
+la paleta base papel/superficie/filete/corte/concreto/grafito/tinta; las
+tarjetas `.dp-card` de §6f; los gráficos SVG a mano de la vuelta
+anterior (se les suma color, no se reemplazan por una librería); la
+disciplina de nunca inventar datos.
+
+Qué cambió:
+
+- **Iconos de vuelta**: se reinstaló `lucide-react` (se había
+  desinstalado en §6e) — nav lateral (reemplaza el índice numérico
+  "01/02/03" de §6e), header (buscador tipo `⌘K`, campana con punto de
+  no-leídos real, engranaje), botones, tabla de acciones, estados
+  vacíos. El índice numérico se mantiene donde sigue teniendo sentido
+  como referencia de fila/tabla (listas, franjas de KPI).
+- **`StatusBadge` (nuevo, `components/dashboard/ui/status-badge.tsx`)**
+  reemplaza `StatusLabel` (eliminado — cero importadores tras migrar
+  todas las páginas) en cada uso de estado nombrado: pastilla
+  `rounded-full` con ícono + texto, 5 tonos en vez de 3
+  (`resolved`/`attention`/`warning`/`info`/`neutral`). Dos tokens de
+  color nuevos en `app/globals.css`: `--color-ambar` (`#B07A34`,
+  advertencia/en curso) y `--color-azul` (`#47607A`, informativo) —
+  misma familia desaturada que acento/verde, no un azul/ámbar genérico
+  de SaaS. Cada `*_TONE` en `lib/supabase/types.ts` (lead/proyecto/fase/
+  tarea/cotización/contrato/pago/versión de documento) se remapeó a los
+  5 tonos con más granularidad que el bucket de 3 anterior — una sola
+  fuente de verdad que reusan tanto los badges como los gráficos
+  (`lib/chart-colors.ts` → `TONE_STROKE`/`TONE_BG`).
+- **`StatusMark`** pasa de marca geométrica abstracta (cuadrado/rombo) a
+  ícono (`CheckCircle2`/`Circle`/`AlertCircle`) — mismo `tone` prop, para
+  no tener dos vocabularios visuales (marca abstracta + ícono)
+  conviviendo ahora que hay íconos en el resto del sistema.
+- **`Avatar` (nuevo, `components/dashboard/ui/avatar.tsx`)**: chip
+  circular de iniciales con color determinístico por nombre (hash simple
+  → paleta fija), no una foto genérica. Se usa donde ya hay una persona
+  real en los datos: contacto de lead/cliente, miembros del equipo, chip
+  de usuario del sidebar/header del portal.
+  **Hallazgo durante la exploración**: `leads.assigned_to` y
+  `tasks.assigned_to` ya existían en el schema (FK a `profiles`) pero
+  ningún formulario ni Server Action los usaba — se agregó un selector
+  de asignado real en `lead-form.tsx` y en el form de tarea nueva del
+  workspace de proyecto (`lib/members.ts` centraliza la query
+  `organization_members` → `profiles`), y se persiste en
+  `leads/actions.ts` / `projects/[id]/actions.ts`, para que la columna
+  de avatar muestre datos reales en vez de estar siempre vacía.
+- **`Sparkline` (nuevo, `components/dashboard/ui/sparkline.tsx` +
+  `lib/sparkline.ts`)**: mini-gráfico de línea con variación % real
+  (7 días vs. los 7 anteriores), solo en tarjetas del dashboard con un
+  log de fechas real detrás (`leads.created_at`, `payments.paid_date`,
+  `clients.created_at`, `contracts.created_at`). Deliberadamente **sin**
+  sparkline en tarjetas que son una foto del momento sin serie histórica
+  (tareas críticas, reuniones hoy, por cobrar) — mismo criterio anti-
+  dato-inventado del proyecto, en vez de fabricar una tendencia falsa.
+- **`Button`**: la sombra offset "apilada" de §6f se reemplazó por una
+  sombra suave y sutil, más cercana al botón plano de la referencia —
+  esta decisión puntual de §6f queda superada por la captura concreta
+  que trajo el usuario ahora.
+- **Gráficos con la paleta completa de 5 tonos**: el donut "Proyectos
+  por estado" del dashboard pasó de 3 buckets colapsados (§6f) a pintar
+  cada estado real con su propio tono (mismo `PROJECT_STATUS_TONE`),
+  más colorido y consistente con el sistema de badges.
+
+**Deliberadamente no incluido** (mismo criterio de las vueltas
+anteriores): checkboxes de selección múltiple ni menú de acciones en
+tres puntos en las tablas — la referencia los usa para acciones en lote
+que no existen como feature en esta app; agregarlos habría sido UI
+decorativa sin función real.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

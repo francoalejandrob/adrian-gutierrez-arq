@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LogOut } from "lucide-react";
 import { dpFontVars } from "@/lib/dp-fonts";
 import { createClient } from "@/lib/supabase/server";
 import { portalSignOut } from "../auth-actions";
@@ -19,8 +20,9 @@ export default async function PortalAuthenticatedLayout({ children }: LayoutProp
         <form action={portalSignOut}>
           <button
             type="submit"
-            className="cursor-pointer font-dp-mono text-[10px] uppercase tracking-[0.1em] text-concreto transition-colors duration-150 hover:text-tinta"
+            className="flex cursor-pointer items-center gap-1.5 font-dp-mono text-[10px] uppercase tracking-[0.1em] text-concreto transition-colors duration-150 hover:text-acento"
           >
+            <LogOut size={13} strokeWidth={1.75} aria-hidden="true" />
             Salir
           </button>
         </form>

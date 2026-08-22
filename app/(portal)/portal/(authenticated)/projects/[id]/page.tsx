@@ -1,14 +1,19 @@
+import { AlertCircle } from "lucide-react";
 import { notFound } from "next/navigation";
 import DownloadButton from "@/components/dashboard/download-button";
 import Section from "@/components/dashboard/ui/section";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { inputClass } from "@/components/dashboard/ui/styles";
 import { createClient } from "@/lib/supabase/server";
 import {
   DOC_CATEGORY_LABELS,
   DOC_VERSION_STATUS_LABELS,
+  DOC_VERSION_STATUS_TONE,
   PAYMENT_STATUS_LABELS,
+  PAYMENT_STATUS_TONE,
   PHASE_STATUS_LABELS,
+  PHASE_STATUS_TONE,
   quoteTotal,
   type PhaseStatus,
 } from "@/lib/supabase/types";
@@ -84,7 +89,10 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
             {(phases ?? []).map((phase) => (
               <div key={phase.id} className="flex items-center justify-between gap-4">
                 <span className="font-dp-sans text-[13px] text-grafito">{phase.name}</span>
-                <span className="font-dp-mono text-[10.5px] text-concreto">{PHASE_STATUS_LABELS[phase.status as PhaseStatus]}</span>
+                <StatusBadge
+                  label={PHASE_STATUS_LABELS[phase.status as PhaseStatus]}
+                  tone={PHASE_STATUS_TONE[phase.status as PhaseStatus]}
+                />
               </div>
             ))}
           </div>
@@ -120,7 +128,10 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
 
       {pendingApprovals.length > 0 && (
         <div className="border-t border-filete pt-10">
-          <p className="mb-5 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-acento">Pendiente de tu aprobación</p>
+          <p className="mb-5 flex items-center gap-2 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-acento">
+            <AlertCircle size={13} strokeWidth={2} aria-hidden="true" />
+            Pendiente de tu aprobación
+          </p>
           <div className="flex flex-col gap-8">
             {pendingApprovals.map(({ doc, version }) => (
               <div key={version.id} className="overflow-hidden rounded-2xl border border-filete">
@@ -158,9 +169,10 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
               <div key={doc.id} className="flex items-center justify-between gap-3.5 border-b border-filete py-4 last:border-0">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-dp-sans text-[13.5px] text-tinta">{doc.name}</p>
-                  <p className="mt-1 font-dp-mono text-[10.5px] text-concreto">
-                    v{latest.version} · {DOC_VERSION_STATUS_LABELS[latest.status]}
-                  </p>
+                  <div className="mt-1.5 flex items-center gap-2.5">
+                    <span className="font-dp-mono text-[10.5px] text-concreto">v{latest.version}</span>
+                    <StatusBadge label={DOC_VERSION_STATUS_LABELS[latest.status]} tone={DOC_VERSION_STATUS_TONE[latest.status]} />
+                  </div>
                 </div>
                 <DownloadButton storagePath={latest.storage_path} getUrl={getPortalDownloadUrl} />
               </div>
@@ -176,10 +188,17 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
             <div key={payment.id} className="flex items-center justify-between gap-4 border-b border-filete py-4 last:border-0">
               <div>
                 <p className="font-dp-sans text-[14px] text-tinta">{payment.method || "Pago"}</p>
-                <p className="mt-1 font-dp-mono text-[10.5px] text-concreto">
-                  {payment.status === "pagada" ? "Pagado" : PAYMENT_STATUS_LABELS[payment.status]}
-                  {payment.due_date ? ` · vence ${new Date(payment.due_date).toLocaleDateString("es-EC")}` : ""}
-                </p>
+                <div className="mt-1.5 flex items-center gap-2.5">
+                  <StatusBadge
+                    label={payment.status === "pagada" ? "Pagado" : PAYMENT_STATUS_LABELS[payment.status]}
+                    tone={PAYMENT_STATUS_TONE[payment.status]}
+                  />
+                  {payment.due_date && (
+                    <span className="font-dp-mono text-[10.5px] text-concreto">
+                      vence {new Date(payment.due_date).toLocaleDateString("es-EC")}
+                    </span>
+                  )}
+                </div>
               </div>
               <p className={`font-dp-mono text-lg ${payment.status === "vencida" ? "text-acento" : "text-tinta"}`}>
                 {currency.format(payment.amount)}

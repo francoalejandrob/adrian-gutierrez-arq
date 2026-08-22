@@ -301,3 +301,32 @@ autenticada real); "17 Modo tinta" (dark mode, sigue siendo demo, no
 una feature pedida); datos que el mockup inventa y que no hay forma de
 calcular real (p. ej. "Impacto en cronograma" en Aprobaciones, "Revisor"
 como concepto distinto del cliente) — se omiten en vez de inventarse.
+
+## Adopción de un dashboard SaaS de referencia ✅
+
+Tercer pase visual: el usuario mandó una captura de un dashboard SaaS de
+tickets/soporte y pidió "algo así en términos de diseño", con "más
+colores que se vean elegantes". Esa referencia usa iconos en todo,
+pastillas de color por estado y avatares — contradice de frente dos
+decisiones del pase anterior (cero íconos, estado como texto/marca). Se
+le preguntó al usuario qué tan literal quería el parecido antes de
+tocar el sistema; eligió adoptar el look SaaS completo. Ver
+`ARCHITECTURE.md` §6g para el detalle técnico completo.
+
+- **Iconos, pastillas de color (5 tonos) y avatares** de vuelta en todo
+  el dashboard/portal — `lucide-react` reinstalado, `StatusBadge`
+  reemplaza `StatusLabel`, nuevo componente `Avatar`.
+- **Selector de asignado real** en leads y tareas — el schema ya tenía
+  `assigned_to` (FK a `profiles`) desde hacía tiempo pero ningún
+  formulario lo usaba; se conectó en vez de dejar la columna de avatar
+  siempre vacía.
+- **Sparklines reales** en las tarjetas de KPI del dashboard que tienen
+  un log de fechas detrás (leads/pagos/clientes/contratos) — nunca en
+  las que son solo una foto del momento.
+
+**Deliberadamente no incluido**: checkboxes de selección múltiple ni
+menú de acciones en tres puntos en las tablas (la referencia los usa
+para acciones en lote que no existen como feature en esta app);
+reemplazar Instrument Serif por el sans-serif genérico de la referencia
+(no fue parte del pedido y es la seña de identidad más elogiada del
+sistema en las vueltas anteriores de feedback).

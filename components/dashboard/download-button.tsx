@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Download } from "lucide-react";
 
 export default function DownloadButton({
   storagePath,
@@ -26,8 +27,9 @@ export default function DownloadButton({
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className="cursor-pointer font-dp-mono text-[10.5px] uppercase tracking-[0.08em] text-concreto underline underline-offset-2 hover:text-tinta disabled:cursor-wait"
+      className="flex cursor-pointer items-center gap-1.5 font-dp-mono text-[10.5px] uppercase tracking-[0.08em] text-concreto transition-colors duration-150 hover:text-tinta disabled:cursor-wait"
     >
+      <Download size={13} strokeWidth={1.75} aria-hidden="true" />
       {loading ? "Generando…" : "Descargar"}
     </button>
   );

@@ -24,8 +24,8 @@
   /* Segundo color del sistema — no está en el mockup original, se agregó
      porque el sistema de un solo acento leía "plano" en la práctica.
      Verde desaturado (no el verde-éxito genérico de SaaS) para "resuelto"
-     en StatusLabel/StatusMark y para la etapa "ganado" del pipeline —
-     el único otro lugar donde el color transmite información real. */
+     en StatusBadge/StatusMark/gráficos y para la etapa "ganado" del
+     pipeline. */
   --color-verde: #3f6b52;
   /* Cuarto y quinto color — se agregaron para adoptar el lenguaje de
      pastillas de estado con más matices (5 tonos en vez de 2) que pidió
