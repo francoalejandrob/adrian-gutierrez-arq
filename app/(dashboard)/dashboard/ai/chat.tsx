@@ -1,13 +1,13 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { Send, Sparkles } from "lucide-react";
+import { Send } from "lucide-react";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import { inputClass } from "@/components/dashboard/ui/styles";
 
 type Message = { role: "user" | "assistant"; content: string };
 
-export default function AiChat() {
+export default function AiChat({ suggestions = [] }: { suggestions?: string[] }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,9 +19,7 @@ export default function AiChat() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, loading]);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const text = input.trim();
+  async function sendMessage(text: string) {
     if (!text || loading) return;
 
     const nextMessages: Message[] = [...messages, { role: "user", content: text }];
@@ -52,9 +50,14 @@ export default function AiChat() {
     }
   }
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void sendMessage(input.trim());
+  }
+
   if (notConfigured) {
     return (
-      <div className="border border-dashed border-carbon/20 bg-hueso/50 p-4 text-sm text-carbon/60">
+      <div className="rounded-[10px] border border-dashed border-carbon/20 bg-hueso/50 p-4 text-sm text-carbon/60">
         <p>{notConfigured}</p>
         <p className="mt-2 text-xs text-carbon/40">
           Ver INTEGRATION_SETUP.md en el repositorio para los pasos de configuración.
@@ -64,65 +67,68 @@ export default function AiChat() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div
-        ref={scrollRef}
-        className="flex max-h-[480px] min-h-[240px] flex-col gap-3 overflow-y-auto border border-carbon/10 bg-white p-4"
-      >
-        {messages.length === 0 && (
-          <p className="text-sm text-carbon/40">
-            Preguntá, por ejemplo: &ldquo;¿qué tareas están vencidas?&rdquo; o &ldquo;¿cuánto
-            llevamos cobrado este mes?&rdquo;
-          </p>
-        )}
-        {messages.map((message, i) => (
-          <div
-            key={i}
-            className={`flex items-end gap-2 ${message.role === "user" ? "flex-row-reverse" : ""}`}
-          >
-            {message.role === "assistant" && (
-              <div className="mb-0.5 flex h-6 w-6 shrink-0 items-center justify-center border border-carbon/15 text-carbon/50">
-                <Sparkles size={12} strokeWidth={1.75} aria-hidden="true" />
+    <div className="flex flex-col gap-6">
+      {messages.length === 0 && suggestions.length > 0 && (
+        <div>
+          <p className="mb-3.5 text-[11px] uppercase tracking-[0.07em] text-carbon/40">Sugerencias</p>
+          <div className="flex flex-col divide-y divide-carbon/[0.08] overflow-hidden rounded-[10px] border border-carbon/[0.08]">
+            {suggestions.map((text) => (
+              <button
+                key={text}
+                type="button"
+                onClick={() => sendMessage(text)}
+                className="flex cursor-pointer items-center justify-between bg-white px-[18px] py-3.5 text-left text-[13.5px] text-carbon transition-colors duration-150 hover:bg-hueso"
+              >
+                {text}
+                <span className="font-mono text-xs text-naranja-oscuro">→</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="rounded-[10px] border border-carbon/[0.08] bg-white p-6">
+        {(messages.length > 0 || loading) && (
+          <div ref={scrollRef} className="mb-4 flex max-h-[420px] flex-col gap-3.5 overflow-y-auto">
+            {messages.map((message, i) => (
+              <div key={i} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`max-w-[75%] whitespace-pre-wrap rounded-lg px-4 py-2.5 text-[13.5px] ${
+                    message.role === "user" ? "bg-hueso text-carbon" : "bg-carbon text-hueso"
+                  }`}
+                >
+                  {message.content}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="flex items-center gap-1 rounded-lg bg-carbon px-4 py-3">
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-hueso/50 [animation-delay:-0.3s]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-hueso/50 [animation-delay:-0.15s]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-hueso/50" />
+                </div>
               </div>
             )}
-            <div
-              className={`max-w-[75%] whitespace-pre-wrap px-3 py-2 text-sm ${
-                message.role === "user" ? "bg-carbon text-white" : "bg-hueso text-carbon"
-              }`}
-            >
-              {message.content}
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="flex items-end gap-2">
-            <div className="mb-0.5 flex h-6 w-6 shrink-0 items-center justify-center border border-carbon/15 text-carbon/50">
-              <Sparkles size={12} strokeWidth={1.75} aria-hidden="true" />
-            </div>
-            <div className="flex items-center gap-1 bg-hueso px-3 py-2.5">
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-carbon/30 [animation-delay:-0.3s]" />
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-carbon/30 [animation-delay:-0.15s]" />
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-carbon/30" />
-            </div>
           </div>
         )}
+
+        {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="flex gap-2.5">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Pregúntale a Archi AI…"
+            disabled={loading}
+            className={`flex-1 ${inputClass}`}
+          />
+          <button type="submit" disabled={loading} className={buttonClass("primary", "md")}>
+            <Send size={15} strokeWidth={1.75} aria-hidden="true" />
+            Enviar
+          </button>
+        </form>
       </div>
-
-      {error && <p className="text-sm text-red-600">{error}</p>}
-
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Escribe tu pregunta…"
-          disabled={loading}
-          className={`flex-1 ${inputClass}`}
-        />
-        <button type="submit" disabled={loading} className={buttonClass("secondary", "md")}>
-          <Send size={15} strokeWidth={1.75} aria-hidden="true" />
-          Enviar
-        </button>
-      </form>
     </div>
   );
 }

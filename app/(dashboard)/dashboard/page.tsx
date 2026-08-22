@@ -18,12 +18,18 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const today = new Date().toISOString().slice(0, 10);
 
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999);
+
   const [
     { data: userRes },
     { data: overdueTasks },
     { count: newLeadsCount },
     { data: payments },
     { count: pendingApprovalsCount },
+    { count: meetingsTodayCount },
     { data: activeProjects },
     { data: allLeads },
     { data: activity },
@@ -38,6 +44,11 @@ export default async function DashboardPage() {
     supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "nuevo"),
     supabase.from("payments").select("amount, status"),
     supabase.from("document_versions").select("*", { count: "exact", head: true }).eq("status", "enviado"),
+    supabase
+      .from("calendar_events")
+      .select("*", { count: "exact", head: true })
+      .gte("starts_at", todayStart.toISOString())
+      .lte("starts_at", todayEnd.toISOString()),
     supabase
       .from("projects")
       .select("id, name, progress, clients(name)")
@@ -91,7 +102,7 @@ export default async function DashboardPage() {
 
       <div className="mt-9 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi label="Tareas críticas" value={overdueCount} accent={overdueCount > 0 ? "#a4432b" : "#6e6659"} tint={overdueCount > 0} />
-        <Kpi label="Reuniones hoy" value={0} accent="#6e6659" />
+        <Kpi label="Reuniones hoy" value={meetingsTodayCount ?? 0} accent="#6e6659" />
         <Kpi label="Leads nuevos" value={newLeadsCount ?? 0} accent="#b26a45" tint={(newLeadsCount ?? 0) > 0} />
         <Kpi label="Pendiente de cobro" value={currency.format(pendingCollection)} accent="#b26a45" dark />
       </div>
