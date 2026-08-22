@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { Send } from "lucide-react";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import { inputClass } from "@/components/dashboard/ui/styles";
 
@@ -73,7 +74,7 @@ export default function AiChat() {
             {messages.map((message, i) => (
               <div key={i} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[75%] whitespace-pre-wrap px-4 py-2.5 font-dp-sans text-[13.5px] ${
+                  className={`max-w-[75%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 font-dp-sans text-[13.5px] ${
                     message.role === "user" ? "bg-superficie text-tinta" : "bg-tinta text-papel"
                   }`}
                 >
@@ -83,7 +84,7 @@ export default function AiChat() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="flex items-center gap-1 bg-tinta px-4 py-3">
+                <div className="flex items-center gap-1 rounded-2xl bg-tinta px-4 py-3">
                   <span className="h-1.5 w-1.5 animate-bounce bg-papel/50 [animation-delay:-0.3s]" />
                   <span className="h-1.5 w-1.5 animate-bounce bg-papel/50 [animation-delay:-0.15s]" />
                   <span className="h-1.5 w-1.5 animate-bounce bg-papel/50" />
@@ -104,6 +105,7 @@ export default function AiChat() {
             className={`flex-1 ${inputClass}`}
           />
           <button type="submit" disabled={loading} className={buttonClass("primary", "md")}>
+            <Send size={14} strokeWidth={1.75} aria-hidden="true" />
             Enviar
           </button>
         </form>

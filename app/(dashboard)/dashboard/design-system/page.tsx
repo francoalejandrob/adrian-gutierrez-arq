@@ -1,5 +1,11 @@
+import { FolderKanban } from "lucide-react";
+import Avatar from "@/components/dashboard/ui/avatar";
+import BarChart from "@/components/dashboard/ui/bar-chart";
+import DonutChart from "@/components/dashboard/ui/donut-chart";
+import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import Section from "@/components/dashboard/ui/section";
+import Sparkline from "@/components/dashboard/ui/sparkline";
 import StatusBadge from "@/components/dashboard/ui/status-badge";
 import StatusMark from "@/components/dashboard/ui/status-mark";
 import Button from "@/components/dashboard/ui/button";
@@ -12,8 +18,10 @@ const PALETTE = [
   { name: "Concreto", hex: "#8A867C", role: "Metadatos" },
   { name: "Grafito", hex: "#45443F", role: "Texto secundario" },
   { name: "Tinta", hex: "#0F0F0E", role: "Texto y acción" },
-  { name: "Acento", hex: "#A8382A", role: "Tinta de revisión — atención" },
-  { name: "Verde", hex: "#3F6B52", role: "Resuelto / positivo — segundo color del sistema" },
+  { name: "Acento", hex: "#A8382A", role: "Atención" },
+  { name: "Verde", hex: "#3F6B52", role: "Resuelto / positivo" },
+  { name: "Ámbar", hex: "#B07A34", role: "Advertencia / en curso" },
+  { name: "Azul", hex: "#47607A", role: "Informativo" },
 ];
 
 const TYPE_SPECIMENS = [
@@ -27,6 +35,18 @@ const BREAKPOINTS = [
   { name: "md", value: "768px" },
   { name: "lg", value: "1024px" },
   { name: "xl", value: "1280px" },
+];
+
+const DONUT_SAMPLE = [
+  { label: "Completados", value: 8, colorClass: "stroke-verde" },
+  { label: "En curso", value: 5, colorClass: "stroke-azul" },
+  { label: "Pausados", value: 2, colorClass: "stroke-ambar" },
+];
+
+const BAR_SAMPLE = [
+  { label: "Referidos", value: 12, colorClass: "bg-tinta" },
+  { label: "Instagram", value: 8, colorClass: "bg-tinta/72" },
+  { label: "Website", value: 5, colorClass: "bg-tinta/52" },
 ];
 
 export default function DesignSystemPage() {
@@ -60,60 +80,93 @@ export default function DesignSystemPage() {
         </Section>
 
         <Section title="03 · Disciplina de estado">
-          <p className="mb-6 max-w-[60ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
-            Una sola gramática en todo el producto: relleno verde = resuelto, hueco = pendiente, rombo rojo =
-            requiere atención. Los estados nombrados siguen siendo texto con color/peso — nunca una pastilla con
-            fondo — y las marcas geométricas se usan aparte para líneas de tiempo, versiones y prioridades. Verde y
-            acento son los dos únicos colores con significado; todo lo demás en la interfaz es tinta/grafito/concreto.
+          <p className="mb-6 max-w-[65ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
+            5 tonos con significado fijo, reusados en pastillas (<span className="font-dp-mono text-[12px]">StatusBadge</span>),
+            marcas de línea de tiempo (<span className="font-dp-mono text-[12px]">StatusMark</span>) y gráficos —
+            <span className="text-verde"> resuelto</span>,{" "}
+            <span className="text-acento">atención</span>,{" "}
+            <span className="text-ambar">advertencia</span>,{" "}
+            <span className="text-azul">informativo</span> y{" "}
+            <span className="text-concreto">neutral</span> — cada dominio (lead, proyecto, tarea, cotización,
+            contrato, pago) mapea sus estados reales a estos 5 tonos una sola vez, en{" "}
+            <span className="font-dp-mono text-[12px]">lib/supabase/types.ts</span>.
           </p>
           <div className="flex flex-wrap gap-x-10 gap-y-5">
-            <div className="flex items-center gap-3">
-              <StatusBadge label="Ganado" tone="resolved" />
-              <span className="font-dp-sans text-[12px] text-concreto">texto — resuelto</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <StatusBadge label="Negociación" tone="attention" />
-              <span className="font-dp-sans text-[12px] text-concreto">texto — atención</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <StatusBadge label="Nuevo" tone="neutral" />
-              <span className="font-dp-sans text-[12px] text-concreto">texto — neutral</span>
-            </div>
+            <StatusBadge label="Ganado" tone="resolved" />
+            <StatusBadge label="Negociación" tone="warning" />
+            <StatusBadge label="Nuevo" tone="info" />
+            <StatusBadge label="Cancelado" tone="attention" />
+            <StatusBadge label="Borrador" tone="neutral" />
           </div>
           <div className="mt-6 flex flex-wrap gap-x-10 gap-y-5">
             <div className="flex items-center gap-3">
               <StatusMark tone="resolved" />
-              <span className="font-dp-sans text-[12px] text-concreto">cuadrado relleno — resuelto</span>
+              <span className="font-dp-sans text-[12px] text-concreto">resuelto</span>
             </div>
             <div className="flex items-center gap-3">
               <StatusMark tone="pending" />
-              <span className="font-dp-sans text-[12px] text-concreto">cuadrado hueco — pendiente</span>
+              <span className="font-dp-sans text-[12px] text-concreto">pendiente</span>
             </div>
             <div className="flex items-center gap-3">
               <StatusMark tone="attention" />
-              <span className="font-dp-sans text-[12px] text-concreto">rombo rojo — atención</span>
+              <span className="font-dp-sans text-[12px] text-concreto">atención</span>
             </div>
             <div className="flex items-center gap-3">
               <StatusMark tone="historic" />
-              <span className="font-dp-sans text-[12px] text-concreto">cuadrado gris — histórico</span>
+              <span className="font-dp-sans text-[12px] text-concreto">histórico</span>
             </div>
           </div>
         </Section>
 
-        <Section title="04 · Retícula y espaciado">
-          <p className="max-w-[60ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
+        <Section title="04 · Retícula y tarjetas">
+          <p className="max-w-[65ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
             12 columnas, márgenes de lámina de 48px, medianil de 22px. Cada bloque de contenido es una tarjeta
-            delimitada — borde fino, esquina de 16px, sombra suave (clase compartida <span className="font-dp-mono text-[12px]">.dp-card</span>) —
-            en vez de solo separadores de 1px; los separadores siguen usándose dentro de una tarjeta, para las filas
-            de una lista o tabla.
+            delimitada — borde fino, esquina de 16px, sombra suave (clase compartida{" "}
+            <span className="font-dp-mono text-[12px]">.dp-card</span>) — en vez de solo separadores de 1px; los
+            separadores siguen usándose dentro de una tarjeta, para las filas de una lista o tabla.
           </p>
         </Section>
 
-        <Section title="05 · Componentes">
-          <p className="mb-6 max-w-[60ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
-            Los botones primario y secundario llevan una sombra sólida sin desenfoque, apilada detrás del botón —
-            lee como una tarjeta superpuesta, no como una sombra de SaaS genérica. Al presionar, el botón viaja hacia
-            su propia sombra.
+        <Section title="05 · Iconos y avatares">
+          <p className="mb-6 max-w-[65ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
+            <span className="font-dp-mono text-[12px]">lucide-react</span>, trazo 1.75px, en nav, header, botones y
+            estados vacíos. Los avatares son iniciales sobre un color determinístico por nombre — nunca una foto
+            genérica ni un ícono de persona — reusados donde el dato es una persona real (asignado, contacto,
+            miembro del equipo).
+          </p>
+          <div className="flex flex-wrap items-center gap-8">
+            <div className="flex items-center gap-3">
+              <Avatar name="Adrián Gutiérrez" />
+              <span className="font-dp-sans text-[12.5px] text-concreto">Avatar</span>
+            </div>
+            <EmptyState icon={FolderKanban} title="Ejemplo de estado vacío" />
+          </div>
+        </Section>
+
+        <Section title="06 · Gráficos">
+          <p className="mb-6 max-w-[65ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
+            SVG a mano (sin librería) para que el estilo coincida exacto con el resto del sistema —{" "}
+            <span className="font-dp-mono text-[12px]">DonutChart</span> (máximo ~5-6 rebanadas, cada una con su
+            valor como texto) y <span className="font-dp-mono text-[12px]">BarChart</span> (más categorías, valores
+            siempre visibles). Categorías con un tono de estado real reusan la paleta de la sección 03; categorías
+            sin significado (fuente de lead, canal de tráfico) usan una escala ordinal de un solo color.
+          </p>
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+            <DonutChart data={DONUT_SAMPLE} centerValue="15" centerLabel="Total" />
+            <BarChart data={BAR_SAMPLE} />
+          </div>
+          <div className="mt-8 flex items-center gap-3">
+            <Sparkline data={[2, 3, 2, 4, 5, 4, 6]} />
+            <span className="font-dp-sans text-[12.5px] text-concreto">
+              Sparkline — solo en tarjetas con un log real detrás (created_at/paid_date); nunca una tendencia inventada.
+            </span>
+          </div>
+        </Section>
+
+        <Section title="07 · Componentes">
+          <p className="mb-6 max-w-[65ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
+            Los botones primario y secundario llevan una sombra suave y sutil (no la sombra apilada del pase
+            anterior) — más cercana a una interfaz SaaS pulida.
           </p>
           <div className="flex flex-wrap items-center gap-6">
             <Button variant="primary">Primario</Button>
@@ -123,7 +176,7 @@ export default function DesignSystemPage() {
           </div>
         </Section>
 
-        <Section title="06 · Breakpoints">
+        <Section title="08 · Breakpoints">
           <div className="flex flex-wrap gap-x-10 gap-y-3">
             {BREAKPOINTS.map((bp) => (
               <div key={bp.name} className="flex items-baseline gap-2.5">

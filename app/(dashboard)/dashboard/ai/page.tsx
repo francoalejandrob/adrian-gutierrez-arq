@@ -1,3 +1,4 @@
+import { Sparkles } from "lucide-react";
 import { getLeadsToContact, getOverdueTasks, getPendingPayments } from "@/lib/ai/tools";
 import { createClient } from "@/lib/supabase/server";
 import AiChat from "./chat";
@@ -61,12 +62,17 @@ export default async function AiPage() {
   return (
     <div className="px-12 py-10">
       <p className="mb-3 font-dp-mono text-[10px] uppercase tracking-[0.16em] text-concreto">Inteligencia · Archi AI</p>
-      <h1 className="font-dp-serif text-[38px] leading-none tracking-[-0.015em] text-tinta">¿Cómo puedo ayudarte hoy?</h1>
+      <div className="flex items-center gap-3.5">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-azul/10 text-azul">
+          <Sparkles size={18} strokeWidth={1.75} aria-hidden="true" />
+        </span>
+        <h1 className="font-dp-serif text-[38px] leading-none tracking-[-0.015em] text-tinta">¿Cómo puedo ayudarte hoy?</h1>
+      </div>
 
       {(suggestions.length > 0 || signals.length > 0) && (
-        <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
           {suggestions.length > 0 && (
-            <div>
+            <div className="dp-card p-7">
               <p className="mb-4 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Archi responde</p>
               <div className="flex flex-col">
                 {suggestions.map((s) => (
@@ -83,7 +89,7 @@ export default async function AiPage() {
             </div>
           )}
           {signals.length > 0 && (
-            <div>
+            <div className="dp-card p-7">
               <p className="mb-4 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Señales detectadas</p>
               <div className="flex flex-col">
                 {signals.map((s) => (

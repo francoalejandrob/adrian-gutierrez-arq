@@ -1,3 +1,4 @@
+import Avatar from "@/components/dashboard/ui/avatar";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import { createClient } from "@/lib/supabase/server";
 
@@ -48,7 +49,10 @@ export default async function SettingsPage() {
               const name = member.profiles?.full_name || member.profiles?.email || "—";
               return (
                 <div key={i} className="flex items-center justify-between gap-3 border-b border-filete py-3.5">
-                  <span className="font-dp-sans text-[13.5px] text-tinta">{name}</span>
+                  <span className="flex items-center gap-3">
+                    <Avatar name={name} size={26} />
+                    <span className="font-dp-sans text-[13.5px] text-tinta">{name}</span>
+                  </span>
                   <span className="font-dp-mono text-[11px] uppercase tracking-[0.08em] text-concreto">{member.role}</span>
                 </div>
               );
