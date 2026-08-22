@@ -4,11 +4,13 @@ import GanttChart from "@/components/dashboard/gantt-chart";
 import ProjectForm from "@/components/dashboard/project-form";
 import StatusSelect from "@/components/dashboard/status-select";
 import DownloadButton from "@/components/dashboard/download-button";
+import Avatar from "@/components/dashboard/ui/avatar";
 import Section from "@/components/dashboard/ui/section";
 import StatusBadge from "@/components/dashboard/ui/status-badge";
 import StatusMark from "@/components/dashboard/ui/status-mark";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { inputClass, selectClass } from "@/components/dashboard/ui/styles";
+import { getAssignableMembers } from "@/lib/members";
 import { createClient } from "@/lib/supabase/server";
 import {
   CONTRACT_STATUS_LABELS,
@@ -31,7 +33,6 @@ import {
   TASK_STATUSES,
   quoteTotal,
   type Phase,
-  type Task,
 } from "@/lib/supabase/types";
 import { addProjectNote, updateProject, updateProjectStatus } from "../actions";
 import {
@@ -100,11 +101,12 @@ export default async function ProjectDetailPage(
     { data: contracts },
     { data: payments },
     { data: expenses },
+    members,
   ] = await Promise.all([
       supabase.from("projects").select("*, clients(id, name, email)").eq("id", id).maybeSingle(),
       supabase.from("clients").select("id, name").order("name"),
       supabase.from("phases").select("*").eq("project_id", id).order("position"),
-      supabase.from("tasks").select("*").eq("project_id", id).order("created_at"),
+      supabase.from("tasks").select("*, profiles(full_name, email)").eq("project_id", id).order("created_at"),
       supabase
         .from("documents")
         .select("*, document_versions(*)")
@@ -124,6 +126,7 @@ export default async function ProjectDetailPage(
       supabase.from("contracts").select("*").eq("project_id", id).order("created_at", { ascending: false }),
       supabase.from("payments").select("*").eq("project_id", id).order("due_date"),
       supabase.from("expenses").select("*").eq("project_id", id).order("date", { ascending: false }),
+      getAssignableMembers(supabase),
     ]);
 
   if (!project) notFound();
@@ -156,7 +159,8 @@ export default async function ProjectDetailPage(
   const boundCreatePayment = createPayment.bind(null, id);
   const boundCreateExpense = createExpense.bind(null, id);
 
-  const tasksByStatus = new Map<string, Task[]>();
+  type TaskRow = NonNullable<typeof tasks>[number];
+  const tasksByStatus = new Map<string, TaskRow[]>();
   for (const task of tasks ?? []) {
     tasksByStatus.set(task.status, [...(tasksByStatus.get(task.status) ?? []), task]);
   }
@@ -365,6 +369,14 @@ export default async function ProjectDetailPage(
                   </option>
                 ))}
               </select>
+              <select name="assigned_to" className={selectClass}>
+                <option value="">Sin asignar</option>
+                {members.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
               <input name="due_date" type="date" className={inputClass} />
               <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…">
                 Agregar tarea
@@ -380,7 +392,10 @@ export default async function ProjectDetailPage(
                 <div className="flex flex-col gap-2.5">
                   {(tasksByStatus.get(status) ?? []).map((task) => (
                     <div key={task.id} className="border border-filete bg-superficie p-3.5">
-                      <p className="mb-2.5 font-dp-sans text-[12.5px] text-tinta">{task.title}</p>
+                      <div className="mb-2.5 flex items-start justify-between gap-2">
+                        <p className="font-dp-sans text-[12.5px] text-tinta">{task.title}</p>
+                        {task.profiles && <Avatar name={task.profiles.full_name || task.profiles.email} size={20} />}
+                      </div>
                       <div className="flex items-center justify-between">
                         {task.due_date && (
                           <span className="font-dp-mono text-[10.5px] text-concreto">
@@ -449,7 +464,7 @@ export default async function ProjectDetailPage(
           <div className="dp-card grid grid-cols-5">
             <SummaryStat label="Contratado" value={currency.format(contracted)} />
             <SummaryStat label="Cobrado" value={currency.format(collected)} tone="positive" />
-            <SummaryStat label="Pendiente" value={currency.format(pending)} />
+            <SummaryStat label="Pendiente" value={currency.format(pending)} tone="attention" />
             <SummaryStat label="Gastos" value={currency.format(spent)} />
             <SummaryStat label="Margen" value={currency.format(margin)} tone="positive" last />
           </div>
@@ -706,11 +721,12 @@ function PhaseRow({ phase, isCurrent }: { phase: Phase; isCurrent: boolean }) {
   );
 }
 
-function SummaryStat({ label, value, tone, last }: { label: string; value: string; tone?: "positive"; last?: boolean }) {
+function SummaryStat({ label, value, tone, last }: { label: string; value: string; tone?: "positive" | "attention"; last?: boolean }) {
+  const toneClass = tone === "positive" ? "text-verde" : tone === "attention" ? "text-acento" : "text-tinta";
   return (
     <div className={`p-6 text-center ${last ? "" : "border-r border-filete"}`}>
       <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">{label}</p>
-      <p className={`mt-2.5 font-dp-mono text-lg ${tone === "positive" ? "text-verde" : "text-tinta"}`}>{value}</p>
+      <p className={`mt-2.5 font-dp-mono text-lg ${toneClass}`}>{value}</p>
     </div>
   );
 }

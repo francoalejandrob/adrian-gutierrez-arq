@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { FolderKanban } from "lucide-react";
+import Avatar from "@/components/dashboard/ui/avatar";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import ProgressBar from "@/components/dashboard/ui/progress-bar";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
-import { PROJECT_STATUS_LABELS, PROJECT_STATUSES } from "@/lib/supabase/types";
+import { PROJECT_STATUS_LABELS, PROJECT_STATUS_TONE, PROJECT_STATUSES } from "@/lib/supabase/types";
 
 export default async function ProjectsPage(
   props: PageProps<"/dashboard/projects">,
@@ -60,6 +62,7 @@ export default async function ProjectsPage(
               className="flex items-center gap-6 border-b border-filete px-12 py-5 transition-colors duration-100 hover:bg-[#EDEBE4]"
             >
               <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
+              {project.clients?.name && <Avatar name={project.clients.name} size={28} />}
               <div className="w-[220px] shrink-0">
                 <p className="truncate font-dp-serif text-xl text-tinta">{project.name}</p>
                 <p className="mt-1 font-dp-sans text-[12px] text-concreto">
@@ -67,10 +70,8 @@ export default async function ProjectsPage(
                 </p>
               </div>
               <div className="min-w-0 flex-1">
-                <div className="mb-2 flex items-baseline justify-between">
-                  <span className="font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
-                    {PROJECT_STATUS_LABELS[project.status]}
-                  </span>
+                <div className="mb-2 flex items-baseline justify-between gap-4">
+                  <StatusBadge label={PROJECT_STATUS_LABELS[project.status]} tone={PROJECT_STATUS_TONE[project.status]} />
                   <span className="font-dp-mono text-[12px] text-tinta">{project.progress}%</span>
                 </div>
                 <ProgressBar value={project.progress} />
