@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import LoginForm from "@/components/dashboard/login-form";
+import { dpFontVars } from "@/lib/dp-fonts";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -21,13 +22,25 @@ export default async function PortalLoginPage() {
   const { data: org } = await supabase.from("organizations").select("name").limit(1).maybeSingle();
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-hueso px-6">
-      <div className="w-full max-w-[380px]">
-        <p className="text-center font-display text-[22px] font-semibold text-carbon">Portal de cliente</p>
-        <p className="mb-10 text-center text-[13px] text-carbon/50">
-          {org?.name ?? "Adrián Gutiérrez Arquitectura"} — seguimiento de tu proyecto
+    <main className={`dp-scope ${dpFontVars} grid min-h-dvh grid-cols-1 font-dp-sans text-tinta md:grid-cols-2`}>
+      <div className="dp-grain-strong hidden flex-col justify-between border-r border-corte p-16 md:flex">
+        <p className="font-dp-mono text-[10px] uppercase tracking-[0.18em] text-grafito">ARCHI.OS &nbsp;·&nbsp; Portal de cliente</p>
+        <div>
+          <h1 className="mb-6 max-w-[16ch] font-dp-serif text-[52px] leading-none tracking-[-0.025em] text-tinta">
+            Tu proyecto, siempre a la vista.
+          </h1>
+          <p className="max-w-[40ch] font-dp-serif text-xl italic leading-relaxed text-grafito">
+            Avance, documentos, aprobaciones y pagos — en un solo lugar.
+          </p>
+        </div>
+        <p className="font-dp-mono text-[10px] uppercase tracking-[0.14em] text-concreto">
+          {org?.name ?? "Adrián Gutiérrez Arquitectura"}
         </p>
-        <div className="rounded-[10px] border border-carbon/[0.08] bg-white p-8">
+      </div>
+
+      <div className="flex items-center justify-center p-16">
+        <div className="w-full max-w-[352px]">
+          <p className="mb-7 font-dp-mono text-[9.5px] uppercase tracking-[0.16em] text-concreto">Acceso de cliente</p>
           <LoginForm next="/portal" />
         </div>
       </div>

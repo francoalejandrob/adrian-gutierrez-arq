@@ -1,18 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  /* Paleta "Concreto Cálido" */
+  /* Paleta "Concreto Cálido" — sitio público, nunca tocar desde el dashboard. */
   --color-hueso: #f1eee8;
   --color-carbon: #000000;
   --color-naranja: #b26a45;
   --color-naranja-oscuro: #8c5335;
   --color-arena: #e4dfd4;
   --color-piedra: #6e6659;
-  /* Warm near-black for dark surfaces (dashboard sidebar). Distinct from
-     --color-carbon (#000000, pure black — used as the site's ink/text
-     color everywhere) so giving a surface this tone doesn't collide with
-     that existing meaning. */
-  --color-noche: #141210;
+
+  /* "El estudio como sistema" — paleta propia del dashboard/portal
+     (DISEÑO PROFESIONAL/ARCHI.OS v2.dc.html), independiente de la marca
+     del sitio público. Nombres calcados de la lámina "Design system" del
+     propio mockup para que el token y su documentación coincidan 1:1. */
+  --color-papel: #f4f3ef;
+  --color-superficie: #faf9f5;
+  --color-filete: #dddad1;
+  --color-corte: #c7c3b7;
+  --color-concreto: #8a867c;
+  --color-grafito: #45443f;
+  --color-tinta: #0f0f0e;
+  --color-acento: #a8382a;
 }
 
 @theme inline {
@@ -22,10 +30,22 @@
   --color-naranja-oscuro: var(--color-naranja-oscuro);
   --color-arena: var(--color-arena);
   --color-piedra: var(--color-piedra);
-  --color-noche: var(--color-noche);
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-plex-sans);
   --font-mono: var(--font-plex-mono);
+
+  --color-papel: var(--color-papel);
+  --color-superficie: var(--color-superficie);
+  --color-filete: var(--color-filete);
+  --color-corte: var(--color-corte);
+  --color-concreto: var(--color-concreto);
+  --color-grafito: var(--color-grafito);
+  --color-tinta: var(--color-tinta);
+  --color-acento: var(--color-acento);
+  --font-dp-serif: var(--font-instrument-serif);
+  --font-dp-sans: var(--font-archivo);
+  --font-dp-mono: var(--font-jetbrains-mono);
+
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -51,6 +71,44 @@ textarea:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid var(--color-naranja);
   outline-offset: 2px;
+}
+
+/* Same rule, tinta-de-revisión colored, scoped to the dashboard/portal
+   subtree (.dp-scope, applied on their root layout wrappers) so keyboard
+   focus stays visible there without borrowing the public site's orange. */
+.dp-scope a:focus-visible,
+.dp-scope button:focus-visible,
+.dp-scope input:focus-visible,
+.dp-scope select:focus-visible,
+.dp-scope textarea:focus-visible,
+.dp-scope [tabindex]:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 2px;
+}
+
+/* Fine paper grain (SVG feTurbulence noise) + a soft top-to-bottom
+   gradient, from DISEÑO PROFESIONAL/ARCHI.OS v2.dc.html — defined once
+   here instead of repeating the same long data-URI in every file that
+   needs the dashboard's paper texture. */
+.dp-grain {
+  background-color: var(--color-papel);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.2'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #f6f5f1, #f1efe9);
+  background-size: 180px 180px, auto;
+  background-blend-mode: multiply, normal;
+}
+
+/* Stronger variant for the login split-panel. */
+.dp-grain-strong {
+  background-color: #cfcbc3;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"),
+    radial-gradient(130% 95% at 20% 14%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 62%),
+    radial-gradient(110% 85% at 80% 88%, rgba(15, 15, 14, 0.13), rgba(15, 15, 14, 0) 64%),
+    linear-gradient(162deg, #dcd8d0, #bebab1);
+  background-size: 240px 240px, auto, auto, auto;
+  background-blend-mode: multiply, screen, multiply, normal;
 }
 
 .press {
@@ -80,6 +138,26 @@ textarea:focus-visible,
 
 .nav-link:hover::after {
   transform: scaleX(1);
+}
+
+@keyframes dp-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes dp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

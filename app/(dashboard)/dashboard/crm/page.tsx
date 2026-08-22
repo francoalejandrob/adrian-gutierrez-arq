@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { Briefcase, Plus, Target } from "lucide-react";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
-import StatusBadge from "@/components/dashboard/ui/status-badge";
-import { initials } from "@/lib/format";
+import StatusLabel from "@/components/dashboard/ui/status-label";
 import { computePipeline } from "@/lib/pipeline";
 import { createClient } from "@/lib/supabase/server";
 import { LEAD_STATUS_LABELS, LEAD_STATUS_TONE, LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/supabase/types";
@@ -22,23 +20,22 @@ export default async function CrmPage(props: PageProps<"/dashboard/crm">) {
   return (
     <div>
       <PageHeader
+        eyebrow="Comercial"
         title="CRM"
         action={
           tab === "leads" ? (
             <Link href="/dashboard/leads/new" className={buttonClass("primary", "md")}>
-              <Plus size={16} strokeWidth={2} aria-hidden="true" />
               Nuevo lead
             </Link>
           ) : tab === "clientes" ? (
             <Link href="/dashboard/clients/new" className={buttonClass("primary", "md")}>
-              <Plus size={16} strokeWidth={2} aria-hidden="true" />
               Nuevo cliente
             </Link>
           ) : undefined
         }
       />
 
-      <div className="mt-5 flex gap-6 border-b border-carbon/[0.1]">
+      <div className="flex gap-8 border-b border-corte px-12">
         <CrmTab href="/dashboard/crm?tab=leads" label="Leads" active={tab === "leads"} />
         <CrmTab href="/dashboard/crm?tab=clientes" label="Clientes" active={tab === "clientes"} />
         <CrmTab href="/dashboard/crm?tab=pipeline" label="Pipeline" active={tab === "pipeline"} />
@@ -55,8 +52,8 @@ function CrmTab({ href, label, active }: { href: string; label: string; active: 
   return (
     <Link
       href={href}
-      className={`border-b-2 pb-3 text-[13.5px] transition-colors duration-150 ${
-        active ? "border-carbon font-medium text-carbon" : "border-transparent text-carbon/50 hover:text-carbon"
+      className={`border-b-2 py-3.5 font-dp-mono text-[10.5px] uppercase tracking-[0.12em] transition-colors duration-150 ${
+        active ? "border-tinta text-tinta" : "border-transparent text-concreto hover:text-tinta"
       }`}
     >
       {label}
@@ -76,12 +73,12 @@ async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; stat
   const viewParam = (v: string) => `/dashboard/crm?tab=leads&view=${v}${statusFilter ? `&status=${statusFilter}` : ""}`;
 
   return (
-    <div className="mt-6">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2">
-          <FilterPill href="/dashboard/crm?tab=leads" label="Todos" active={!statusFilter} />
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-filete px-12 py-4">
+        <div className="flex flex-wrap gap-5">
+          <FilterLink href="/dashboard/crm?tab=leads" label="Todos" active={!statusFilter} />
           {LEAD_STATUSES.map((status) => (
-            <FilterPill
+            <FilterLink
               key={status}
               href={`/dashboard/crm?tab=leads&status=${status}`}
               label={LEAD_STATUS_LABELS[status]}
@@ -89,53 +86,49 @@ async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; stat
             />
           ))}
         </div>
-        <div className="flex gap-1.5">
-          <Link href={viewParam("table")} className={buttonClass(view === "table" ? "primary" : "secondary", "sm")}>
+        <div className="flex gap-4 font-dp-mono text-[9.5px] uppercase tracking-[0.1em]">
+          <Link href={viewParam("table")} className={view === "table" ? "text-tinta" : "text-concreto hover:text-tinta"}>
             Tabla
           </Link>
-          <Link href={viewParam("kanban")} className={buttonClass(view === "kanban" ? "primary" : "secondary", "sm")}>
+          <Link href={viewParam("kanban")} className={view === "kanban" ? "text-tinta" : "text-concreto hover:text-tinta"}>
             Kanban
           </Link>
         </div>
       </div>
 
       {view === "kanban" ? (
-        <LeadsKanban leads={leads ?? []} />
+        <div className="px-12 py-8">
+          <LeadsKanban leads={leads ?? []} />
+        </div>
       ) : (
-        <div className="overflow-x-auto rounded-[10px] border border-carbon/[0.08] bg-white">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-carbon/[0.08] text-[11px] uppercase tracking-wide text-carbon/40">
-                <th className="px-4 py-3">Lead</th>
-                <th className="px-4 py-3">Necesidad</th>
-                <th className="px-4 py-3">Valor</th>
-                <th className="px-4 py-3">Fuente</th>
-                <th className="px-4 py-3">Estado</th>
-                <th className="px-4 py-3">Creado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(leads ?? []).map((lead) => (
-                <tr key={lead.id} className="border-b border-carbon/5 transition-colors duration-100 last:border-0 hover:bg-hueso/60">
-                  <td className="px-4 py-3">
-                    <Link href={`/dashboard/leads/${lead.id}`} className="font-medium text-carbon hover:text-naranja-oscuro hover:underline">
-                      {lead.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-carbon/60">{lead.need || "—"}</td>
-                  <td className="px-4 py-3 font-mono">{lead.estimated_value ? currency.format(lead.estimated_value) : "—"}</td>
-                  <td className="px-4 py-3 text-carbon/55">{lead.source}</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} tone={LEAD_STATUS_TONE[lead.status as LeadStatus]} />
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs text-carbon/50">{new Date(lead.created_at).toLocaleDateString("es-EC")}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div>
+          <div className="grid grid-cols-[2.4fr_1.6fr_1fr_1.2fr_1fr_0.9fr] gap-4 border-b border-filete px-12 py-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">
+            <span>Lead</span>
+            <span>Necesidad</span>
+            <span>Valor</span>
+            <span>Fuente</span>
+            <span>Estado</span>
+            <span>Creado</span>
+          </div>
+          {(leads ?? []).map((lead, i) => (
+            <Link
+              key={lead.id}
+              href={`/dashboard/leads/${lead.id}`}
+              className="grid grid-cols-[2.4fr_1.6fr_1fr_1.2fr_1fr_0.9fr] items-center gap-4 border-b border-filete px-12 py-4 transition-colors duration-100 hover:bg-[#EDEBE4]"
+            >
+              <span className="flex items-baseline gap-3 font-dp-sans text-[13.5px] text-tinta">
+                <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
+                {lead.name}
+              </span>
+              <span className="truncate font-dp-sans text-[12.5px] text-grafito">{lead.need || "—"}</span>
+              <span className="font-dp-mono text-[12.5px] text-tinta">{lead.estimated_value ? currency.format(lead.estimated_value) : "—"}</span>
+              <span className="font-dp-sans text-[12.5px] text-grafito">{lead.source}</span>
+              <StatusLabel label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} tone={LEAD_STATUS_TONE[lead.status as LeadStatus]} />
+              <span className="font-dp-mono text-[11px] text-concreto">{new Date(lead.created_at).toLocaleDateString("es-EC")}</span>
+            </Link>
+          ))}
           {(leads ?? []).length === 0 && (
             <EmptyState
-              icon={Target}
               title="Todavía no hay leads"
               description="Los leads que lleguen desde el sitio web o que cargues manualmente aparecerán aquí."
               action={
@@ -153,26 +146,22 @@ async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; stat
 
 function LeadsKanban({ leads }: { leads: Lead[] }) {
   return (
-    <div className="flex gap-3.5 overflow-x-auto pb-2">
+    <div className="flex gap-5 overflow-x-auto pb-2">
       {LEAD_STATUSES.map((status) => {
         const inColumn = leads.filter((l) => l.status === status);
         return (
           <div key={status} className="w-[220px] shrink-0">
-            <div className="mb-2.5 flex items-center justify-between border-b-2 border-piedra/40 pb-2 text-[11.5px] uppercase tracking-wide text-carbon/45">
+            <div className="mb-3 flex items-center justify-between border-b border-corte pb-2.5 font-dp-mono text-[10px] uppercase tracking-[0.12em] text-concreto">
               <span>{LEAD_STATUS_LABELS[status]}</span>
-              <span className="font-mono">{inColumn.length}</span>
+              <span>{inColumn.length}</span>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2.5">
               {inColumn.map((lead) => (
-                <Link
-                  key={lead.id}
-                  href={`/dashboard/leads/${lead.id}`}
-                  className="block rounded-[10px] border border-carbon/[0.08] bg-white p-3 text-[12.5px] transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)]"
-                >
-                  <p className="mb-1.5 font-medium text-carbon">{lead.name}</p>
-                  <p className="mb-2 text-carbon/50">{lead.need || "—"}</p>
+                <Link key={lead.id} href={`/dashboard/leads/${lead.id}`} className="block border border-filete bg-superficie p-3.5 transition-colors duration-150 hover:border-tinta">
+                  <p className="mb-1.5 font-dp-sans text-[12.5px] text-tinta">{lead.name}</p>
+                  <p className="mb-2.5 font-dp-sans text-[11.5px] text-concreto">{lead.need || "—"}</p>
                   {lead.estimated_value != null && (
-                    <p className="font-mono font-medium text-naranja-oscuro">{currency.format(lead.estimated_value)}</p>
+                    <p className="font-dp-mono text-[12px] text-tinta">{currency.format(lead.estimated_value)}</p>
                   )}
                 </Link>
               ))}
@@ -197,42 +186,33 @@ async function ClientesTab({ supabase }: { supabase: Supa }) {
   }
 
   return (
-    <div className="mt-6">
+    <div>
       {(clients ?? []).length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {(clients ?? []).map((client) => {
-            const info = projectsByClient.get(client.id);
-            return (
-              <Link
-                key={client.id}
-                href={`/dashboard/clients/${client.id}`}
-                className="rounded-[10px] border border-carbon/[0.08] bg-white p-5 transition-all duration-150 hover:-translate-y-[3px] hover:shadow-[0_10px_22px_rgba(0,0,0,0.1)]"
-              >
-                <div className="mb-3.5 flex items-start justify-between">
-                  <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-arena font-display text-sm text-carbon">
-                    {initials(client.name)}
-                  </div>
-                  <span className="font-mono text-xs text-carbon/50">{info?.count ?? 0} proy.</span>
-                </div>
-                <p className="mb-1 text-[14.5px] font-medium text-carbon">{client.name}</p>
-                <p className="text-[12.5px] text-carbon/50">{info?.category ?? client.company ?? "—"}</p>
-              </Link>
-            );
-          })}
-        </div>
+        (clients ?? []).map((client, i) => {
+          const info = projectsByClient.get(client.id);
+          return (
+            <Link
+              key={client.id}
+              href={`/dashboard/clients/${client.id}`}
+              className="flex items-baseline gap-6 border-b border-filete px-12 py-5 transition-colors duration-100 hover:bg-[#EDEBE4]"
+            >
+              <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
+              <span className="min-w-[220px] font-dp-serif text-xl text-tinta">{client.name}</span>
+              <span className="flex-1 font-dp-sans text-[12.5px] text-concreto">{info?.category ?? client.company ?? "—"}</span>
+              <span className="font-dp-mono text-[11px] text-concreto">{info?.count ?? 0} proyecto{info?.count === 1 ? "" : "s"}</span>
+            </Link>
+          );
+        })
       ) : (
-        <div className="rounded-[10px] border border-carbon/[0.08] bg-white">
-          <EmptyState
-            icon={Briefcase}
-            title="Todavía no hay clientes"
-            description="Convertí un lead ganado o creá un cliente directamente."
-            action={
-              <Link href="/dashboard/clients/new" className={buttonClass("secondary", "sm")}>
-                Crear el primero
-              </Link>
-            }
-          />
-        </div>
+        <EmptyState
+          title="Todavía no hay clientes"
+          description="Convertí un lead ganado o creá un cliente directamente."
+          action={
+            <Link href="/dashboard/clients/new" className={buttonClass("secondary", "sm")}>
+              Crear el primero
+            </Link>
+          }
+        />
       )}
     </div>
   );
@@ -241,21 +221,21 @@ async function ClientesTab({ supabase }: { supabase: Supa }) {
 async function PipelineTab({ supabase }: { supabase: Supa }) {
   const { data: leads } = await supabase.from("leads").select("status, estimated_value");
   const pipeline = computePipeline(leads ?? []);
+  const maxValue = Math.max(1, ...pipeline.map((s) => s.value));
 
   return (
-    <div className="mt-6">
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+    <div className="px-12 py-8">
+      <div className="flex flex-col">
         {pipeline.map((stage) => (
-          <div
-            key={stage.status}
-            className={`rounded-[10px] border p-6 text-center ${
-              stage.status === "ganado" ? "border-naranja" : "border-carbon/[0.08]"
-            }`}
-          >
-            <p className={`font-mono text-2xl font-medium ${stage.status === "ganado" ? "text-naranja-oscuro" : "text-carbon"}`}>
-              {currency.format(stage.value)}
-            </p>
-            <p className="mt-1.5 text-xs text-carbon/50">{stage.label}</p>
+          <div key={stage.status} className="grid grid-cols-[140px_1fr_140px_60px] items-center gap-5 border-b border-filete py-4 last:border-0">
+            <span className={`font-dp-mono text-[10.5px] uppercase tracking-[0.1em] ${stage.status === "ganado" ? "text-tinta font-medium" : "text-grafito"}`}>
+              {stage.label}
+            </span>
+            <div className="h-[3px] bg-filete">
+              <div className="h-[3px] bg-tinta" style={{ width: `${(stage.value / maxValue) * 100}%` }} />
+            </div>
+            <span className="text-right font-dp-mono text-[13px] text-tinta">{currency.format(stage.value)}</span>
+            <span className="text-right font-dp-mono text-[11px] text-concreto">{stage.count}</span>
           </div>
         ))}
       </div>
@@ -263,12 +243,12 @@ async function PipelineTab({ supabase }: { supabase: Supa }) {
   );
 }
 
-function FilterPill({ href, label, active }: { href: string; label: string; active: boolean }) {
+function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
   return (
     <Link
       href={href}
-      className={`rounded-full px-3 py-1.5 text-xs transition-colors duration-150 ${
-        active ? "bg-carbon text-white" : "border border-carbon/20 text-carbon/60 hover:border-carbon hover:text-carbon"
+      className={`font-dp-mono text-[10px] uppercase tracking-[0.1em] transition-colors duration-150 ${
+        active ? "text-tinta" : "text-concreto hover:text-tinta"
       }`}
     >
       {label}

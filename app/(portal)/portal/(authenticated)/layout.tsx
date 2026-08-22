@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { dpFontVars } from "@/lib/dp-fonts";
 import { createClient } from "@/lib/supabase/server";
 import { portalSignOut } from "../auth-actions";
 
@@ -12,18 +13,19 @@ export default async function PortalAuthenticatedLayout({ children }: LayoutProp
   const { data: org } = await supabase.from("organizations").select("name").limit(1).maybeSingle();
 
   return (
-    <div className="min-h-dvh bg-hueso">
-      <div className="mx-auto max-w-[520px] px-6 pb-24 pt-10">
-        <div className="mb-10 flex items-center justify-between">
-          <p className="font-display text-base font-semibold text-carbon">{org?.name ?? "Adrián Gutiérrez Arq."}</p>
-          <form action={portalSignOut}>
-            <button type="submit" className="cursor-pointer text-xs text-carbon/40 transition-colors duration-150 hover:text-carbon">
-              Salir
-            </button>
-          </form>
-        </div>
-        {children}
+    <div className={`dp-scope ${dpFontVars} min-h-dvh bg-papel font-dp-sans text-tinta`}>
+      <div className="dp-grain sticky top-0 z-40 flex h-[53px] items-center justify-between border-b border-corte px-6">
+        <p className="font-dp-sans text-sm font-medium tracking-[0.02em] text-tinta">{org?.name ?? "Adrián Gutiérrez Arq."}</p>
+        <form action={portalSignOut}>
+          <button
+            type="submit"
+            className="cursor-pointer font-dp-mono text-[10px] uppercase tracking-[0.1em] text-concreto transition-colors duration-150 hover:text-tinta"
+          >
+            Salir
+          </button>
+        </form>
       </div>
+      <div className="mx-auto max-w-[560px] px-6 pb-24 pt-10">{children}</div>
     </div>
   );
 }

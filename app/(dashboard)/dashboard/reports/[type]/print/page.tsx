@@ -19,10 +19,10 @@ export default async function ReportPrintPage(props: PageProps<"/dashboard/repor
   const supabase = await createClient();
 
   return (
-    <div className="mx-auto max-w-3xl bg-white p-10 text-carbon">
-      <div className="border-b border-carbon/20 pb-5">
-        <p className="font-display text-xl">Adrián Gutiérrez Arquitectura</p>
-        <p className="mt-1 text-sm text-carbon/60">
+    <div className="mx-auto max-w-3xl bg-papel p-10 text-tinta">
+      <div className="border-b border-corte pb-5">
+        <p className="font-dp-serif text-2xl">Adrián Gutiérrez Arquitectura</p>
+        <p className="mt-1.5 font-dp-mono text-[10px] uppercase tracking-[0.12em] text-concreto">
           {REPORT_TITLES[type]} · {new Date().toLocaleDateString("es-EC", { day: "numeric", month: "long", year: "numeric" })}
         </p>
       </div>
@@ -44,9 +44,9 @@ async function ComercialTable({ supabase }: { supabase: Supa }) {
     .order("created_at", { ascending: false });
 
   return (
-    <table className="mt-6 w-full text-sm">
+    <table className="mt-7 w-full font-dp-sans text-[13px]">
       <thead>
-        <tr className="border-b border-carbon/20 text-left text-xs uppercase tracking-wide text-carbon/50">
+        <tr className="border-b border-corte text-left font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">
           <th className="py-2">Lead</th>
           <th className="py-2">Fuente</th>
           <th className="py-2">Estado</th>
@@ -55,11 +55,11 @@ async function ComercialTable({ supabase }: { supabase: Supa }) {
       </thead>
       <tbody>
         {(leads ?? []).map((l) => (
-          <tr key={l.email + l.created_at} className="border-b border-carbon/10">
+          <tr key={l.email + l.created_at} className="border-b border-filete">
             <td className="py-2">{l.name}</td>
             <td className="py-2">{l.source}</td>
             <td className="py-2">{l.status}</td>
-            <td className="py-2 text-right font-mono">{l.estimated_value ? currency.format(l.estimated_value) : "—"}</td>
+            <td className="py-2 text-right font-dp-mono text-tinta">{l.estimated_value ? currency.format(l.estimated_value) : "—"}</td>
           </tr>
         ))}
       </tbody>
@@ -74,9 +74,9 @@ async function FinancieroTable({ supabase }: { supabase: Supa }) {
     .order("due_date", { ascending: false });
 
   return (
-    <table className="mt-6 w-full text-sm">
+    <table className="mt-7 w-full font-dp-sans text-[13px]">
       <thead>
-        <tr className="border-b border-carbon/20 text-left text-xs uppercase tracking-wide text-carbon/50">
+        <tr className="border-b border-corte text-left font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">
           <th className="py-2">Cliente</th>
           <th className="py-2">Proyecto</th>
           <th className="py-2">Vence</th>
@@ -86,12 +86,12 @@ async function FinancieroTable({ supabase }: { supabase: Supa }) {
       </thead>
       <tbody>
         {(payments ?? []).map((p, i) => (
-          <tr key={i} className="border-b border-carbon/10">
+          <tr key={i} className="border-b border-filete">
             <td className="py-2">{p.projects?.clients?.name ?? "—"}</td>
             <td className="py-2">{p.projects?.name ?? "—"}</td>
             <td className="py-2">{p.due_date ?? "—"}</td>
             <td className="py-2">{p.status}</td>
-            <td className="py-2 text-right font-mono">{currency.format(p.amount)}</td>
+            <td className="py-2 text-right font-dp-mono text-tinta">{currency.format(p.amount)}</td>
           </tr>
         ))}
       </tbody>
@@ -106,9 +106,9 @@ async function ProyectosTable({ supabase }: { supabase: Supa }) {
     .order("created_at", { ascending: false });
 
   return (
-    <table className="mt-6 w-full text-sm">
+    <table className="mt-7 w-full font-dp-sans text-[13px]">
       <thead>
-        <tr className="border-b border-carbon/20 text-left text-xs uppercase tracking-wide text-carbon/50">
+        <tr className="border-b border-corte text-left font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">
           <th className="py-2">Proyecto</th>
           <th className="py-2">Cliente</th>
           <th className="py-2">Estado</th>
@@ -118,12 +118,12 @@ async function ProyectosTable({ supabase }: { supabase: Supa }) {
       </thead>
       <tbody>
         {(projects ?? []).map((p) => (
-          <tr key={p.name} className="border-b border-carbon/10">
+          <tr key={p.name} className="border-b border-filete">
             <td className="py-2">{p.name}</td>
             <td className="py-2">{p.clients?.name ?? "—"}</td>
             <td className="py-2">{PROJECT_STATUS_LABELS[p.status as ProjectStatus]}</td>
-            <td className="py-2 text-right font-mono">{p.progress}%</td>
-            <td className="py-2 text-right font-mono">{p.estimated_end_date ?? "—"}</td>
+            <td className="py-2 text-right font-dp-mono text-tinta">{p.progress}%</td>
+            <td className="py-2 text-right font-dp-mono text-tinta">{p.estimated_end_date ?? "—"}</td>
           </tr>
         ))}
       </tbody>
@@ -146,9 +146,9 @@ async function MarketingTable({ supabase }: { supabase: Supa }) {
   });
 
   return (
-    <table className="mt-6 w-full text-sm">
+    <table className="mt-7 w-full font-dp-sans text-[13px]">
       <thead>
-        <tr className="border-b border-carbon/20 text-left text-xs uppercase tracking-wide text-carbon/50">
+        <tr className="border-b border-corte text-left font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">
           <th className="py-2">Fuente</th>
           <th className="py-2 text-right">Leads</th>
           <th className="py-2 text-right">Clientes</th>
@@ -158,12 +158,12 @@ async function MarketingTable({ supabase }: { supabase: Supa }) {
       </thead>
       <tbody>
         {rows.map((r) => (
-          <tr key={r.source} className="border-b border-carbon/10">
+          <tr key={r.source} className="border-b border-filete">
             <td className="py-2">{r.source}</td>
-            <td className="py-2 text-right font-mono">{r.leads}</td>
-            <td className="py-2 text-right font-mono">{r.clients}</td>
-            <td className="py-2 text-right font-mono">{r.projects}</td>
-            <td className="py-2 text-right font-mono">{currency.format(r.contractedValue)}</td>
+            <td className="py-2 text-right font-dp-mono text-tinta">{r.leads}</td>
+            <td className="py-2 text-right font-dp-mono text-tinta">{r.clients}</td>
+            <td className="py-2 text-right font-dp-mono text-tinta">{r.projects}</td>
+            <td className="py-2 text-right font-dp-mono text-tinta">{currency.format(r.contractedValue)}</td>
           </tr>
         ))}
       </tbody>

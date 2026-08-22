@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#F4F3EF;color:#0F0F0E;font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased;text-wrap:pretty}
+  *{box-sizing:border-box}
+  a{color:#A8382A;text-decoration:none}
+  a:hover{color:#0F0F0E}
+  ::selection{background:#0F0F0E;color:#F4F3EF}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:#C7C3B7}
+  ::-webkit-scrollbar-track{background:#F4F3EF}
+  button{font-family:'Archivo',sans-serif}
+  input{font-family:'Archivo',sans-serif}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background-color:#F4F3EF;background-image:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.9%27%20numOctaves%3D%274%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27180%27%20height%3D%27180%27%20filter%3D%27url%28%23n%29%27%20opacity%3D%270.2%27%2F%3E%3C%2Fsvg%3E),linear-gradient(180deg,#F6F5F1,#F1EFE9);background-size:180px 180px,auto;background-blend-mode:multiply,normal">
+
+<!-- ══ SHEET HEADER ══ -->
+<div style="position:sticky;top:0;z-index:40;display:flex;align-items:stretch;height:53px;background-color:#F4F3EF;background-image:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.9%27%20numOctaves%3D%274%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27180%27%20height%3D%27180%27%20filter%3D%27url%28%23n%29%27%20opacity%3D%270.2%27%2F%3E%3C%2Fsvg%3E),linear-gradient(180deg,#F6F5F1,#F1EFE9);background-size:180px 180px,auto;background-blend-mode:multiply,normal;border-bottom:1px solid #C7C3B7">
+  <div style="width:225px;flex-shrink:0;display:flex;align-items:center;gap:9px;padding:0 20px;border-right:1px solid #DDDAD1">
+    <span style="width:15px;height:15px;border:1.5px solid #0F0F0E;position:relative;flex-shrink:0"><span style="position:absolute;left:3px;top:3px;right:3px;bottom:3px;background:#0F0F0E;display:block"></span></span>
+    <span style="font:500 14px/1 'Archivo',sans-serif;letter-spacing:0.1em">ARCHI.OS</span>
+  </div>
+  <div style="flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;padding:0 22px;gap:20px;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:9px;font:400 10.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#8A867C;white-space:nowrap;flex:0 0 auto">
+      <span>Estudio</span><span style="color:#8A867C">/</span><span style="color:#0F0F0E">{{ crumb }}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;min-width:0;flex:0 1 auto;justify-content:flex-end">
+      <button onclick="{{ openCmd }}" title="Buscar o preguntar" style="display:flex;align-items:center;justify-content:center;height:29px;padding:0 10px;flex:0 0 auto;background:none;border:1px solid #DDDAD1;cursor:pointer;font:400 10.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;color:#8A867C;white-space:nowrap;transition:border-color 140ms,color 140ms" style-hover="border-color:#0F0F0E;color:#0F0F0E">⌘K</button>
+      <span style="font:400 10.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;color:#8A867C;white-space:nowrap;flex-shrink:0">22.08.2026</span>
+      <div style="display:flex;border:1px solid #DDDAD1;flex-shrink:0">
+        <button onclick="{{ setModeAdmin }}" style="{{ segAdmin }}">Estudio</button>
+        <button onclick="{{ setModePortal }}" style="{{ segPortal }}">Cliente</button>
+        <button onclick="{{ setModeLogin }}" style="{{ segLogin }}">Acceso</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<sc-if value="{{ isAdminMode }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:flex-start">
+
+  <!-- ══ INDEX / NAV ══ -->
+  <aside style="width:225px;flex-shrink:0;position:sticky;top:53px;height:calc(100vh - 53px);overflow-y:auto;border-right:1px solid #DDDAD1;background-color:#F4F3EF;background-image:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.9%27%20numOctaves%3D%274%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27180%27%20height%3D%27180%27%20filter%3D%27url%28%23n%29%27%20opacity%3D%270.2%27%2F%3E%3C%2Fsvg%3E),linear-gradient(180deg,#F6F5F1,#EFEDE6);background-size:180px 180px,auto;background-blend-mode:multiply,normal;padding:22px 0 24px">
+    <button onclick="{{ goDashboard }}" style="{{ navStyles.dashboard }}" style-hover="color:#0F0F0E;background:#EDEBE4">
+      <span style="{{ navNum.dashboard }}">01</span><span>Dashboard</span>
+    </button>
+
+    <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#6E6A60;margin:22px 20px 9px;padding-bottom:7px;border-bottom:1px solid #DDDAD1">Comercial</p>
+    <button onclick="{{ goCrmLeads }}" style="{{ navStyles.crmLeads }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.crmLeads }}">02</span><span>Leads</span><span style="{{ navTail }}">8</span></button>
+    <button onclick="{{ goCrmClientes }}" style="{{ navStyles.crmClientes }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.crmClientes }}">03</span><span>Clientes</span></button>
+    <button onclick="{{ goCrmPipeline }}" style="{{ navStyles.crmPipeline }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.crmPipeline }}">04</span><span>Pipeline</span></button>
+    <button onclick="{{ goQuoteBuilder }}" style="{{ navStyles.quotes }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.quotes }}">05</span><span>Cotizaciones</span></button>
+    <button onclick="{{ goContracts }}" style="{{ navStyles.contracts }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.contracts }}">06</span><span>Contratos</span></button>
+
+    <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#6E6A60;margin:22px 20px 9px;padding-bottom:7px;border-bottom:1px solid #DDDAD1">Producción</p>
+    <button onclick="{{ goProjects }}" style="{{ navStyles.projects }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.projects }}">07</span><span>Proyectos</span><span style="{{ navTail }}">5</span></button>
+    <button onclick="{{ goCalendar }}" style="{{ navStyles.calendar }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.calendar }}">08</span><span>Agenda</span></button>
+
+    <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#6E6A60;margin:22px 20px 9px;padding-bottom:7px;border-bottom:1px solid #DDDAD1">Inteligencia</p>
+    <button onclick="{{ goFinance }}" style="{{ navStyles.finance }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.finance }}">09</span><span>Finanzas</span></button>
+    <button onclick="{{ goWebsiteAnalytics }}" style="{{ navStyles.website }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.website }}">10</span><span>Website</span></button>
+    <button onclick="{{ goMarketing }}" style="{{ navStyles.marketing }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.marketing }}">11</span><span>Marketing</span></button>
+    <button onclick="{{ goAi }}" style="{{ navStyles.ai }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.ai }}">12</span><span>Archi AI</span></button>
+    <button onclick="{{ goReports }}" style="{{ navStyles.reports }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.reports }}">13</span><span>Reportes</span></button>
+
+    <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#6E6A60;margin:22px 20px 9px;padding-bottom:7px;border-bottom:1px solid #DDDAD1">Sistema</p>
+    <button onclick="{{ goNotifications }}" style="{{ navStyles.notifications }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.notifications }}">14</span><span>Notificaciones</span><span style="font:500 10px/1 'JetBrains Mono',monospace;margin-left:auto;color:#A8382A">5</span></button>
+    <button onclick="{{ goSettings }}" style="{{ navStyles.settings }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.settings }}">15</span><span>Configuración</span></button>
+    <button onclick="{{ goSystem }}" style="{{ navStyles.system }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.system }}">16</span><span>Design system</span></button>
+    <button onclick="{{ goDark }}" style="{{ navStyles.dark }}" style-hover="color:#0F0F0E;background:#EDEBE4"><span style="{{ navNum.dark }}">17</span><span>Modo tinta</span></button>
+
+    <div style="margin:26px 20px 0;padding-top:16px;border-top:1px solid #DDDAD1">
+      <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#6E6A60;margin:0 0 11px">Recientes</p>
+      <sc-for list="{{ recentProjects }}" as="r" hint-placeholder-count="3">
+        <button onclick="{{ r.open }}" style="display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;padding:5px 0;cursor:pointer;font:400 12px/1 'Archivo',sans-serif;color:#45443F;transition:color 140ms" style-hover="color:#0F0F0E">
+          <span style="{{ r.chip }}"></span><span>{{ r.name }}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin:24px 20px 0;padding-top:16px;border-top:1px solid #DDDAD1">
+      <span style="width:27px;height:27px;background:#0F0F0E;color:#F4F3EF;display:flex;align-items:center;justify-content:center;font:400 11px/1 'JetBrains Mono',monospace;flex-shrink:0">AG</span>
+      <div style="min-width:0">
+        <p style="margin:0;font:400 12px/1.2 'Archivo',sans-serif">Adrián Gutiérrez</p>
+        <p style="margin:2px 0 0;font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;color:#6E6A60;text-transform:uppercase">Principal</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ SHEET ══ -->
+  <main style="flex:1;min-width:0">
+
+  <!-- ═════ 01 DASHBOARD ═════ -->
+  <sc-if value="{{ screenIs.dashboard }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <div>
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 20px">Sábado 22 de agosto, 2026 &nbsp;·&nbsp; Semana 34</p>
+        <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:56px;line-height:0.98;margin:0;letter-spacing:-0.015em;max-width:15ch">Buenos días, Adrián.</h1>
+      </div>
+      <div style="display:flex;gap:0;flex-shrink:0;border-left:1px solid #DDDAD1">
+        <div style="padding:0 20px;border-right:1px solid #DDDAD1">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 8px">Estudio</p>
+          <p style="font:400 13px/1 'JetBrains Mono',monospace;margin:0">A. GUTIÉRREZ</p>
+        </div>
+        <div style="padding:0 20px;border-right:1px solid #DDDAD1">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 8px">Activos</p>
+          <p style="font:400 13px/1 'JetBrains Mono',monospace;margin:0">05</p>
+        </div>
+        <div style="padding:0 0 0 20px">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 8px">Revisión</p>
+          <p style="font:400 13px/1 'JetBrains Mono',monospace;margin:0">08</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- instrument band -->
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid #C7C3B7;background-image:repeating-linear-gradient(to right,rgba(15,15,14,0.026) 0 1px,transparent 1px 48px),repeating-linear-gradient(to bottom,rgba(15,15,14,0.018) 0 1px,transparent 1px 48px),url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.9%27%20numOctaves%3D%274%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27180%27%20height%3D%27180%27%20filter%3D%27url%28%23n%29%27%20opacity%3D%270.2%27%2F%3E%3C%2Fsvg%3E);background-size:auto,auto,180px 180px;background-blend-mode:normal,normal,multiply">
+      <div style="padding:30px 30px 32px;border-right:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;color:#6E6A60;margin:0 0 14px">01</p>
+        <p style="font:400 clamp(38px,4.2vw,60px)/0.85 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em;color:#A8382A">03</p>
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#45443F;margin:16px 0 0;overflow-wrap:break-word;overflow-wrap:break-word">Tareas críticas</p>
+      </div>
+      <div style="padding:30px 26px 32px;border-right:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;color:#6E6A60;margin:0 0 14px">02</p>
+        <p style="font:400 clamp(38px,4.2vw,60px)/0.85 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">02</p>
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#45443F;margin:16px 0 0;overflow-wrap:break-word;overflow-wrap:break-word">Reuniones hoy</p>
+      </div>
+      <div style="padding:30px 26px 32px;border-right:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;color:#6E6A60;margin:0 0 14px">03</p>
+        <p style="font:400 clamp(38px,4.2vw,60px)/0.85 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">04</p>
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#45443F;margin:16px 0 0;overflow-wrap:break-word;overflow-wrap:break-word">Leads nuevos</p>
+      </div>
+      <div style="padding:30px 30px 32px">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;color:#6E6A60;margin:0 0 14px">04</p>
+        <p style="font:400 clamp(38px,4.2vw,60px)/0.85 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">18.4<span style="font-size:26px;color:#8A867C">K</span></p>
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#45443F;margin:16px 0 0;overflow-wrap:break-word;overflow-wrap:break-word">Por cobrar &nbsp;USD</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr)">
+      <!-- projects -->
+      <section style="padding:44px 48px 56px;border-right:1px solid #DDDAD1">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:26px">
+          <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0;white-space:nowrap">Proyectos activos</h2>
+          <button onclick="{{ goProjects }}" style="background:none;border:none;padding:0;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#8A867C;white-space:nowrap;transition:color 140ms" style-hover="color:#0F0F0E">Ver los 05 →</button>
+        </div>
+        <sc-for list="{{ projects }}" as="p" hint-placeholder-count="5">
+          <div onclick="{{ p.open }}" style="display:grid;grid-template-columns:34px 1fr auto;align-items:baseline;gap:18px;padding:17px 0 15px;border-top:1px solid #DDDAD1;cursor:pointer;transition:padding-left 160ms" style-hover="padding-left:8px">
+            <span style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ p.idx }}</span>
+            <div style="min-width:0">
+              <p style="font-family:'Instrument Serif',serif;font-weight:400;font-size:25px;line-height:1;margin:0 0 9px;letter-spacing:-0.005em">{{ p.name }}</p>
+              <p style="font:400 10.5px/1 'JetBrains Mono',monospace;letter-spacing:0.09em;text-transform:uppercase;color:#8A867C;margin:0">{{ p.client }} &nbsp;·&nbsp; {{ p.phase }}</p>
+              <div style="height:1px;background:#DDDAD1;margin-top:14px;position:relative">
+                <div style="position:absolute;left:0;top:0;height:1px;background:#0F0F0E;width:{{ p.progressPct }};transform-origin:left;animation:draw 700ms cubic-bezier(0.2,0.8,0.2,1) both"></div>
+              </div>
+            </div>
+            <span style="font:400 clamp(16px,1.7vw,22px)/1 'JetBrains Mono',monospace;letter-spacing:-0.02em">{{ p.progress }}<span style="font-size:12px;color:#8A867C">%</span></span>
+          </div>
+        </sc-for>
+      </section>
+
+      <!-- right rail -->
+      <div>
+        <section style="padding:44px 48px 34px 32px;border-bottom:1px solid #DDDAD1">
+          <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 22px">Hoy</h2>
+          <sc-for list="{{ agendaToday }}" as="e" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:52px 1fr;gap:14px;padding:11px 0;border-top:1px solid #DDDAD1">
+              <span style="font:400 11px/1.3 'JetBrains Mono',monospace;color:#8A867C">{{ e.time }}</span>
+              <div>
+                <p style="margin:0;font:400 13px/1.3 'Archivo',sans-serif">{{ e.title }}</p>
+                <p style="margin:3px 0 0;font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;color:#6E6A60">{{ e.where }}</p>
+              </div>
+            </div>
+          </sc-for>
+        </section>
+
+        <section style="padding:34px 48px 34px 32px;border-bottom:1px solid #DDDAD1">
+          <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Pipeline</h2>
+          <p style="font:400 clamp(23px,2.5vw,34px)/1 'JetBrains Mono',monospace;margin:0 0 20px;letter-spacing:-0.03em">$128,400</p>
+          <div style="display:flex;height:34px;align-items:flex-end;gap:2px;margin-bottom:14px">
+            <sc-for list="{{ pipelineStages }}" as="s" hint-placeholder-count="4">
+              <div style="width:{{ s.pct }};height:{{ s.h }};background:{{ s.fill }}"></div>
+            </sc-for>
+          </div>
+          <sc-for list="{{ pipelineStages }}" as="s" hint-placeholder-count="4">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-top:1px solid #DDDAD1">
+              <span style="display:flex;align-items:center;gap:9px;font:400 11.5px/1 'Archivo',sans-serif;color:#45443F"><span style="width:7px;height:7px;background:{{ s.fill }};flex-shrink:0"></span>{{ s.name }}</span>
+              <span style="font:400 11.5px/1 'JetBrains Mono',monospace">{{ s.value }}</span>
+            </div>
+          </sc-for>
+        </section>
+
+        <section style="padding:34px 48px 44px 32px">
+          <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#A8382A;margin:0 0 18px">Atención</h2>
+          <sc-for list="{{ attention }}" as="a" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:26px 1fr;align-items:baseline;gap:10px;padding:11px 0;border-top:1px solid #DDDAD1">
+              <span style="font:400 10px/1 'JetBrains Mono',monospace;color:#A8382A">{{ a.n }}</span>
+              <p style="margin:0;font:400 13px/1.35 'Archivo',sans-serif">{{ a.text }}</p>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ═════ 07 PROYECTOS ═════ -->
+  <sc-if value="{{ screenIs.projects }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;padding:52px 48px 28px;border-bottom:1px solid #C7C3B7">
+      <div>
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Producción &nbsp;·&nbsp; 05 activos &nbsp;·&nbsp; 02 en cierre</p>
+        <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Proyectos</h1>
+      </div>
+      <button style="background:#0F0F0E;color:#F4F3EF;border:none;padding:0 20px;height:38px;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;transition:background 140ms" style-hover="background:#A8382A">Nuevo proyecto</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:34px 118px minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) 112px;gap:22px;padding:13px 48px;border-bottom:1px solid #DDDAD1;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60">
+      <span></span><span></span><span>Proyecto</span><span>Tipología</span><span>Fase</span><span style="text-align:right">Avance</span>
+    </div>
+
+    <sc-for list="{{ projects }}" as="p" hint-placeholder-count="5">
+      <div onclick="{{ p.open }}" style="display:grid;grid-template-columns:34px 118px minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) 112px;gap:22px;align-items:center;padding:24px 48px;border-bottom:1px solid #DDDAD1;cursor:pointer;transition:background 160ms" style-hover="background:#EDEBE4">
+        <span style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ p.idx }}</span>
+        <div style="{{ p.coverStyle }};height:78px;position:relative">
+          <span style="{{ p.dateStyle }}">{{ p.due }}</span>
+        </div>
+        <div style="min-width:0">
+          <p style="font-family:'Instrument Serif',serif;font-weight:400;font-size:30px;line-height:1;margin:0 0 9px;letter-spacing:-0.01em">{{ p.name }}</p>
+          <p style="font:400 10.5px/1 'JetBrains Mono',monospace;letter-spacing:0.09em;text-transform:uppercase;color:#8A867C;margin:0">{{ p.place }}</p>
+        </div>
+        <div>
+          <p style="margin:0;font:400 12.5px/1 'Archivo',sans-serif">{{ p.category }}</p>
+          <p style="margin:6px 0 0;font:400 10.5px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ p.client }}</p>
+        </div>
+        <div>
+          <p style="margin:0;font:400 12.5px/1 'Archivo',sans-serif">{{ p.phase }}</p>
+          <p style="margin:6px 0 0;font:400 10.5px/1 'JetBrains Mono',monospace;color:#6E6A60">Entrega {{ p.due }}</p>
+        </div>
+        <div>
+          <p style="margin:0;text-align:right;font:400 26px/1 'JetBrains Mono',monospace;letter-spacing:-0.02em">{{ p.progress }}<span style="font-size:13px;color:#8A867C">%</span></p>
+          <div style="height:1px;background:#DDDAD1;margin-top:12px;position:relative">
+            <div style="position:absolute;left:0;top:0;height:1px;background:#0F0F0E;width:{{ p.progressPct }}"></div>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </sc-if>
+
+  <!-- ═════ PROJECT WORKSPACE ═════ -->
+  <sc-if value="{{ screenIs.workspace }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:44px 48px 0">
+      <button onclick="{{ goProjects }}" style="background:none;border:none;padding:0;margin:0 0 26px;cursor:pointer;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#8A867C;transition:color 140ms" style-hover="color:#0F0F0E">← Proyectos</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);gap:48px;padding:0 48px 34px;align-items:flex-end;border-bottom:1px solid #C7C3B7">
+      <div>
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 16px">Residencial &nbsp;·&nbsp; Salinas / Ecuador &nbsp;·&nbsp; Exp. 2025-014</p>
+        <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:68px;line-height:0.94;margin:0 0 22px;letter-spacing:-0.02em">Casa EG</h1>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));column-gap:28px;row-gap:22px">
+          <div style="border-top:1px solid #DDDAD1;padding-top:14px">
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 8px">Cliente</p>
+            <p style="margin:0;font:400 13px/1.3 'Archivo',sans-serif">Familia Rodríguez</p>
+          </div>
+          <div style="border-top:1px solid #DDDAD1;padding-top:14px">
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 8px">Fase</p>
+            <p style="margin:0;font:400 13px/1.3 'Archivo',sans-serif">Diseño arquitectónico</p>
+          </div>
+          <div style="border-top:1px solid #DDDAD1;padding-top:14px">
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 8px">Entrega</p>
+            <p style="margin:0;font:400 13px/1.3 'JetBrains Mono',monospace">15.09.26</p>
+          </div>
+          <div style="border-top:1px solid #DDDAD1;padding-top:14px">
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 8px">Contrato</p>
+            <p style="margin:0;font:400 13px/1.3 'JetBrains Mono',monospace">$42,000</p>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <p style="font:400 clamp(52px,6.6vw,92px)/0.82 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.045em">82<span style="font-size:0.37em;color:#8A867C">%</span></p>
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#8A867C;margin:16px 0 0">Avance general</p>
+      </div>
+    </div>
+
+    <!-- section nav -->
+    <div style="display:flex;gap:0;padding:0 48px;border-bottom:1px solid #C7C3B7;overflow:auto hidden;scrollbar-width:none">
+      <button onclick="{{ goWsOverview }}" style="{{ wsTabStyles.overview }}"><span style="{{ wsNum.overview }}">01</span>Overview</button>
+      <button onclick="{{ goWsDocs }}" style="{{ wsTabStyles.docs }}"><span style="{{ wsNum.docs }}">02</span>Documentos</button>
+      <button onclick="{{ goWsTasks }}" style="{{ wsTabStyles.tasks }}"><span style="{{ wsNum.tasks }}">03</span>Tareas</button>
+      <button onclick="{{ goWsGantt }}" style="{{ wsTabStyles.gantt }}"><span style="{{ wsNum.gantt }}">04</span>Cronograma</button>
+      <button onclick="{{ goWsApprovals }}" style="{{ wsTabStyles.approvals }}"><span style="{{ wsNum.approvals }}">05</span>Aprobaciones</button>
+      <button onclick="{{ goWsFinance }}" style="{{ wsTabStyles.finance }}"><span style="{{ wsNum.finance }}">06</span>Finanzas</button>
+      <button onclick="{{ goWsActivity }}" style="{{ wsTabStyles.activity }}"><span style="{{ wsNum.activity }}">07</span>Actividad</button>
+    </div>
+
+    <!-- 01 overview -->
+    <sc-if value="{{ wsTabIs.overview }}" hint-placeholder-val="{{ true }}">
+      <section style="padding:44px 48px 46px;border-bottom:1px solid #DDDAD1">
+        <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 30px">Fases &nbsp;·&nbsp; línea de proyecto</h2>
+        <div style="max-width:296px">
+          <sc-for list="{{ phases }}" as="ph" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:186px 26px 84px;align-items:center;padding:8px 0">
+              <p style="{{ ph.labelStyle }}">{{ ph.name }}</p>
+              <div style="position:relative;align-self:stretch;display:flex;align-items:center;justify-content:center">
+                <sc-if value="{{ ph.hasLine }}" hint-placeholder-val="{{ true }}">
+                  <span style="position:absolute;left:50%;top:50%;bottom:-8px;width:1px;background:#DDDAD1"></span>
+                </sc-if>
+                <span style="{{ ph.markStyle }}"></span>
+              </div>
+              <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:0;text-align:right">{{ ph.date }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr">
+        <section style="padding:38px 48px 44px;border-right:1px solid #DDDAD1">
+          <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 20px">Próximos hitos</h2>
+          <sc-for list="{{ milestones }}" as="m" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:22px 1fr auto;align-items:baseline;gap:14px;padding:14px 0;border-top:1px solid #DDDAD1">
+              <span style="{{ m.markStyle }}"></span>
+              <p style="margin:0;font:400 14px/1.3 'Archivo',sans-serif">{{ m.title }}</p>
+              <span style="{{ m.dateStyle }}">{{ m.date }}</span>
+            </div>
+          </sc-for>
+        </section>
+        <section style="padding:38px 48px 44px">
+          <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 20px">Equipo asignado</h2>
+          <sc-for list="{{ team }}" as="t" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid #DDDAD1">
+              <span style="width:29px;height:29px;background:#EDEBE4;border:1px solid #DDDAD1;display:flex;align-items:center;justify-content:center;font:400 10px/1 'JetBrains Mono',monospace;flex-shrink:0">{{ t.initials }}</span>
+              <p style="margin:0;flex:1;font:400 13.5px/1 'Archivo',sans-serif">{{ t.name }}</p>
+              <span style="font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60">{{ t.role }}</span>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+    </sc-if>
+
+    <!-- 02 documentos -->
+    <sc-if value="{{ wsTabIs.docs }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-bottom:1px solid #C7C3B7">
+        <sc-for list="{{ docCategories }}" as="c" hint-placeholder-count="5">
+          <div style="{{ c.cellStyle }}" style-hover="background:#EDEBE4">
+            <p style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:0 0 26px">{{ c.n }}</p>
+            <p style="font-family:'Instrument Serif',serif;font-weight:400;font-size:21px;line-height:1.05;margin:0 0 20px">{{ c.name }}</p>
+            <p style="font:400 24px/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.02em">{{ c.count }}</p>
+            <p style="font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60;margin:9px 0 0">Últ. {{ c.last }}</p>
+          </div>
+        </sc-for>
+      </div>
+
+      <section style="padding:38px 48px 20px">
+        <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Archivos recientes</h2>
+        <sc-for list="{{ documents }}" as="d" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:34px minmax(0,1fr) 118px 88px 100px;align-items:center;gap:20px;padding:15px 0;border-top:1px solid #DDDAD1;cursor:pointer;transition:padding-left 160ms" style-hover="padding-left:8px">
+            <span style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ d.n }}</span>
+            <p style="margin:0;font:400 13.5px/1.3 'Archivo',sans-serif">{{ d.name }}</p>
+            <span style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#8A867C">{{ d.author }}</span>
+            <span style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#8A867C">{{ d.date }}</span>
+            <span style="{{ d.statusStyle }}">{{ d.status }}</span>
+          </div>
+        </sc-for>
+      </section>
+
+      <section style="padding:34px 48px 52px">
+        <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 34px">Evolución &nbsp;·&nbsp; Fachada principal</h2>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));position:relative;max-width:760px">
+          <div style="position:absolute;left:0;right:0;top:9px;height:1px;background:#C7C3B7"></div>
+          <sc-for list="{{ versions }}" as="v" hint-placeholder-count="4">
+            <div style="position:relative">
+              <span style="{{ v.markStyle }}"></span>
+              <p style="font:400 15px/1 'JetBrains Mono',monospace;margin:30px 0 0">{{ v.label }}</p>
+              <p style="font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60;margin:9px 0 0">{{ v.date }}</p>
+              <p style="{{ v.tagStyle }}">{{ v.tag }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- 03 tareas -->
+    <sc-if value="{{ wsTabIs.tasks }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr))">
+        <sc-for list="{{ taskColumns }}" as="col" hint-placeholder-count="4">
+          <div style="{{ col.colStyle }}">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 0 16px;margin-bottom:4px;border-bottom:1px solid #C7C3B7">
+              <span style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#8A867C">{{ col.name }}</span>
+              <span style="font:400 13px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ col.count }}</span>
+            </div>
+            <sc-for list="{{ col.tasks }}" as="t" hint-placeholder-count="2">
+              <div style="padding:16px 0;border-bottom:1px solid #DDDAD1;cursor:pointer;transition:padding-left 160ms" style-hover="padding-left:6px">
+                <p style="margin:0 0 12px;font:400 13.5px/1.35 'Archivo',sans-serif">{{ t.title }}</p>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="{{ t.priorityStyle }}">{{ t.priority }}</span>
+                  <span style="{{ t.dateStyle }}">{{ t.date }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- 04 cronograma -->
+    <sc-if value="{{ wsTabIs.gantt }}" hint-placeholder-val="{{ false }}">
+      <section style="padding:40px 48px 56px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:26px">
+          <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0">Cronograma 2026</h2>
+          <div style="display:flex;gap:22px;font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60">
+            <span style="display:flex;align-items:center;gap:7px"><span style="width:14px;height:4px;background:#0F0F0E"></span>Ejecutado</span>
+            <span style="display:flex;align-items:center;gap:7px"><span style="width:14px;height:4px;background:#C7C3B7"></span>Previsto</span>
+            <span style="display:flex;align-items:center;gap:7px"><span style="width:1px;height:12px;background:#A8382A"></span>Hoy</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:186px 1fr">
+          <div style="border-right:1px solid #C7C3B7"></div>
+          <div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));border-bottom:1px solid #C7C3B7">
+            <sc-for list="{{ ganttMonths }}" as="m" hint-placeholder-count="8">
+              <span style="font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#6E6A60;padding:0 0 11px 9px;border-left:1px solid #DDDAD1">{{ m }}</span>
+            </sc-for>
+          </div>
+          <sc-for list="{{ ganttRows }}" as="row" hint-placeholder-count="8">
+            <div style="font:400 12px/1 'Archivo',sans-serif;color:{{ row.labelColor }};padding:17px 16px 17px 0;border-right:1px solid #C7C3B7;border-bottom:1px solid #DDDAD1;display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <span>{{ row.name }}</span><span style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ row.pctLabel }}</span>
+            </div>
+            <div style="position:relative;border-bottom:1px solid #DDDAD1;background:repeating-linear-gradient(to right,#DDDAD1 0 1px,transparent 1px 12.5%)">
+              <div style="position:absolute;left:{{ row.offset }};top:50%;transform:translateY(-50%);width:{{ row.width }};height:5px;background:{{ row.fill }}"></div>
+              <sc-if value="{{ row.milestone }}" hint-placeholder-val="{{ false }}">
+                <span style="position:absolute;left:{{ row.msAt }};top:50%;width:9px;height:9px;background:#0F0F0E;transform:translate(-50%,-50%) rotate(45deg)"></span>
+              </sc-if>
+              <div style="position:absolute;left:46.5%;top:0;bottom:0;width:1px;background:#A8382A;opacity:0.65"></div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- 05 aprobaciones -->
+    <sc-if value="{{ wsTabIs.approvals }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+        <div style="padding:40px 40px 56px 48px;border-right:1px solid #DDDAD1">
+          <div style="background:linear-gradient(155deg,#E6E4DE,#C7C3B7);aspect-ratio:16/10;display:flex;align-items:flex-end;justify-content:space-between;padding:20px 22px">
+            <span style="font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:rgba(15,15,14,0.66)">Render · Fachada principal · V04</span>
+            <span style="font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;color:rgba(15,15,14,0.66)">1:100</span>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:12px">
+            <span style="width:74px;height:52px;background:linear-gradient(155deg,#D8D5CE,#B8B4A9)"></span>
+            <span style="width:74px;height:52px;background:linear-gradient(155deg,#DFDCD5,#C2BEB2)"></span>
+            <span style="width:74px;height:52px;background:linear-gradient(155deg,#E6E4DE,#CBC7BB);outline:1px solid #0F0F0E;outline-offset:2px"></span>
+          </div>
+        </div>
+        <div style="padding:40px 48px 56px 36px">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#A8382A;margin:0 0 20px">Esperando aprobación · 2 días</p>
+          <h2 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:38px;line-height:1;margin:0 0 8px;letter-spacing:-0.015em">Fachada principal</h2>
+          <p style="font:400 13px/1 'JetBrains Mono',monospace;color:#8A867C;margin:0 0 28px">Versión 04 · 22.08.2026</p>
+          <p style="font-family:'Instrument Serif',serif;font-style:italic;font-size:19px;line-height:1.5;margin:0 0 32px;color:#45443F">“La revisión 04 incorpora el cambio de revestimiento solicitado en el volumen superior y ajusta la altura del parapeto en 30 cm.”</p>
+          <div style="border-top:1px solid #DDDAD1;padding-top:20px;margin-bottom:32px">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;font:400 12px/1 'Archivo',sans-serif"><span style="color:#8A867C">Solicitado por</span><span>Adrián Gutiérrez</span></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;font:400 12px/1 'Archivo',sans-serif"><span style="color:#8A867C">Revisor</span><span>Familia Rodríguez</span></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;font:400 12px/1 'Archivo',sans-serif"><span style="color:#8A867C">Impacto en cronograma</span><span style="color:#A8382A">+3 días</span></div>
+          </div>
+          <button style="width:100%;background:#0F0F0E;color:#F4F3EF;border:none;height:46px;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;transition:background 140ms" style-hover="background:#A8382A">Aprobar diseño</button>
+          <button style="width:100%;background:none;color:#0F0F0E;border:1px solid #C7C3B7;height:46px;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;transition:border-color 140ms" style-hover="border-color:#0F0F0E">Solicitar cambios</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 06 finanzas -->
+    <sc-if value="{{ wsTabIs.finance }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid #C7C3B7">
+        <div style="padding:34px 30px 36px;border-right:1px solid #DDDAD1">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 20px">Contratado</p>
+          <p style="font:400 clamp(28px,3.1vw,44px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">$42,000</p>
+        </div>
+        <div style="padding:34px 30px 36px;border-right:1px solid #DDDAD1">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 20px">Cobrado</p>
+          <p style="font:400 clamp(28px,3.1vw,44px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">$28,000</p>
+          <div style="height:2px;background:#DDDAD1;margin-top:20px;position:relative"><div style="position:absolute;left:0;top:0;height:2px;width:66.6%;background:#0F0F0E"></div></div>
+        </div>
+        <div style="padding:34px 30px 36px">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#A8382A;margin:0 0 20px">Pendiente</p>
+          <p style="font:400 clamp(28px,3.1vw,44px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em;color:#A8382A">$14,000</p>
+          <p style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#8A867C;margin:20px 0 0">Vencía 15.09.26</p>
+        </div>
+      </div>
+      <section style="padding:38px 48px 52px">
+        <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Cuotas</h2>
+        <sc-for list="{{ installments }}" as="i" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:34px 1fr 130px 120px;align-items:center;gap:20px;padding:16px 0;border-top:1px solid #DDDAD1">
+            <span style="{{ i.markStyle }}"></span>
+            <p style="margin:0;font:400 13.5px/1 'Archivo',sans-serif">{{ i.name }}</p>
+            <span style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#8A867C">{{ i.date }}</span>
+            <span style="{{ i.amountStyle }}">{{ i.amount }}</span>
+          </div>
+        </sc-for>
+      </section>
+    </sc-if>
+
+    <!-- 07 actividad -->
+    <sc-if value="{{ wsTabIs.activity }}" hint-placeholder-val="{{ false }}">
+      <section style="padding:40px 48px 56px;max-width:760px">
+        <sc-for list="{{ activity }}" as="a" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:64px 1fr;gap:20px;padding:16px 0;border-top:1px solid #DDDAD1">
+            <span style="font:400 10.5px/1.4 'JetBrains Mono',monospace;color:#6E6A60">{{ a.time }}</span>
+            <p style="margin:0;font:400 13.5px/1.4 'Archivo',sans-serif">{{ a.text }}</p>
+          </div>
+        </sc-for>
+      </section>
+    </sc-if>
+  </sc-if>
+
+  <!-- ═════ CRM ═════ -->
+  <sc-if value="{{ screenIs.crm }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;padding:52px 48px 28px;border-bottom:1px solid #C7C3B7">
+      <div>
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Agosto 2026 &nbsp;·&nbsp; 08 leads &nbsp;·&nbsp; $459,300 en juego</p>
+        <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Comercial</h1>
+      </div>
+      <button style="background:#0F0F0E;color:#F4F3EF;border:none;padding:0 20px;height:38px;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;transition:background 140ms" style-hover="background:#A8382A">Registrar lead</button>
+    </div>
+
+    <div style="display:flex;gap:0;padding:0 48px;border-bottom:1px solid #C7C3B7">
+      <button onclick="{{ goCrmLeads }}" style="{{ crmTabStyles.leads }}"><span style="{{ crmNum.leads }}">01</span>Leads</button>
+      <button onclick="{{ goCrmPipeline }}" style="{{ crmTabStyles.pipeline }}"><span style="{{ crmNum.pipeline }}">02</span>Pipeline</button>
+      <button onclick="{{ goCrmClientes }}" style="{{ crmTabStyles.clientes }}"><span style="{{ crmNum.clientes }}">03</span>Clientes</button>
+    </div>
+
+    <!-- leads: editorial ledger -->
+    <sc-if value="{{ crmTabIs.leads }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:34px minmax(0,1.4fr) minmax(0,1fr) 118px 116px 108px;gap:22px;padding:13px 48px;border-bottom:1px solid #DDDAD1;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60">
+        <span></span><span>Contacto</span><span>Encargo</span><span>Origen</span><span>Estado</span><span style="text-align:right">Valor</span>
+      </div>
+      <sc-for list="{{ leads }}" as="l" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:34px minmax(0,1.4fr) minmax(0,1fr) 118px 116px 108px;gap:22px;align-items:center;padding:19px 48px;border-bottom:1px solid #DDDAD1;cursor:pointer;transition:background 160ms" style-hover="background:#EDEBE4">
+          <span style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ l.n }}</span>
+          <div>
+            <p style="margin:0;font:400 17px/1.15 'Archivo',sans-serif;letter-spacing:-0.005em">{{ l.name }}</p>
+            <p style="margin:5px 0 0;font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.09em;text-transform:uppercase;color:#6E6A60">Seguimiento {{ l.next }}</p>
+          </div>
+          <span style="font:400 12.5px/1.3 'Archivo',sans-serif;color:#45443F">{{ l.project }}</span>
+          <span style="font:400 10.5px/1 'JetBrains Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;color:#8A867C">{{ l.source }}</span>
+          <span style="{{ l.stateStyle }}">{{ l.status }}</span>
+          <span style="text-align:right;font:400 15px/1 'JetBrains Mono',monospace">{{ l.valueFmt }}</span>
+        </div>
+      </sc-for>
+    </sc-if>
+
+    <!-- pipeline: stage ladder -->
+    <sc-if value="{{ crmTabIs.pipeline }}" hint-placeholder-val="{{ false }}">
+      <section style="padding:44px 48px 56px">
+        <div style="display:grid;grid-template-columns:22px 168px 1fr 128px 78px;gap:22px;padding-bottom:13px;border-bottom:1px solid #C7C3B7;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60">
+          <span></span><span>Etapa</span><span>Volumen relativo</span><span style="text-align:right">Valor</span><span style="text-align:right">Leads</span>
+        </div>
+        <sc-for list="{{ ladder }}" as="st" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:22px 168px 1fr 128px 78px;gap:22px;align-items:center;padding:20px 0;border-bottom:1px solid #DDDAD1">
+            <div style="position:relative;height:100%;display:flex;align-items:center;justify-content:center">
+              <span style="{{ st.dot }}"></span>
+              <sc-if value="{{ st.hasLine }}" hint-placeholder-val="{{ true }}">
+                <span style="position:absolute;left:50%;top:50%;bottom:-20px;width:1px;background:#DDDAD1"></span>
+              </sc-if>
+            </div>
+            <span style="{{ st.nameStyle }}">{{ st.name }}</span>
+            <div style="height:8px;background:#EDEBE4"><div style="height:8px;width:{{ st.pct }};background:{{ st.fill }}"></div></div>
+            <span style="text-align:right;font:400 15px/1 'JetBrains Mono',monospace">{{ st.value }}</span>
+            <span style="text-align:right;font:400 12px/1 'JetBrains Mono',monospace;color:#8A867C">{{ st.count }}</span>
+          </div>
+        </sc-for>
+      </section>
+    </sc-if>
+
+    <!-- clientes: case files -->
+    <sc-if value="{{ crmTabIs.clientes }}" hint-placeholder-val="{{ false }}">
+      <sc-for list="{{ clients }}" as="c" hint-placeholder-count="6">
+        <div onclick="{{ goClientDetail }}" style="display:grid;grid-template-columns:34px minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) 132px;gap:24px;align-items:center;padding:26px 48px;border-bottom:1px solid #DDDAD1;cursor:pointer;transition:background 160ms" style-hover="background:#EDEBE4">
+          <span style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ c.n }}</span>
+          <div>
+            <p style="font-family:'Instrument Serif',serif;font-weight:400;font-size:27px;line-height:1;margin:0 0 8px;letter-spacing:-0.01em">{{ c.name }}</p>
+            <p style="font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60;margin:0">Cliente desde {{ c.since }}</p>
+          </div>
+          <span style="font:400 12.5px/1 'Archivo',sans-serif;color:#45443F">{{ c.category }}</span>
+          <span style="font:400 12.5px/1 'Archivo',sans-serif;color:#45443F">{{ c.projects }} proyecto(s)</span>
+          <span style="text-align:right;font:400 16px/1 'JetBrains Mono',monospace">{{ c.value }}</span>
+        </div>
+      </sc-for>
+    </sc-if>
+  </sc-if>
+
+  <!-- ═════ CLIENT CASE FILE ═════ -->
+  <sc-if value="{{ screenIs.clientDetail }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:44px 48px 0">
+      <button onclick="{{ goCrmClientes }}" style="background:none;border:none;padding:0;margin:0 0 26px;cursor:pointer;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#8A867C;transition:color 140ms" style-hover="color:#0F0F0E">← Clientes</button>
+    </div>
+    <div style="padding:0 48px 34px;border-bottom:1px solid #C7C3B7">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 16px">Expediente 2025-014 &nbsp;·&nbsp; Residencial</p>
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:62px;line-height:0.96;margin:0;letter-spacing:-0.02em">Familia Rodríguez</h1>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid #C7C3B7">
+      <div style="padding:30px 30px 32px;border-right:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 18px">Contrato</p>
+        <p style="font:400 clamp(24px,2.6vw,36px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">$42,000</p>
+      </div>
+      <div style="padding:30px 26px 32px;border-right:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 18px">Cobrado</p>
+        <p style="font:400 clamp(24px,2.6vw,36px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">$28,000</p>
+        <div style="height:2px;background:#DDDAD1;margin-top:16px"><div style="height:2px;width:66.6%;background:#0F0F0E"></div></div>
+      </div>
+      <div style="padding:30px 26px 32px;border-right:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 18px">Proyectos</p>
+        <p style="font:400 clamp(24px,2.6vw,36px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">01</p>
+      </div>
+      <div style="padding:30px 30px 32px">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 18px">Interacciones</p>
+        <p style="font:400 clamp(24px,2.6vw,36px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">14</p>
+      </div>
+    </div>
+
+    <section style="padding:44px 48px 50px;border-bottom:1px solid #DDDAD1">
+      <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 40px">Recorrido del cliente</h2>
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:relative;max-width:920px">
+        <div style="position:absolute;left:0;right:0;top:5px;height:1px;background:#C7C3B7"></div>
+        <sc-for list="{{ journey }}" as="j" hint-placeholder-count="5">
+          <div style="position:relative">
+            <span style="{{ j.markStyle }}"></span>
+            <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.11em;text-transform:uppercase;margin:26px 0 0;color:{{ j.color }}">{{ j.label }}</p>
+            <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:9px 0 0">{{ j.date }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <section style="padding:38px 48px 48px;border-right:1px solid #DDDAD1">
+        <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Proyecto</h2>
+        <div onclick="{{ goWorkspace }}" style="display:flex;align-items:center;gap:20px;padding:18px 0;border-top:1px solid #DDDAD1;cursor:pointer;transition:padding-left 160ms" style-hover="padding-left:8px">
+          <span style="width:64px;height:44px;background:linear-gradient(148deg,#4A4842,#C7C3B7);flex-shrink:0"></span>
+          <div style="flex:1">
+            <p style="font-family:'Instrument Serif',serif;font-size:24px;line-height:1;margin:0 0 6px">Casa EG</p>
+            <p style="font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.09em;text-transform:uppercase;color:#6E6A60;margin:0">Diseño arquitectónico</p>
+          </div>
+          <span style="font:400 20px/1 'JetBrains Mono',monospace">82<span style="font-size:11px;color:#8A867C">%</span></span>
+        </div>
+      </section>
+      <section style="padding:38px 48px 48px">
+        <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Actividad</h2>
+        <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:64px 1fr;gap:18px;padding:13px 0;border-top:1px solid #DDDAD1">
+            <span style="font:400 10px/1.4 'JetBrains Mono',monospace;color:#6E6A60">{{ a.time }}</span>
+            <p style="margin:0;font:400 12.5px/1.4 'Archivo',sans-serif">{{ a.text }}</p>
+          </div>
+        </sc-for>
+      </section>
+    </div>
+  </sc-if>
+
+  <!-- ═════ 09 FINANZAS ═════ -->
+  <sc-if value="{{ screenIs.finance }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Ejercicio 2026 &nbsp;·&nbsp; acumulado a agosto</p>
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Finanzas</h1>
+    </div>
+
+    <div style="border-bottom:1px solid #C7C3B7;padding:44px 48px 46px">
+      <div style="display:flex;align-items:flex-start;gap:64px;flex-wrap:wrap">
+        <div>
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 20px">Contratado</p>
+          <p style="font:400 78px/0.86 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.045em">$128,400</p>
+          <p style="font:400 11px/1 'JetBrains Mono',monospace;color:#45443F;margin:20px 0 0">+18.4% &nbsp;vs. ejercicio anterior</p>
+        </div>
+        <div style="flex:1;min-width:280px;display:flex;align-items:flex-end;gap:9px;height:132px;border-bottom:1px solid #C7C3B7;padding-bottom:1px">
+          <sc-for list="{{ cashflow }}" as="m" hint-placeholder-count="6">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;justify-content:flex-end;height:100%">
+              <div style="width:100%;height:{{ m.h }};background:{{ m.fill }}"></div>
+              <span style="font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60">{{ m.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid #C7C3B7">
+      <div style="padding:30px 30px 32px;border-right:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 16px">Cobrado</p>
+        <p style="font:400 clamp(23px,2.5vw,34px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">$84,000</p>
+      </div>
+      <div style="padding:30px 26px 32px;border-right:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#A8382A;margin:0 0 16px">Por cobrar</p>
+        <p style="font:400 clamp(23px,2.5vw,34px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em;color:#A8382A">$44,400</p>
+      </div>
+      <div style="padding:30px 26px 32px;border-right:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 16px">Gastos</p>
+        <p style="font:400 clamp(23px,2.5vw,34px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">$37,800</p>
+      </div>
+      <div style="padding:30px 30px 32px">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:0 0 16px">Margen</p>
+        <p style="font:400 clamp(23px,2.5vw,34px)/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">35.9%</p>
+      </div>
+    </div>
+
+    <section style="padding:40px 48px 56px">
+      <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 20px">Rentabilidad por proyecto</h2>
+      <sc-for list="{{ profitability }}" as="p" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:34px minmax(0,190px) minmax(0,1fr) 86px;gap:24px;align-items:center;padding:17px 0;border-top:1px solid #DDDAD1">
+          <span style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ p.n }}</span>
+          <span style="font:400 14px/1 'Archivo',sans-serif">{{ p.name }}</span>
+          <div style="height:6px;background:#EDEBE4"><div style="height:6px;width:{{ p.pct }};background:{{ p.fill }}"></div></div>
+          <span style="text-align:right;font:400 15px/1 'JetBrains Mono',monospace">{{ p.margin }}</span>
+        </div>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <!-- ═════ 10 WEBSITE INTELLIGENCE ═════ -->
+  <sc-if value="{{ screenIs.website }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <div>
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">adriangutierrezarq.com &nbsp;·&nbsp; últimos 30 días</p>
+        <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Observatorio digital</h1>
+      </div>
+      <span style="display:flex;align-items:center;gap:9px;font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#8A867C;flex-shrink:0">
+        <span style="width:7px;height:7px;background:#0F0F0E"></span>Operativo · 99.98%
+      </span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-bottom:1px solid #C7C3B7">
+      <sc-for list="{{ webMetrics }}" as="m" hint-placeholder-count="5">
+        <div style="{{ m.cellStyle }}">
+          <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:0 0 20px">{{ m.n }}</p>
+          <p style="font:400 clamp(26px,2.9vw,40px)/0.9 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.035em">{{ m.value }}</p>
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#45443F;margin:16px 0 0;overflow-wrap:break-word">{{ m.label }}</p>
+          <p style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:8px 0 0">{{ m.delta }}</p>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- source → revenue matrix -->
+    <section style="padding:44px 48px 50px;border-bottom:1px solid #DDDAD1">
+      <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 4px">De la fuente al ingreso</h2>
+      <p style="font-family:'Instrument Serif',serif;font-style:italic;font-size:19px;color:#45443F;margin:0 0 30px">Qué canal construye realmente el estudio.</p>
+      <div style="display:grid;grid-template-columns:132px repeat(4,minmax(0,1fr)) 132px;gap:0;border-bottom:1px solid #C7C3B7;padding-bottom:12px;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#6E6A60">
+        <span>Canal</span><span>Visitas</span><span>Leads</span><span>Clientes</span><span>Proyectos</span><span style="text-align:right">Ingresos</span>
+      </div>
+      <sc-for list="{{ funnel }}" as="f" hint-placeholder-count="3">
+        <div style="display:grid;grid-template-columns:132px repeat(4,minmax(0,1fr)) 132px;align-items:center;padding:22px 0;border-bottom:1px solid #DDDAD1">
+          <span style="font-family:'Instrument Serif',serif;font-size:23px;line-height:1">{{ f.name }}</span>
+          <sc-for list="{{ f.steps }}" as="st" hint-placeholder-count="4">
+            <div style="padding-right:22px">
+              <p style="font:400 clamp(16px,1.7vw,22px)/1 'JetBrains Mono',monospace;margin:0 0 10px;letter-spacing:-0.02em">{{ st.v }}</p>
+              <div style="height:4px;background:#EDEBE4"><div style="height:4px;width:{{ st.pct }};background:{{ f.fill }}"></div></div>
+            </div>
+          </sc-for>
+          <span style="text-align:right;font:400 clamp(16px,1.7vw,22px)/1 'JetBrains Mono',monospace;letter-spacing:-0.02em">{{ f.revenue }}</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <section style="padding:38px 48px 48px;border-right:1px solid #DDDAD1">
+        <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Posiciones SEO</h2>
+        <sc-for list="{{ keywords }}" as="k" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:1fr 56px;gap:16px;align-items:center;padding:14px 0;border-top:1px solid #DDDAD1">
+            <span style="font:400 13px/1.3 'Archivo',sans-serif">{{ k.term }}</span>
+            <span style="{{ k.posStyle }}">{{ k.position }}</span>
+          </div>
+        </sc-for>
+      </section>
+      <section style="padding:38px 48px 48px">
+        <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Proyectos más vistos</h2>
+        <sc-for list="{{ topPages }}" as="pg" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:1fr 1fr 78px;gap:16px;align-items:center;padding:14px 0;border-top:1px solid #DDDAD1">
+            <span style="font:400 13px/1.3 'Archivo',sans-serif">{{ pg.name }}</span>
+            <div style="height:4px;background:#EDEBE4"><div style="height:4px;width:{{ pg.pct }};background:#45443F"></div></div>
+            <span style="text-align:right;font:400 11.5px/1 'JetBrains Mono',monospace;color:#8A867C">{{ pg.views }}</span>
+          </div>
+        </sc-for>
+      </section>
+    </div>
+  </sc-if>
+
+  <!-- ═════ 11 MARKETING ═════ -->
+  <sc-if value="{{ screenIs.marketing }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Atribución acumulada &nbsp;·&nbsp; 2026</p>
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Marketing intelligence</h1>
+    </div>
+    <section style="padding:48px 48px 60px">
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;max-width:1080px">
+        <sc-for list="{{ funnelStages }}" as="f" hint-placeholder-count="5">
+          <div style="{{ f.cellStyle }}">
+            <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:0 0 22px">{{ f.n }}</p>
+            <p style="font:400 clamp(28px,3.2vw,46px)/0.9 'JetBrains Mono',monospace;margin:0 0 18px;letter-spacing:-0.04em">{{ f.value }}</p>
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#45443F;margin:0 0 20px">{{ f.label }}</p>
+            <div style="height:{{ f.barH }};width:26px;background:{{ f.fill }}"></div>
+            <p style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:16px 0 0">{{ f.rate }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-if>
+
+  <!-- ═════ 12 ARCHI AI ═════ -->
+  <sc-if value="{{ screenIs.ai }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 48px 34px;border-bottom:1px solid #C7C3B7">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#A8382A;margin:0 0 18px">Archi AI &nbsp;·&nbsp; contexto: estudio completo</p>
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Panel de inteligencia</h1>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:16px;padding:26px 48px;border-bottom:1px solid #C7C3B7;background:#EDEBE4">
+      <span style="font:500 15px/1 'JetBrains Mono',monospace;color:#A8382A">&gt;</span>
+      <input placeholder="Pregunta cualquier cosa sobre el estudio…" style="flex:1;border:none;outline:none;background:none;font:400 17px/1 'Archivo',sans-serif;color:#0F0F0E"/>
+      <span style="font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#6E6A60">↵ Preguntar</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr)">
+      <section style="padding:40px 48px 56px;border-right:1px solid #DDDAD1">
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 10px">Archi responde</p>
+        <p style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1.25;margin:0 0 36px;letter-spacing:-0.01em;max-width:26ch">Hoy la prioridad es desbloquear Casa EG y recuperar el cobro vencido.</p>
+        <sc-for list="{{ aiActions }}" as="a" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:28px minmax(0,1fr) minmax(0,104px);gap:16px;align-items:center;padding:20px 0;border-top:1px solid #DDDAD1">
+            <span style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ a.n }}</span>
+            <div>
+              <p style="margin:0 0 6px;font:400 15px/1.3 'Archivo',sans-serif">{{ a.title }}</p>
+              <p style="margin:0;font:400 11px/1.4 'JetBrains Mono',monospace;color:#8A867C">{{ a.why }}</p>
+            </div>
+            <button onclick="{{ a.run }}" style="border:1px solid #C7C3B7;background:none;height:34px;cursor:pointer;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;transition:background 140ms,color 140ms,border-color 140ms" style-hover="background:#0F0F0E;color:#F4F3EF;border-color:#0F0F0E">Ejecutar</button>
+          </div>
+        </sc-for>
+      </section>
+      <section style="padding:40px 48px 56px 36px">
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Señales detectadas</p>
+        <sc-for list="{{ aiSignals }}" as="sg" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:20px 1fr;gap:12px;align-items:baseline;padding:14px 0;border-top:1px solid #DDDAD1">
+            <span style="{{ sg.mark }}"></span>
+            <p style="margin:0;font:400 12.5px/1.4 'Archivo',sans-serif">{{ sg.text }}</p>
+          </div>
+        </sc-for>
+      </section>
+    </div>
+  </sc-if>
+
+  <!-- ═════ 05 COTIZACIONES ═════ -->
+  <sc-if value="{{ screenIs.quotes }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Cotización 0042 &nbsp;·&nbsp; Remodelación cocina &nbsp;·&nbsp; Sra. Peña</p>
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Propuesta de honorarios</h1>
+    </div>
+    <div>
+      <section style="padding:40px 48px 34px">
+        <div style="display:grid;grid-template-columns:34px minmax(0,1fr) 68px 108px 116px;gap:20px;padding-bottom:13px;border-bottom:1px solid #C7C3B7;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#6E6A60">
+          <span></span><span>Servicio</span><span>Cant.</span><span style="text-align:right">Unitario</span><span style="text-align:right">Subtotal</span>
+        </div>
+        <sc-for list="{{ quoteItems }}" as="it" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:34px minmax(0,1fr) 68px 108px 116px;gap:20px;align-items:center;padding:17px 0;border-bottom:1px solid #DDDAD1">
+            <span style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ it.n }}</span>
+            <span style="font:400 13.5px/1.3 'Archivo',sans-serif">{{ it.name }}</span>
+            <span style="font:400 12px/1 'JetBrains Mono',monospace;color:#8A867C">{{ it.qty }}</span>
+            <span style="text-align:right;font:400 12px/1 'JetBrains Mono',monospace;color:#8A867C">{{ it.price }}</span>
+            <span style="text-align:right;font:400 14px/1 'JetBrains Mono',monospace">{{ it.subtotal }}</span>
+          </div>
+        </sc-for>
+      </section>
+      <section style="padding:30px 48px 56px;border-top:1px solid #C7C3B7;display:flex;justify-content:flex-end">
+        <div style="width:100%;max-width:340px">
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 24px">Resumen</p>
+        <div style="display:flex;justify-content:space-between;padding:9px 0;font:400 12.5px/1 'Archivo',sans-serif"><span style="color:#8A867C">Subtotal</span><span style="font-family:'JetBrains Mono',monospace">$24,500</span></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 0;font:400 12.5px/1 'Archivo',sans-serif"><span style="color:#8A867C">Descuento</span><span style="font-family:'JetBrains Mono',monospace">−$500</span></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #DDDAD1;font:400 12.5px/1 'Archivo',sans-serif"><span style="color:#8A867C">IVA 15%</span><span style="font-family:'JetBrains Mono',monospace">$3,600</span></div>
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60;margin:26px 0 12px">Total</p>
+        <p style="font:400 clamp(30px,3.4vw,46px)/1 'JetBrains Mono',monospace;margin:0 0 30px;letter-spacing:-0.035em">$27,600</p>
+        <button style="width:100%;background:#0F0F0E;color:#F4F3EF;border:none;height:44px;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;transition:background 140ms" style-hover="background:#A8382A">Enviar al cliente</button>
+        </div>
+      </section>
+    </div>
+  </sc-if>
+
+  <!-- ═════ 06 CONTRATOS ═════ -->
+  <sc-if value="{{ screenIs.contracts }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">04 vigentes &nbsp;·&nbsp; $190,000 comprometidos</p>
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Contratos</h1>
+    </div>
+    <div style="display:grid;grid-template-columns:34px minmax(0,1.2fr) minmax(0,1fr) 116px 116px 112px;gap:22px;padding:13px 48px;border-bottom:1px solid #DDDAD1;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60">
+      <span></span><span>Cliente</span><span>Encargo</span><span>Firmado</span><span>Estado</span><span style="text-align:right">Valor</span>
+    </div>
+    <sc-for list="{{ contracts }}" as="c" hint-placeholder-count="4">
+      <div style="display:grid;grid-template-columns:34px minmax(0,1.2fr) minmax(0,1fr) 116px 116px 112px;gap:22px;align-items:center;padding:20px 48px;border-bottom:1px solid #DDDAD1;transition:background 160ms" style-hover="background:#EDEBE4">
+        <span style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ c.n }}</span>
+        <span style="font:400 15px/1 'Archivo',sans-serif">{{ c.client }}</span>
+        <span style="font:400 12.5px/1.3 'Archivo',sans-serif;color:#45443F">{{ c.project }}</span>
+        <span style="font:400 11px/1 'JetBrains Mono',monospace;color:#8A867C">{{ c.date }}</span>
+        <span style="{{ c.statusStyle }}">{{ c.status }}</span>
+        <span style="text-align:right;font:400 15px/1 'JetBrains Mono',monospace">{{ c.value }}</span>
+      </div>
+    </sc-for>
+  </sc-if>
+
+  <!-- ═════ 08 AGENDA ═════ -->
+  <sc-if value="{{ screenIs.calendar }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <div>
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Semana 34 &nbsp;·&nbsp; 09 compromisos</p>
+        <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Agosto 2026</h1>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-bottom:1px solid #C7C3B7">
+      <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7">
+        <span style="padding:12px 14px;border-left:1px solid #DDDAD1;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#6E6A60">{{ w }}</span>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr))">
+      <sc-for list="{{ calendarDays }}" as="d" hint-placeholder-count="35">
+        <div style="{{ d.cellStyle }}">
+          <span style="{{ d.numStyle }}">{{ d.num }}</span>
+          <sc-if value="{{ d.hasEvent }}" hint-placeholder-val="{{ false }}">
+            <p style="{{ d.eventStyle }}">{{ d.eventLabel }}</p>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- ═════ 14 NOTIFICACIONES ═════ -->
+  <sc-if value="{{ screenIs.notifications }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">05 sin leer</p>
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Notificaciones</h1>
+    </div>
+    <section style="max-width:840px">
+      <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:34px 20px 1fr 130px;gap:18px;align-items:baseline;padding:20px 48px;border-bottom:1px solid #DDDAD1;transition:background 160ms" style-hover="background:#EDEBE4">
+          <span style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60">{{ nt.n }}</span>
+          <span style="{{ nt.mark }}"></span>
+          <p style="margin:0;font:400 14px/1.4 'Archivo',sans-serif">{{ nt.text }}</p>
+          <span style="text-align:right;font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;color:#6E6A60">{{ nt.time }}</span>
+        </div>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <!-- ═════ 13 REPORTES ═════ -->
+  <sc-if value="{{ screenIs.reports }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Exportables &nbsp;·&nbsp; PDF / CSV</p>
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Reportes</h1>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <sc-for list="{{ reports }}" as="r" hint-placeholder-count="4">
+        <div style="{{ r.cellStyle }}">
+          <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:0 0 22px">{{ r.n }}</p>
+          <p style="font-family:'Instrument Serif',serif;font-weight:400;font-size:28px;line-height:1.05;margin:0 0 12px;letter-spacing:-0.01em">{{ r.title }}</p>
+          <p style="font:400 13px/1.5 'Archivo',sans-serif;color:#45443F;margin:0 0 26px;max-width:42ch">{{ r.desc }}</p>
+          <div style="display:flex;gap:9px">
+            <button style="border:1px solid #C7C3B7;background:none;height:32px;padding:0 16px;cursor:pointer;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;transition:background 140ms,color 140ms" style-hover="background:#0F0F0E;color:#F4F3EF">PDF</button>
+            <button style="border:1px solid #C7C3B7;background:none;height:32px;padding:0 16px;cursor:pointer;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;transition:background 140ms,color 140ms" style-hover="background:#0F0F0E;color:#F4F3EF">CSV</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- ═════ 15 CONFIGURACIÓN ═════ -->
+  <sc-if value="{{ screenIs.settings }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Configuración</h1>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <section style="padding:40px 48px 52px;border-right:1px solid #DDDAD1">
+        <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 20px">Estudio</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-top:1px solid #DDDAD1"><span style="font:400 12.5px/1 'Archivo',sans-serif;color:#8A867C">Nombre</span><span style="font:400 13px/1 'Archivo',sans-serif">Adrián Gutiérrez Arq.</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-top:1px solid #DDDAD1"><span style="font:400 12.5px/1 'Archivo',sans-serif;color:#8A867C">Dominio</span><span style="font:400 12px/1 'JetBrains Mono',monospace">adriangutierrezarq.com</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-top:1px solid #DDDAD1"><span style="font:400 12.5px/1 'Archivo',sans-serif;color:#8A867C">Moneda</span><span style="font:400 12px/1 'JetBrains Mono',monospace">USD</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-top:1px solid #DDDAD1"><span style="font:400 12.5px/1 'Archivo',sans-serif;color:#8A867C">Tinta de revisión</span><span style="display:flex;align-items:center;gap:9px"><span style="width:14px;height:14px;background:#A8382A"></span><span style="font:400 12px/1 'JetBrains Mono',monospace">#A8382A</span></span></div>
+      </section>
+      <section style="padding:40px 48px 52px">
+        <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 20px">Equipo &amp; permisos</h2>
+        <sc-for list="{{ team }}" as="t" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:14px;padding:15px 0;border-top:1px solid #DDDAD1">
+            <span style="width:29px;height:29px;background:#EDEBE4;border:1px solid #DDDAD1;display:flex;align-items:center;justify-content:center;font:400 10px/1 'JetBrains Mono',monospace;flex-shrink:0">{{ t.initials }}</span>
+            <p style="margin:0;flex:1;font:400 13px/1 'Archivo',sans-serif">{{ t.name }}</p>
+            <span style="font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60">{{ t.role }}</span>
+          </div>
+        </sc-for>
+      </section>
+    </div>
+  </sc-if>
+
+  <!-- ═════ 16 DESIGN SYSTEM ═════ -->
+  <sc-if value="{{ screenIs.system }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">ARCHI.OS &nbsp;·&nbsp; v2.0 &nbsp;·&nbsp; lámina de referencia</p>
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0 0 20px;letter-spacing:-0.015em">Sistema de diseño</h1>
+      <p style="font-family:'Instrument Serif',serif;font-style:italic;font-size:21px;line-height:1.45;color:#45443F;margin:0;max-width:52ch">El estudio como sistema: la interfaz se comporta como una lámina de dibujo — retícula, ejes, anotaciones y una disciplina estricta de estado.</p>
+    </div>
+
+    <section style="padding:40px 48px 44px;border-bottom:1px solid #DDDAD1">
+      <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 26px">01 &nbsp;Tipografía</h2>
+      <div style="display:grid;grid-template-columns:130px 1fr;gap:24px;align-items:baseline;padding:18px 0;border-top:1px solid #DDDAD1">
+        <span style="font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60">Display</span>
+        <div><p style="font-family:'Instrument Serif',serif;font-size:44px;line-height:1;margin:0 0 8px">Instrument Serif</p><p style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#8A867C;margin:0">Títulos de lámina · 28–92 px · tracking −0.02em</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:130px 1fr;gap:24px;align-items:baseline;padding:18px 0;border-top:1px solid #DDDAD1">
+        <span style="font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60">Interfaz</span>
+        <div><p style="font:400 30px/1 'Archivo',sans-serif;margin:0 0 8px">Archivo</p><p style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#8A867C;margin:0">Cuerpo y controles · 12–17 px · 400 / 500</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:130px 1fr;gap:24px;align-items:baseline;padding:18px 0;border-top:1px solid #DDDAD1">
+        <span style="font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60">Instrumento</span>
+        <div><p style="font:400 30px/1 'JetBrains Mono',monospace;margin:0 0 8px">JetBrains Mono</p><p style="font:400 10.5px/1 'JetBrains Mono',monospace;color:#8A867C;margin:0">Cifras, etiquetas, metadatos · 9.5–92 px · tracking 0.14em en versales</p></div>
+      </div>
+    </section>
+
+    <section style="padding:40px 48px 44px;border-bottom:1px solid #DDDAD1">
+      <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 26px">02 &nbsp;Color</h2>
+      <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;border:1px solid #DDDAD1">
+        <sc-for list="{{ palette }}" as="c" hint-placeholder-count="7">
+          <div style="{{ c.cellStyle }}">
+            <div style="{{ c.swatch }}"></div>
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;margin:14px 0 6px">{{ c.name }}</p>
+            <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:0 0 8px">{{ c.hex }}</p>
+            <p style="font:400 10px/1.4 'Archivo',sans-serif;color:#8A867C;margin:0">{{ c.use }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding:40px 48px 44px;border-bottom:1px solid #DDDAD1">
+      <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 8px">03 &nbsp;Disciplina de estado</h2>
+      <p style="font:400 13px/1.5 'Archivo',sans-serif;color:#45443F;margin:0 0 26px;max-width:60ch">Una sola gramática en todo el producto: relleno = resuelto, hueco = pendiente, rombo rojo = requiere atención. Sin semáforos de color.</p>
+      <div style="display:flex;gap:0;border:1px solid #DDDAD1">
+        <div style="flex:1;padding:26px;border-right:1px solid #DDDAD1"><span style="display:block;width:11px;height:11px;background:#0F0F0E;margin-bottom:18px"></span><p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;margin:0 0 8px">Resuelto</p><p style="font:400 11.5px/1.4 'Archivo',sans-serif;color:#8A867C;margin:0">Fase completada, pago recibido, versión aprobada</p></div>
+        <div style="flex:1;padding:26px;border-right:1px solid #DDDAD1"><span style="display:block;width:11px;height:11px;border:1px solid #B5B1A6;margin-bottom:18px"></span><p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;margin:0 0 8px">Pendiente</p><p style="font:400 11.5px/1.4 'Archivo',sans-serif;color:#8A867C;margin:0">Fase futura, cuota programada, tarea en cola</p></div>
+        <div style="flex:1;padding:26px;border-right:1px solid #DDDAD1"><span style="display:block;width:11px;height:11px;background:#A8382A;transform:rotate(45deg);margin:2px 0 18px"></span><p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;margin:0 0 8px">Atención</p><p style="font:400 11.5px/1.4 'Archivo',sans-serif;color:#8A867C;margin:0">Vencido, bloqueado, esperando decisión</p></div>
+        <div style="flex:1;padding:26px"><span style="display:block;width:11px;height:11px;background:#C7C3B7;margin-bottom:18px"></span><p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;margin:0 0 8px">Histórico</p><p style="font:400 11.5px/1.4 'Archivo',sans-serif;color:#8A867C;margin:0">Versión reemplazada, periodo cerrado</p></div>
+      </div>
+    </section>
+
+    <section style="padding:40px 48px 44px;border-bottom:1px solid #DDDAD1">
+      <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 26px">04 &nbsp;Retícula &amp; espaciado</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px">
+        <div>
+          <div style="height:96px;background:repeating-linear-gradient(to right,#DDDAD1 0 1px,transparent 1px 8.333%);border-top:1px solid #C7C3B7;border-bottom:1px solid #C7C3B7"></div>
+          <p style="font:400 11.5px/1.5 'Archivo',sans-serif;color:#45443F;margin:14px 0 0">12 columnas · márgenes de lámina 48 px · medianil 22 px. Las secciones se separan con filete de 1 px (#DDDAD1) y los cortes mayores con #C7C3B7 — nunca con sombras.</p>
+        </div>
+        <div>
+          <div style="display:flex;align-items:flex-end;gap:9px;height:96px">
+            <span style="width:34px;height:8px;background:#0F0F0E"></span>
+            <span style="width:34px;height:16px;background:#45443F"></span>
+            <span style="width:34px;height:24px;background:#6B6862"></span>
+            <span style="width:34px;height:34px;background:#8A867C"></span>
+            <span style="width:34px;height:48px;background:#A5A199"></span>
+            <span style="width:34px;height:64px;background:#B8B4A9"></span>
+            <span style="width:34px;height:96px;background:#C7C3B7"></span>
+          </div>
+          <p style="font:400 11.5px/1.5 'Archivo',sans-serif;color:#45443F;margin:14px 0 0">Escala 8 / 16 / 24 / 34 / 48 / 64 / 96. Radio 0 px por defecto: la esquina viva es parte de la identidad.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding:40px 48px 44px;border-bottom:1px solid #DDDAD1">
+      <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 26px">05 &nbsp;Componentes</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid #DDDAD1">
+        <div style="padding:28px;border-right:1px solid #DDDAD1;border-bottom:1px solid #DDDAD1">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#6E6A60;margin:0 0 20px">Botones</p>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+            <button style="background:#0F0F0E;color:#F4F3EF;border:none;height:38px;padding:0 20px;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;transition:background 140ms" style-hover="background:#A8382A">Primario</button>
+            <button style="background:none;border:1px solid #C7C3B7;height:38px;padding:0 20px;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;transition:border-color 140ms" style-hover="border-color:#0F0F0E">Secundario</button>
+            <button style="background:none;border:none;padding:0;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#8A867C;transition:color 140ms" style-hover="color:#0F0F0E">Terciario →</button>
+          </div>
+        </div>
+        <div style="padding:28px;border-right:1px solid #DDDAD1;border-bottom:1px solid #DDDAD1">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#6E6A60;margin:0 0 20px">Campo</p>
+          <input placeholder="Nombre del proyecto" style="width:100%;height:38px;padding:0 13px;border:1px solid #C7C3B7;background:#FAF9F5;outline:none;font:400 13px/1 'Archivo',sans-serif"/>
+          <p style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:12px 0 0">Foco: borde #0F0F0E, sin halo</p>
+        </div>
+        <div style="padding:28px;border-bottom:1px solid #DDDAD1">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#6E6A60;margin:0 0 20px">Cifra instrumento</p>
+          <p style="font:400 52px/0.9 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.04em">82<span style="font-size:22px;color:#8A867C">%</span></p>
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#45443F;margin:14px 0 0">Etiqueta</p>
+        </div>
+        <div style="padding:28px;border-right:1px solid #DDDAD1">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#6E6A60;margin:0 0 20px">Avance</p>
+          <div style="height:1px;background:#DDDAD1;margin-bottom:16px"><div style="height:1px;width:82%;background:#0F0F0E"></div></div>
+          <div style="height:6px;background:#EDEBE4;margin-bottom:16px"><div style="height:6px;width:42%;background:#45443F"></div></div>
+          <div style="height:2px;background:#DDDAD1"><div style="height:2px;width:66%;background:#A8382A"></div></div>
+        </div>
+        <div style="padding:28px;border-right:1px solid #DDDAD1">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#6E6A60;margin:0 0 20px">Etiqueta de estado</p>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <span style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#0F0F0E">Ganado</span>
+            <span style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#A8382A">Negociación</span>
+            <span style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#8A867C">Contactado</span>
+          </div>
+        </div>
+        <div style="padding:28px">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#6E6A60;margin:0 0 20px">Portada de proyecto</p>
+          <div style="height:58px;background:linear-gradient(148deg,#4A4842,#C7C3B7);margin-bottom:11px"></div>
+          <p style="font:400 10px/1.4 'Archivo',sans-serif;color:#8A867C;margin:0">Degradado tonal derivado del proyecto; admite render o plano real sin cambiar el layout.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding:40px 48px 56px">
+      <h2 style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 26px">06 &nbsp;Comportamiento responsive</h2>
+      <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;border:1px solid #DDDAD1">
+        <sc-for list="{{ breakpoints }}" as="b" hint-placeholder-count="6">
+          <div style="{{ b.cellStyle }}">
+            <p style="font:400 15px/1 'JetBrains Mono',monospace;margin:0 0 16px">{{ b.w }}</p>
+            <div style="{{ b.diagram }}"></div>
+            <p style="font:400 11px/1.45 'Archivo',sans-serif;color:#8A867C;margin:16px 0 0">{{ b.rule }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-if>
+
+  <!-- ═════ 17 MODO TINTA ═════ -->
+  <sc-if value="{{ screenIs.dark }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:52px 48px 30px;border-bottom:1px solid #C7C3B7">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 18px">Superficies: tinta · grafito · carbón · elevada</p>
+      <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:52px;line-height:1;margin:0;letter-spacing:-0.015em">Modo tinta</h1>
+    </div>
+    <div style="padding:34px 48px 56px">
+      <div style="background:#111110;border:1px solid #26251F">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;padding:40px 40px 28px;border-bottom:1px solid #26251F">
+          <div>
+            <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#7C7A70;margin:0 0 18px">Sábado 22 de agosto, 2026 · Semana 34</p>
+            <h2 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:44px;line-height:1;margin:0;color:#EDEBE4;letter-spacing:-0.015em">Buenos días, Adrián.</h2>
+          </div>
+          <span style="font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#7C7A70;flex-shrink:0">Rev 08</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid #26251F">
+          <div style="padding:26px 26px 28px;border-right:1px solid #1E1D19">
+            <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#8A867C;margin:0 0 14px">01</p>
+            <p style="font:400 clamp(32px,3.6vw,50px)/0.85 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em;color:#D9614A">03</p>
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#9A9789;margin:15px 0 0">Tareas críticas</p>
+          </div>
+          <div style="padding:26px 24px 28px;border-right:1px solid #1E1D19">
+            <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#8A867C;margin:0 0 14px">02</p>
+            <p style="font:400 clamp(32px,3.6vw,50px)/0.85 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em;color:#EDEBE4">02</p>
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#9A9789;margin:15px 0 0">Reuniones hoy</p>
+          </div>
+          <div style="padding:26px 24px 28px;border-right:1px solid #1E1D19">
+            <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#8A867C;margin:0 0 14px">03</p>
+            <p style="font:400 clamp(32px,3.6vw,50px)/0.85 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em;color:#EDEBE4">04</p>
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#9A9789;margin:15px 0 0">Leads nuevos</p>
+          </div>
+          <div style="padding:26px 26px 28px;background:#171614">
+            <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#8A867C;margin:0 0 14px">04</p>
+            <p style="font:400 clamp(32px,3.6vw,50px)/0.85 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em;color:#EDEBE4">18.4<span style="font-size:22px;color:#7C7A70">K</span></p>
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#9A9789;margin:15px 0 0">Por cobrar USD</p>
+          </div>
+        </div>
+        <div style="padding:34px 40px 40px">
+          <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#7C7A70;margin:0 0 22px">Proyectos activos</p>
+          <sc-for list="{{ projects }}" as="p" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:34px 1fr auto;align-items:baseline;gap:18px;padding:15px 0;border-top:1px solid #1E1D19">
+              <span style="font:400 10px/1 'JetBrains Mono',monospace;color:#8A867C">{{ p.idx }}</span>
+              <div>
+                <p style="font-family:'Instrument Serif',serif;font-size:23px;line-height:1;margin:0 0 9px;color:#EDEBE4">{{ p.name }}</p>
+                <div style="height:1px;background:#26251F"><div style="height:1px;background:#EDEBE4;width:{{ p.progressPct }}"></div></div>
+              </div>
+              <span style="font:400 19px/1 'JetBrains Mono',monospace;color:#EDEBE4">{{ p.progress }}<span style="font-size:11px;color:#7C7A70">%</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;border:1px solid #DDDAD1;margin-top:28px">
+        <sc-for list="{{ inkPalette }}" as="c" hint-placeholder-count="6">
+          <div style="{{ c.cellStyle }}">
+            <div style="{{ c.swatch }}"></div>
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;margin:14px 0 6px">{{ c.name }}</p>
+            <p style="font:400 9.5px/1 'JetBrains Mono',monospace;color:#6E6A60;margin:0">{{ c.hex }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  </main>
+</div>
+</sc-if>
+
+<!-- ═════ CLIENT PORTAL ═════ -->
+<sc-if value="{{ isPortalMode }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:calc(100vh - 53px);background-color:#F4F3EF;background-image:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.9%27%20numOctaves%3D%274%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27180%27%20height%3D%27180%27%20filter%3D%27url%28%23n%29%27%20opacity%3D%270.2%27%2F%3E%3C%2Fsvg%3E),linear-gradient(180deg,#F6F5F1,#F1EFE9);background-size:180px 180px,auto;background-blend-mode:multiply,normal;display:flex;justify-content:center">
+    <div style="width:100%;max-width:768px;padding:0 40px 96px">
+      <div style="padding:64px 0 40px;border-bottom:1px solid #C7C3B7">
+        <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.18em;text-transform:uppercase;color:#8A867C;margin:0 0 26px">Adrián Gutiérrez Arq. &nbsp;·&nbsp; expediente 2025-014</p>
+        <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:76px;line-height:0.94;margin:0 0 28px;letter-spacing:-0.025em">Casa EG</h1>
+        <p style="font-family:'Instrument Serif',serif;font-style:italic;font-size:23px;line-height:1.5;color:#45443F;margin:0;max-width:44ch">Su proyecto avanza según lo previsto. Esta semana entregamos los planos estructurales.</p>
+      </div>
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:32px;padding:44px 0 34px;border-bottom:1px solid #DDDAD1">
+        <div>
+          <p style="font:400 116px/0.82 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.05em">82<span style="font-size:40px;color:#8A867C">%</span></p>
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:22px 0 0">Completado</p>
+        </div>
+        <div style="flex:1;max-width:300px">
+          <sc-for list="{{ portalPhases }}" as="ph" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:13px;padding:9px 0">
+              <span style="{{ ph.mark }}"></span>
+              <span style="{{ ph.labelStyle }}">{{ ph.name }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="padding:38px 0 34px;border-bottom:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 20px">Próximo hito</p>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:24px">
+          <p style="font-family:'Instrument Serif',serif;font-size:34px;line-height:1.05;margin:0;letter-spacing:-0.01em">Entrega de planos estructurales</p>
+          <span style="font:400 15px/1 'JetBrains Mono',monospace;color:#45443F;flex-shrink:0">26.08.26</span>
+        </div>
+      </div>
+
+      <div style="padding:38px 0 40px;border-bottom:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#A8382A;margin:0 0 22px">Su aprobación</p>
+        <div style="background:linear-gradient(155deg,#E6E4DE,#C7C3B7);aspect-ratio:16/9;display:flex;align-items:flex-end;padding:20px 22px;margin-bottom:24px">
+          <span style="font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:rgba(15,15,14,0.66)">Fachada principal · Versión 04</span>
+        </div>
+        <p style="font-family:'Instrument Serif',serif;font-style:italic;font-size:20px;line-height:1.5;color:#45443F;margin:0 0 28px;max-width:52ch">“Hemos incorporado el cambio de revestimiento que solicitó en el volumen superior y ajustado la altura del parapeto.”</p>
+        <div style="display:flex;gap:12px">
+          <button style="flex:1;background:#0F0F0E;color:#F4F3EF;border:none;height:52px;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;transition:background 140ms" style-hover="background:#A8382A">Aprobar diseño</button>
+          <button style="flex:1;background:none;border:1px solid #C7C3B7;height:52px;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;transition:border-color 140ms" style-hover="border-color:#0F0F0E">Solicitar cambios</button>
+        </div>
+      </div>
+
+      <div style="padding:38px 0 34px;border-bottom:1px solid #DDDAD1">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 8px">Documentos</p>
+        <sc-for list="{{ portalDocs }}" as="d" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding:17px 0;border-top:1px solid #DDDAD1;cursor:pointer;transition:padding-left 160ms" style-hover="padding-left:8px">
+            <span style="font:400 15px/1 'Archivo',sans-serif">{{ d.name }}</span>
+            <span style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#8A867C">Descargar</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="padding:38px 0 0">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 26px">Pagos</p>
+        <div style="display:flex;gap:0;border-top:1px solid #DDDAD1;padding-top:26px">
+          <div style="flex:1;padding-right:32px;border-right:1px solid #DDDAD1">
+            <p style="font:400 40px/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em">$28,000</p>
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#8A867C;margin:16px 0 0">Pagado &nbsp;·&nbsp; 2 de 3 cuotas</p>
+          </div>
+          <div style="flex:1;padding-left:32px">
+            <p style="font:400 40px/1 'JetBrains Mono',monospace;margin:0;letter-spacing:-0.03em;color:#A8382A">$14,000</p>
+            <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#8A867C;margin:16px 0 0">Pendiente &nbsp;·&nbsp; vence 15.09.26</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ═════ ACCESO ═════ -->
+<sc-if value="{{ isLoginMode }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:calc(100vh - 53px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+    <div style="padding:80px 64px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid #C7C3B7;background-color:#CFCBC3;background-image:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27240%27%20height%3D%27240%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.62%27%20numOctaves%3D%275%27%20stitchTiles%3D%27stitch%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27240%27%20height%3D%27240%27%20filter%3D%27url%28%23n%29%27%20opacity%3D%270.55%27%2F%3E%3C%2Fsvg%3E),radial-gradient(130% 95% at 20% 14%,rgba(255,255,255,0.55),rgba(255,255,255,0) 62%),radial-gradient(110% 85% at 80% 88%,rgba(15,15,14,0.13),rgba(15,15,14,0) 64%),linear-gradient(162deg,#DCD8D0,#BEBAB1);background-size:240px 240px,auto,auto,auto;background-blend-mode:multiply,screen,multiply,normal">
+      <p style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.18em;text-transform:uppercase;color:#45443F;margin:0">ARCHI.OS &nbsp;·&nbsp; v2.0</p>
+      <div>
+        <h1 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:64px;line-height:1;margin:0 0 24px;letter-spacing:-0.025em;max-width:18ch">El estudio como sistema.</h1>
+        <p style="font-family:'Instrument Serif',serif;font-style:italic;font-size:21px;line-height:1.5;color:#45443F;margin:0;max-width:40ch">Comercial, producción, documentación y finanzas en una sola lámina de trabajo.</p>
+      </div>
+      <div style="display:flex;gap:44px">
+        <div><p style="font:400 26px/1 'JetBrains Mono',monospace;margin:0">05</p><p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#45443F;margin:10px 0 0">Proyectos</p></div>
+        <div><p style="font:400 26px/1 'JetBrains Mono',monospace;margin:0">$128K</p><p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#45443F;margin:10px 0 0">Contratado</p></div>
+        <div><p style="font:400 26px/1 'JetBrains Mono',monospace;margin:0">14</p><p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#45443F;margin:10px 0 0">Clientes</p></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;padding:64px">
+      <div style="width:100%;max-width:352px">
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#8A867C;margin:0 0 28px">Acceso al estudio</p>
+        <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.13em;text-transform:uppercase;color:#6E6A60;margin:0 0 10px">Correo</p>
+        <input type="email" placeholder="adrian@estudio.com" style="width:100%;height:46px;padding:0 14px;border:1px solid #C7C3B7;background:#FAF9F5;outline:none;font:400 13.5px/1 'Archivo',sans-serif;margin-bottom:20px"/>
+        <button style="width:100%;background:#0F0F0E;color:#F4F3EF;border:none;height:46px;cursor:pointer;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;transition:background 140ms" style-hover="background:#A8382A">Enviar enlace de acceso</button>
+        <p style="font:400 11px/1.5 'Archivo',sans-serif;color:#8A867C;margin:18px 0 0">Sin contraseñas. Enviamos un enlace de un solo uso válido por 15 minutos.</p>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ══ COMMAND PALETTE ══ -->
+<sc-if value="{{ cmdOpen }}" hint-placeholder-val="{{ false }}">
+  <div onclick="{{ closeCmd }}" style="position:fixed;inset:0;z-index:90;background:rgba(15,15,14,0.28);display:flex;justify-content:center;align-items:flex-start;padding-top:13vh">
+    <div style="width:592px;max-width:92vw;background:#FAF9F5;border:1px solid #0F0F0E;box-shadow:0 30px 70px rgba(15,15,14,0.22);animation:rise 180ms cubic-bezier(0.2,0.8,0.2,1) both">
+      <div style="display:flex;align-items:center;gap:12px;padding:17px 20px;border-bottom:1px solid #DDDAD1">
+        <span style="font:500 13px/1 'JetBrains Mono',monospace;color:#A8382A">&gt;</span>
+        <input autofocus placeholder="Buscar, crear, navegar o preguntar…" style="flex:1;border:none;outline:none;background:none;font:400 14.5px/1 'Archivo',sans-serif;color:#0F0F0E"/>
+        <span style="border:1px solid #DDDAD1;padding:3px 6px;font:400 9.5px/1 'JetBrains Mono',monospace;color:#6E6A60">ESC</span>
+      </div>
+      <sc-for list="{{ cmdGroups }}" as="g" hint-placeholder-count="3">
+        <div style="padding:14px 20px 8px">
+          <p style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#6E6A60;margin:0 0 4px">{{ g.name }}</p>
+        </div>
+        <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+          <div onclick="{{ it.run }}" style="display:flex;align-items:center;gap:14px;padding:10px 20px;cursor:pointer;transition:background 120ms" style-hover="background:#EDEBE4">
+            <span style="font:400 10px/1 'JetBrains Mono',monospace;color:#6E6A60;width:18px;flex-shrink:0">{{ it.n }}</span>
+            <span style="flex:1;font:400 13.5px/1 'Archivo',sans-serif">{{ it.label }}</span>
+            <span style="font:400 10px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60">{{ it.hint }}</span>
+          </div>
+        </sc-for>
+      </sc-for>
+      <div style="padding:12px 20px;border-top:1px solid #DDDAD1;display:flex;gap:18px;font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#6E6A60">
+        <span>↑↓ navegar</span><span>↵ ejecutar</span><span>⌘K cerrar</span>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1512,&quot;height&quot;:982},&quot;initialScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dashboard&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;dashboard&quot;,&quot;projects&quot;,&quot;workspace&quot;,&quot;crm&quot;,&quot;finance&quot;,&quot;website&quot;,&quot;ai&quot;,&quot;system&quot;,&quot;dark&quot;],&quot;section&quot;:&quot;Comportamiento&quot;},&quot;startMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;admin&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;admin&quot;,&quot;portal&quot;,&quot;login&quot;],&quot;section&quot;:&quot;Comportamiento&quot;},&quot;showCommandPalette&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamiento&quot;}}">
+const PROJECTS = [
+  { name:"Casa EG", client:"Familia Rodríguez", category:"Residencial", place:"Salinas / Ecuador", progress:82, phase:"Diseño arquitectónico", due:"15.09.26", contracted:42000, collected:28000, tone:"#4A4842" },
+  { name:"Hormipen", client:"Hormipen S.A.", category:"Comercial", place:"Guayaquil / Ecuador", progress:64, phase:"Planos ejecutivos", due:"30.08.26", contracted:68000, collected:44000, tone:"#6B6862" },
+  { name:"Brangus", client:"Grupo Brangus", category:"Comercial", place:"Salinas / Ecuador", progress:41, phase:"Anteproyecto", due:"12.10.26", contracted:54000, collected:12000, tone:"#8A867C" },
+  { name:"Tulum", client:"Inversiones Tulum", category:"Hospitalidad", place:"Montañita / Ecuador", progress:23, phase:"Conceptualización", due:"05.11.26", contracted:31000, collected:6000, tone:"#A5A199" },
+  { name:"Suite Palmar", client:"Hotel Palmar", category:"Interiorismo", place:"Palmar / Ecuador", progress:95, phase:"Entrega", due:"26.08.26", contracted:26000, collected:26000, tone:"#B8B4A9" },
+];
+
+class Component extends DCLogic {
+  state = { mode:"admin", screen:"dashboard", cmdOpen:false, wsTab:"overview", crmTab:"leads", portalTab:"project" };
+
+  componentDidMount(){
+    this._key = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); this.setState(s => ({ cmdOpen: !s.cmdOpen })); }
+      if (e.key === "Escape") this.setState({ cmdOpen:false });
+    };
+    window.addEventListener("keydown", this._key);
+  }
+  componentWillUnmount(){ window.removeEventListener("keydown", this._key); }
+
+  go(screen){ return () => this.setState({ screen, mode:"admin", cmdOpen:false }); }
+
+  renderVals(){
+    const s = this.state;
+    const screens = ["dashboard","crm","clientDetail","projects","workspace","quotes","contracts","finance","website","marketing","calendar","notifications","ai","reports","settings","system","dark"];
+    const screenIs = {}; screens.forEach(k => screenIs[k] = s.screen === k);
+
+    const CRUMBS = { dashboard:"Dashboard", crm:"Comercial / CRM", clientDetail:"Comercial / Cliente", projects:"Producción / Proyectos", workspace:"Producción / Casa EG", quotes:"Comercial / Cotizaciones", contracts:"Comercial / Contratos", finance:"Inteligencia / Finanzas", website:"Inteligencia / Website", marketing:"Inteligencia / Marketing", calendar:"Producción / Agenda", notifications:"Sistema / Notificaciones", ai:"Inteligencia / Archi AI", reports:"Inteligencia / Reportes", settings:"Sistema / Configuración", system:"Sistema / Design system", dark:"Sistema / Modo tinta" };
+
+    const navMap = { dashboard:"dashboard", crmLeads:"crm", crmClientes:"crm", crmPipeline:"crm", quotes:"quotes", contracts:"contracts", projects:"projects", calendar:"calendar", finance:"finance", website:"website", marketing:"marketing", ai:"ai", reports:"reports", notifications:"notifications", settings:"settings", system:"system", dark:"dark" };
+    const navStyles = {}, navNum = {};
+    Object.keys(navMap).forEach(k => {
+      const active = s.screen === navMap[k] || (k === "projects" && s.screen === "workspace") || (k === "crmClientes" && s.screen === "clientDetail");
+      navStyles[k] = `display:flex;align-items:center;gap:13px;width:100%;text-align:left;background:${active ? "#EDEBE4" : "none"};border:none;border-left:2px solid ${active ? "#0F0F0E" : "transparent"};padding:7px 20px 7px 18px;cursor:pointer;font:${active ? "500" : "400"} 13px/1 'Archivo',sans-serif;color:${active ? "#0F0F0E" : "#45443F"};transition:background 140ms,color 140ms`;
+      navNum[k] = `font:400 9.5px/1 'JetBrains Mono',monospace;color:${active ? "#A8382A" : "#6E6A60"};flex-shrink:0;width:14px`;
+    });
+
+    const seg = (active) => `background:${active ? "#0F0F0E" : "none"};color:${active ? "#F4F3EF" : "#8A867C"};border:none;padding:0 11px;height:27px;cursor:pointer;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;transition:background 140ms,color 140ms`;
+
+    const projects = PROJECTS.map((p, i) => ({
+      ...p, idx: String(i + 1).padStart(2, "0"), progressPct: p.progress + "%",
+      open: this.go("workspace"),
+      coverStyle: `background:linear-gradient(148deg,${p.tone},#C7C3B7)`,
+      dateStyle: `position:absolute;left:7px;bottom:6px;font:400 8.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;color:#0F0F0E`,
+      chip: `width:9px;height:9px;background:${p.tone};flex-shrink:0`,
+    }));
+
+    const cmdGroups = [
+      { name:"Ir a", items:[
+        { n:"01", label:"Dashboard", hint:"⌘1", run:this.go("dashboard") },
+        { n:"02", label:"Proyectos", hint:"⌘2", run:this.go("projects") },
+        { n:"03", label:"Casa EG — workspace", hint:"↵", run:this.go("workspace") },
+      ]},
+      { name:"Crear", items:[
+        { n:"04", label:"Nueva tarea en Casa EG", hint:"↵", run:this.go("workspace") },
+        { n:"05", label:"Nueva cotización", hint:"↵", run:this.go("quotes") },
+      ]},
+      { name:"Preguntar a Archi", items:[
+        { n:"06", label:"¿En qué debo enfocarme hoy?", hint:"AI", run:this.go("ai") },
+        { n:"07", label:"¿Qué proyectos están atrasados?", hint:"AI", run:this.go("ai") },
+      ]},
+    ];
+
+    return {
+      isAdminMode: s.mode === "admin", isPortalMode: s.mode === "portal", isLoginMode: s.mode === "login",
+      setModeAdmin: () => this.setState({ mode:"admin" }),
+      setModePortal: () => this.setState({ mode:"portal" }),
+      setModeLogin: () => this.setState({ mode:"login" }),
+      segAdmin: seg(s.mode === "admin"), segPortal: seg(s.mode === "portal"), segLogin: seg(s.mode === "login"),
+      crumb: CRUMBS[s.screen] || "Dashboard",
+      screenIs, navStyles, navNum,
+      navTail: "font:400 10px/1 'JetBrains Mono',monospace;margin-left:auto;color:#6E6A60",
+
+      goDashboard: this.go("dashboard"), goProjects: this.go("projects"), goCalendar: this.go("calendar"),
+      goCrmLeads: this.go("crm"), goCrmClientes: this.go("crm"), goCrmPipeline: this.go("crm"),
+      goQuoteBuilder: this.go("quotes"), goContracts: this.go("contracts"), goFinance: this.go("finance"),
+      goWebsiteAnalytics: this.go("website"), goMarketing: this.go("marketing"), goAi: this.go("ai"),
+      goReports: this.go("reports"), goNotifications: this.go("notifications"), goSettings: this.go("settings"),
+      goSystem: this.go("system"), goDark: this.go("dark"), goWorkspace: this.go("workspace"),
+
+      cmdOpen: s.cmdOpen,
+      openCmd: () => this.setState({ cmdOpen:true }),
+      closeCmd: () => this.setState({ cmdOpen:false }),
+      cmdGroups,
+
+      projects,
+      recentProjects: projects.slice(0, 3),
+
+      agendaToday: [
+        { time:"09:00", title:"Visita de obra — Casa EG", where:"Salinas" },
+        { time:"11:30", title:"Revisión con cliente — Brangus", where:"Estudio" },
+        { time:"15:00", title:"Coordinación estructural", where:"Remoto" },
+      ],
+      pipelineStages: [
+        { name:"Nuevo", value:"$12,000", pct:"9%", h:"12px", fill:"#C7C3B7" },
+        { name:"Propuesta", value:"$42,000", pct:"33%", h:"20px", fill:"#A5A199" },
+        { name:"Negociación", value:"$51,000", pct:"40%", h:"27px", fill:"#6B6862" },
+        { name:"Ganado", value:"$23,000", pct:"18%", h:"34px", fill:"#0F0F0E" },
+      ],
+      attention: [
+        { n:"01", text:"2 tareas atrasadas en Brangus" },
+        { n:"02", text:"Cuota final vencida — Casa EG, $14,000" },
+        { n:"03", text:"3 aprobaciones esperando al cliente" },
+      ],
+
+      ...this.workspaceVals(),
+      ...this.commercialVals(),
+      ...this.intelVals(),
+      ...this.miscVals(),
+    };
+  }
+
+  miscVals(){
+    const quoteItems = [
+      ["Anteproyecto y diseño arquitectónico",1,8500,8500],
+      ["Planos estructurales",1,6200,6200],
+      ["Dirección de obra (mensual)",8,900,7200],
+      ["Renders fotorrealistas",3,867,2600],
+    ].map(([name, qty, price, subtotal], i) => ({
+      n: String(i+1).padStart(2,"0"), name, qty: String(qty).padStart(2,"0"),
+      price: "$" + price.toLocaleString("en-US"), subtotal: "$" + subtotal.toLocaleString("en-US"),
+    }));
+
+    const contracts = [
+      ["Familia Rodríguez","Casa EG","12.03.25","Vigente","$42,000"],
+      ["Hormipen S.A.","Fachada corporativa","03.02.25","Vigente","$68,000"],
+      ["Grupo Brangus","Restaurante Brangus","20.06.25","Vigente","$54,000"],
+      ["Hotel Palmar","Interiorismo suites","09.01.25","Cerrado","$26,000"],
+    ].map(([client, project, date, status, value], i) => ({
+      n: String(i+1).padStart(2,"0"), client, project, date, status, value,
+      statusStyle: `font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:${status === "Vigente" ? "#0F0F0E" : "#8A867C"}`,
+    }));
+
+    const EVENTS = { 21:"Reunión Brangus", 24:"Visita de obra", 26:"Entrega planos", 28:"Revisión cliente", 31:"Cierre mensual" };
+    const calendarDays = Array.from({ length:35 }, (_, i) => {
+      const num = i - 4;
+      const valid = num > 0 && num <= 31;
+      const hasEvent = valid && !!EVENTS[num];
+      const today = num === 22;
+      return {
+        num: valid ? String(num).padStart(2,"0") : "", hasEvent,
+        eventLabel: EVENTS[num] || "",
+        cellStyle: `min-height:104px;padding:12px 14px;border-left:1px solid #DDDAD1;border-bottom:1px solid #DDDAD1;${today ? "background:#EDEBE4" : ""}`,
+        numStyle: `font:400 11px/1 'JetBrains Mono',monospace;color:${today ? "#A8382A" : valid ? "#8A867C" : "#DDDAD1"}`,
+        eventStyle: "margin:14px 0 0;padding-left:8px;border-left:2px solid #0F0F0E;font:400 11px/1.35 'Archivo',sans-serif",
+      };
+    });
+
+    const notifications = [
+      ["Fachada V04 lleva 2 días esperando aprobación del cliente","hace 1 h","hot"],
+      ["Cuota final de Casa EG vencida — $14,000","hace 3 h","hot"],
+      ["Nuevo lead desde Google — María Fernanda Solís","hace 12 min","ok"],
+      ["Hormipen S.A. aceptó la cotización 0039","ayer","ok"],
+      ["Camila Moreira actualizó Planta baja a V03","20.08","ok"],
+      ["Suite Palmar cerró con 51% de margen","18.08","ok"],
+    ].map(([text, time, st], i) => ({
+      n: String(i+1).padStart(2,"0"), text, time,
+      mark: st === "hot" ? "width:9px;height:9px;background:#A8382A;transform:rotate(45deg);margin-top:5px" : "width:9px;height:9px;border:1px solid #B5B1A6;margin-top:5px",
+    }));
+
+    const reports = [
+      ["01","Reporte comercial","Leads, pipeline y conversión por origen, con valor en juego y tiempo medio de cierre."],
+      ["02","Reporte financiero","Contratado, cobrado, gastos y rentabilidad por proyecto y por periodo."],
+      ["03","Reporte de producción","Avance real por fase, retrasos acumulados y carga por integrante del equipo."],
+      ["04","Reporte de atribución","Del canal al ingreso: qué fuente construye realmente la cartera del estudio."],
+    ].map(([n, title, desc], i) => ({ n, title, desc, cellStyle: `padding:36px 48px 40px;border-bottom:1px solid #DDDAD1;${i % 2 === 0 ? "border-right:1px solid #DDDAD1" : ""}` }));
+
+    const palette = [
+      ["Papel","#F4F3EF","Lienzo base"],["Superficie","#FAF9F5","Paneles y campos"],
+      ["Filete","#DDDAD1","Separación interna"],["Corte","#C7C3B7","Cortes mayores"],
+      ["Concreto","#8A867C","Metadatos y etiquetas"],["Grafito","#45443F","Texto secundario"],
+      ["Tinta","#0F0F0E","Texto y acción"],
+    ].map(([name, hex, use], i) => ({
+      name, hex, use,
+      cellStyle: `padding:22px;${i < 6 ? "border-right:1px solid #DDDAD1" : ""}`,
+      swatch: `height:64px;background:${hex};${hex === "#F4F3EF" || hex === "#FAF9F5" ? "border:1px solid #DDDAD1" : ""}`,
+    }));
+
+    const inkPalette = [
+      ["Tinta","#0B0B0A"],["Carbón","#111110"],["Grafito","#171614"],
+      ["Elevada","#1E1D19"],["Filete","#26251F"],["Metadato","#8A867C"],["Revisión","#D9614A"],
+    ].map(([name, hex], i) => ({ name, hex, cellStyle: `padding:20px 16px;${i < 6 ? "border-right:1px solid #DDDAD1" : ""}`, swatch: `height:64px;background:${hex}` }));
+
+    const breakpoints = [
+      ["1440+","Índice fijo + lámina de 12 columnas + carril derecho de 384 px","display:flex;gap:2px;height:44px","#0F0F0E,#C7C3B7,#8A867C"],
+      ["1280","El carril derecho baja bajo la lámina; la banda de cifras mantiene 4 columnas","",""],
+      ["1024","Índice colapsa a 64 px con solo numeración; cifras en 2×2","",""],
+      ["768","Índice en cajón; tablas se convierten en listas de dos líneas","",""],
+      ["480","Una columna; cifras apiladas; portada de proyecto a ancho completo","",""],
+      ["390","Portal y aprobaciones primero; acciones fijas al pie","",""],
+    ].map(([w, rule], i) => ({
+      w, rule,
+      cellStyle: `padding:22px;${i < 5 ? "border-right:1px solid #DDDAD1" : ""}`,
+      diagram: i === 0 ? "height:44px;background:linear-gradient(to right,#0F0F0E 0 14%,#EDEBE4 14% 76%,#C7C3B7 76% 100%)"
+        : i === 1 ? "height:44px;background:linear-gradient(to right,#0F0F0E 0 14%,#EDEBE4 14% 100%)"
+        : i === 2 ? "height:44px;background:linear-gradient(to right,#0F0F0E 0 7%,#EDEBE4 7% 100%)"
+        : i === 3 ? "height:44px;background:#EDEBE4;border-left:3px solid #0F0F0E"
+        : i === 4 ? "height:44px;background:#EDEBE4"
+        : "height:44px;background:linear-gradient(to bottom,#EDEBE4 0 72%,#0F0F0E 72% 100%)",
+    }));
+
+    const portalPhases = [
+      ["Anteproyecto","done"],["Diseño arquitectónico","current"],["Planos ejecutivos","next"],["Construcción","next"],
+    ].map(([name, st]) => ({
+      name,
+      mark: st === "current" ? "width:10px;height:10px;background:#A8382A;transform:rotate(45deg);flex-shrink:0"
+        : st === "done" ? "width:9px;height:9px;background:#0F0F0E;flex-shrink:0"
+        : "width:9px;height:9px;border:1px solid #B5B1A6;flex-shrink:0",
+      labelStyle: `font:${st === "current" ? "500" : "400"} 12.5px/1 'Archivo',sans-serif;color:${st === "next" ? "#6E6A60" : "#0F0F0E"}`,
+    }));
+
+    return { quoteItems, contracts, calendarDays, notifications, reports, palette, inkPalette, breakpoints, portalPhases,
+      weekdays: ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"],
+      portalDocs: [{ name:"Planos arquitectónicos V03" }, { name:"Render fachada V04" }, { name:"Contrato firmado" }],
+    };
+  }
+
+  commercialVals(){
+    const s = this.state;
+    const keys = ["leads","pipeline","clientes"];
+    const crmTabIs = {}, crmTabStyles = {}, crmNum = {};
+    keys.forEach(k => {
+      const a = s.crmTab === k;
+      crmTabIs[k] = a;
+      crmTabStyles[k] = `display:flex;align-items:center;gap:9px;background:none;border:none;border-bottom:2px solid ${a ? "#0F0F0E" : "transparent"};margin-bottom:-1px;padding:17px 30px 15px 0;cursor:pointer;font:${a ? "500" : "400"} 12.5px/1 'Archivo',sans-serif;color:${a ? "#0F0F0E" : "#8A867C"};transition:color 140ms,border-color 140ms`;
+      crmNum[k] = `font:400 9.5px/1 'JetBrains Mono',monospace;color:${a ? "#A8382A" : "#6E6A60"}`;
+    });
+
+    const L = [
+      ["María Fernanda Solís","Ampliación de vivienda",18500,"Google","Propuesta","22.08"],
+      ["Municipio de Salinas","Renovación urbana",210000,"Licitación","Propuesta","29.08"],
+      ["Grupo Brangus","Restaurante Brangus",54000,"Instagram","Negociación","25.08"],
+      ["Hormipen S.A.","Fachada corporativa",68000,"Referido","Ganado","—"],
+      ["Familia Rodríguez","Casa EG",42000,"Referido","Ganado","—"],
+      ["Suite Palmar Hotel","Interiorismo suites",26000,"Referido","Reunión","27.08"],
+      ["Inversiones Tulum","Bistrobar Tulum",31000,"Instagram","Contactado","24.08"],
+      ["Cocina Urbana — Sra. Peña","Remodelación cocina",9800,"Google","Nuevo","23.08"],
+    ];
+    const hot = { Negociación:1, Propuesta:1 };
+    const leads = L.map(([name, project, value, source, status, next], i) => ({
+      n: String(i + 1).padStart(2,"0"), name, project, source, status, next,
+      valueFmt: "$" + value.toLocaleString("en-US"),
+      stateStyle: `font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:${status === "Ganado" ? "#0F0F0E" : hot[status] ? "#A8382A" : "#8A867C"}`,
+    }));
+
+    const LD = [
+      ["Nuevo","$9,800","01","8%","#C7C3B7"],["Contactado","$31,000","01","24%","#B8B4A9"],
+      ["Reunión","$26,000","01","20%","#A5A199"],["Propuesta","$228,500","02","100%","#6B6862"],
+      ["Negociación","$54,000","01","42%","#45443F"],["Ganado","$110,000","02","64%","#0F0F0E"],
+    ];
+    const ladder = LD.map(([name, value, count, pct, fill], i) => ({
+      name, value, count, pct, fill, hasLine: i < LD.length - 1,
+      dot: i === LD.length - 1 ? "width:11px;height:11px;background:#0F0F0E;z-index:1" : "width:9px;height:9px;border:1px solid #B5B1A6;background:#F4F3EF;z-index:1",
+      nameStyle: `font:${i === LD.length - 1 ? "500" : "400"} 13.5px/1 'Archivo',sans-serif;color:${i === LD.length - 1 ? "#0F0F0E" : "#45443F"}`,
+    }));
+
+    const C = [
+      ["Familia Rodríguez","Residencial","mar. 2025",1,"$42,000"],
+      ["Hormipen S.A.","Comercial","feb. 2025",1,"$68,000"],
+      ["Grupo Brangus","Comercial","jun. 2025",1,"$54,000"],
+      ["Hotel Palmar","Interiorismo","ene. 2025",2,"$26,000"],
+      ["Inversiones Tulum","Hospitalidad","jul. 2026",1,"$31,000"],
+      ["Municipio de Salinas","Institucional","ago. 2026",1,"$210,000"],
+    ];
+    const clients = C.map(([name, category, since, projects, value], i) => ({
+      n: String(i + 1).padStart(2,"0"), name, category, since, projects: String(projects).padStart(2,"0"), value,
+    }));
+
+    const J = [["Lead","02.2025","done"],["Reunión","02.2025","done"],["Cotización","03.2025","done"],["Contrato","03.2025","done"],["Proyecto","en curso","current"]];
+    const journey = J.map(([label, date, st]) => ({
+      label, date,
+      color: st === "current" ? "#A8382A" : "#45443F",
+      markStyle: st === "current"
+        ? "position:absolute;left:0;top:0;width:11px;height:11px;background:#A8382A;transform:rotate(45deg)"
+        : "position:absolute;left:0;top:1px;width:9px;height:9px;background:#0F0F0E",
+    }));
+
+    return { crmTabIs, crmTabStyles, crmNum, leads, ladder, clients, journey,
+      goClientDetail: this.go("clientDetail"),
+      goCrmLeads: () => this.setState({ screen:"crm", mode:"admin", crmTab:"leads", cmdOpen:false }),
+      goCrmPipeline: () => this.setState({ screen:"crm", mode:"admin", crmTab:"pipeline", cmdOpen:false }),
+      goCrmClientes: () => this.setState({ screen:"crm", mode:"admin", crmTab:"clientes", cmdOpen:false }),
+    };
+  }
+
+  intelVals(){
+    const cashflow = [["Mar","46%","#C7C3B7"],["Abr","58%","#C7C3B7"],["May","52%","#C7C3B7"],["Jun","74%","#45443F"],["Jul","92%","#0F0F0E"],["Ago","68%","#45443F"]]
+      .map(([label, h, fill]) => ({ label, h, fill }));
+
+    const profitability = [["Suite Palmar","51%"],["Casa EG","42%"],["Hormipen","38%"],["Brangus","29%"],["Tulum","18%"]]
+      .map(([name, margin], i) => ({ n: String(i+1).padStart(2,"0"), name, margin, pct: margin, fill: i === 0 ? "#0F0F0E" : i < 3 ? "#45443F" : "#A5A199" }));
+
+    const webMetrics = [
+      ["01","12,842","Visitantes","+14.2%"],["02","16,203","Sesiones","+9.8%"],
+      ["03","147","Leads","+22.1%"],["04","3.8%","Conversión","+0.6 pt"],["05","6.2","Pos. media","+1.4"],
+    ].map(([n, value, label, delta], i) => ({ n, value, label, delta, cellStyle: `padding:30px 26px 32px;${i < 4 ? "border-right:1px solid #DDDAD1" : ""}` }));
+
+    const funnel = [
+      ["Google","#0F0F0E","$150,000",[["5,912","100%"],["32","54%"],["08","80%"],["05","100%"]]],
+      ["Referidos","#45443F","$220,000",[["1,204","20%"],["22","37%"],["09","90%"],["07","100%"]]],
+      ["Instagram","#A5A199","$42,000",[["3,988","67%"],["41","100%"],["03","30%"],["02","28%"]]],
+    ].map(([name, fill, revenue, steps]) => ({ name, fill, revenue, steps: steps.map(([v, pct]) => ({ v, pct })) }));
+
+    const keywords = [
+      ["arquitectos en Salinas Ecuador",2],["estudio de arquitectura Salinas",4],
+      ["diseño de interiores Ecuador",7],["arquitectos Ecuador",9],["remodelación de cocinas Salinas",11],
+    ].map(([term, position]) => ({ term, position: "#" + position, posStyle: `text-align:right;font:400 16px/1 'JetBrains Mono',monospace;color:${position <= 3 ? "#0F0F0E" : position <= 8 ? "#45443F" : "#6E6A60"}` }));
+
+    const topPages = [["Casa EG","100%","4,210"],["Hormipen","74%","3,105"],["Suite Palmar","45%","1,884"],["Brangus","29%","1,240"]]
+      .map(([name, pct, views]) => ({ name, pct, views }));
+
+    const funnelStages = [
+      ["01","12,842","Visitas","32px","#C7C3B7","—"],
+      ["02","147","Leads","62px","#B8B4A9","1.1% de visitas"],
+      ["03","20","Clientes","92px","#6B6862","13.6% de leads"],
+      ["04","14","Proyectos","118px","#45443F","70% de clientes"],
+      ["05","$412K","Ingresos","148px","#0F0F0E","$29.4K promedio"],
+    ].map(([n, value, label, barH, fill, rate], i) => ({ n, value, label, barH, fill, rate, cellStyle: `padding:0 30px 0 ${i === 0 ? "0" : "30px"};${i < 4 ? "border-right:1px solid #DDDAD1" : ""}` }));
+
+    const aiActions = [
+      { n:"01", title:"Revisar la aprobación de Casa EG", why:"Fachada V04 lleva 2 días esperando · bloquea planos ejecutivos", run:this.go("workspace") },
+      { n:"02", title:"Reclamar cuota final de Casa EG", why:"$14,000 vencidos el 15.09 · 33% del contrato", run:this.go("finance") },
+      { n:"03", title:"Dar seguimiento a María Fernanda Solís", why:"Propuesta enviada hace 6 días · sin respuesta", run:this.go("crm") },
+    ];
+    const aiSignals = [
+      ["Referidos convierten 4× mejor que Instagram","hot"],
+      ["Brangus acumula 6 días de retraso en anteproyecto","hot"],
+      ["Suite Palmar cierra con 51% de margen — el mejor del año","ok"],
+      ["Agosto es el mes con más leads del ejercicio","ok"],
+    ].map(([text, st]) => ({ text, mark: st === "hot" ? "width:9px;height:9px;background:#A8382A;transform:rotate(45deg);margin-top:4px" : "width:9px;height:9px;background:#0F0F0E;margin-top:4px" }));
+
+    return { cashflow, profitability, webMetrics, funnel, keywords, topPages, funnelStages, aiActions, aiSignals };
+  }
+
+  workspaceVals(){
+    const s = this.state;
+    const wsKeys = ["overview","docs","tasks","gantt","approvals","finance","activity"];
+    const wsTabIs = {}, wsTabStyles = {}, wsNum = {};
+    wsKeys.forEach(k => {
+      const a = s.wsTab === k;
+      wsTabIs[k] = a;
+      wsTabStyles[k] = `display:flex;align-items:center;gap:9px;background:none;border:none;border-bottom:2px solid ${a ? "#0F0F0E" : "transparent"};margin-bottom:-1px;padding:17px 26px 15px 0;cursor:pointer;white-space:nowrap;font:${a ? "500" : "400"} 12.5px/1 'Archivo',sans-serif;color:${a ? "#0F0F0E" : "#8A867C"};transition:color 140ms,border-color 140ms`;
+      wsNum[k] = `font:400 9.5px/1 'JetBrains Mono',monospace;color:${a ? "#A8382A" : "#6E6A60"}`;
+    });
+
+    const PH = [
+      ["Levantamiento","03.25","done"],["Conceptualización","04.25","done"],["Anteproyecto","05.25","done"],
+      ["Diseño arquitectónico","08.26","current"],["Planos ejecutivos","10.26","next"],["Permisos","11.26","next"],
+      ["Construcción","01.27","next"],["Entrega","06.27","next"],
+    ];
+    const phases = PH.map(([name, date, st], i) => ({
+      name, date, hasLine: i < PH.length - 1,
+      labelStyle: `font:${st === "current" ? "500" : "400"} 11px/1.3 'JetBrains Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;color:${st === "current" ? "#0F0F0E" : st === "done" ? "#45443F" : "#6E6A60"};margin:0;text-align:right;padding-right:14px`,
+      markStyle: st === "current"
+        ? "position:relative;z-index:1;width:11px;height:11px;background:#A8382A;transform:rotate(45deg);flex-shrink:0"
+        : st === "done"
+          ? "position:relative;z-index:1;width:9px;height:9px;background:#0F0F0E;flex-shrink:0"
+          : "position:relative;z-index:1;width:9px;height:9px;border:1px solid #B5B1A6;background:#F4F3EF;flex-shrink:0",
+    }));
+
+    const MS = [
+      ["Entrega planos estructurales","28.08.26","ok"],
+      ["Aprobación fachada V04","vencido","late"],
+      ["Reunión de obra","02.09.26","ok"],
+      ["Cierre fase de diseño","15.09.26","ok"],
+    ];
+    const milestones = MS.map(([title, date, st]) => ({
+      title, date,
+      markStyle: st === "late"
+        ? "width:9px;height:9px;background:#A8382A;transform:rotate(45deg);margin-top:5px"
+        : "width:9px;height:9px;border:1px solid #B5B1A6;background:#F4F3EF;margin-top:5px",
+      dateStyle: `font:400 10.5px/1 'JetBrains Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;color:${st === "late" ? "#A8382A" : "#8A867C"}`,
+    }));
+
+    const DC = [
+      ["01","Arquitectura",14,"02.08"],["02","Estructura",9,"18.07"],["03","Instalaciones",7,"11.07"],
+      ["04","Renders",12,"hoy"],["05","Permisos",4,"03.06"],
+    ];
+    const docCategories = DC.map(([n, name, count, last], i) => ({
+      n, name, count: String(count).padStart(2,"0"), last,
+      cellStyle: `padding:32px 26px 34px;cursor:pointer;transition:background 160ms;${i < 4 ? "border-right:1px solid #DDDAD1" : ""}`,
+    }));
+
+    const DOCS = [
+      ["01","06_RENDERS — Fachada principal V04.jpg","Adrián G.","hoy","En revisión","late"],
+      ["02","03_ARQUITECTURA — Planta baja V03.dwg","Adrián G.","02.08.26","Vigente","ok"],
+      ["03","04_ESTRUCTURA — Cimentación.pdf","C. Moreira","18.07.26","Vigente","ok"],
+      ["04","07_PRESUPUESTO — Detallado.xlsx","Adrián G.","15.07.26","Vigente","ok"],
+      ["05","01_CONTRATO — Casa EG.pdf","Adrián G.","12.03.25","Firmado","done"],
+    ];
+    const documents = DOCS.map(([n, name, author, date, status, st]) => ({
+      n, name, author, date, status,
+      statusStyle: `font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:${st === "late" ? "#A8382A" : st === "done" ? "#0F0F0E" : "#8A867C"}`,
+    }));
+
+    const VS = [["V01","12.05.26","Reemplazada"],["V02","28.06.26","Reemplazada"],["V03","19.07.26","Reemplazada"],["V04","22.08.26","En revisión"]];
+    const versions = VS.map(([label, date, tag], i) => {
+      const cur = i === 3;
+      return { label, date, tag,
+        markStyle: cur
+          ? "position:absolute;left:0;top:4px;width:11px;height:11px;background:#A8382A;transform:rotate(45deg)"
+          : "position:absolute;left:0;top:5px;width:9px;height:9px;background:#C7C3B7",
+        tagStyle: `font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:${cur ? "#A8382A" : "#6E6A60"};margin:12px 0 0`,
+      };
+    });
+
+    const TC = [
+      ["Backlog",[["Levantar medidas de terreno","Media","02.09"]]],
+      ["Por hacer",[["Revisar instalaciones eléctricas","Alta","24.08"],["Cotizar acabados de baño","Baja","29.08"]]],
+      ["En progreso",[["Ajustar fachada V04","Alta","22.08"]]],
+      ["Revisión",[["Planos estructurales","Alta","vencido"]]],
+    ];
+    const taskColumns = TC.map(([name, tasks], i) => ({
+      name, count: String(tasks.length).padStart(2,"0"),
+      colStyle: `padding:34px 26px 44px;${i < 3 ? "border-right:1px solid #DDDAD1" : ""}`,
+      tasks: tasks.map(([title, priority, date]) => ({
+        title, priority, date,
+        priorityStyle: `font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:${priority === "Alta" ? "#A8382A" : "#6E6A60"}`,
+        dateStyle: `font:400 10px/1 'JetBrains Mono',monospace;color:${date === "vencido" ? "#A8382A" : "#6E6A60"}`,
+      })),
+    }));
+
+    const GR = [
+      ["Levantamiento",100,"0%","9%",false],["Conceptualización",100,"7%","11%",false],
+      ["Anteproyecto",100,"16%","13%",false],["Diseño arquitectónico",82,"27%","19%",true],
+      ["Planos ejecutivos",0,"44%","15%",false],["Permisos",0,"57%","13%",false],
+      ["Construcción",0,"68%","24%",false],["Entrega",0,"90%","7%",true],
+    ];
+    const ganttRows = GR.map(([name, pct, offset, width, milestone]) => ({
+      name, offset, width, milestone,
+      pctLabel: pct === 0 ? "—" : pct + "%",
+      fill: pct === 100 ? "#0F0F0E" : pct > 0 ? "#45443F" : "#C7C3B7",
+      labelColor: pct > 0 ? "#0F0F0E" : "#8A867C",
+      msAt: width === "19%" ? "100%" : "100%",
+    }));
+
+    const INS = [
+      ["Anticipo 40%","12.03.25","$16,800","paid"],
+      ["Avance de obra 27%","28.06.26","$11,200","paid"],
+      ["Cuota final 33%","15.09.26","$14,000","due"],
+    ];
+    const installments = INS.map(([name, date, amount, st]) => ({
+      name, date, amount,
+      markStyle: st === "paid" ? "width:9px;height:9px;background:#0F0F0E" : "width:9px;height:9px;background:#A8382A;transform:rotate(45deg)",
+      amountStyle: `text-align:right;font:400 14px/1 'JetBrains Mono',monospace;color:${st === "paid" ? "#0F0F0E" : "#A8382A"}`,
+    }));
+
+    return {
+      wsTabIs, wsTabStyles, wsNum,
+      goWsOverview: () => this.setState({ wsTab:"overview" }),
+      goWsDocs: () => this.setState({ wsTab:"docs" }),
+      goWsTasks: () => this.setState({ wsTab:"tasks" }),
+      goWsGantt: () => this.setState({ wsTab:"gantt" }),
+      goWsApprovals: () => this.setState({ wsTab:"approvals" }),
+      goWsFinance: () => this.setState({ wsTab:"finance" }),
+      goWsActivity: () => this.setState({ wsTab:"activity" }),
+      phases, milestones, docCategories, documents, versions, taskColumns, ganttRows, installments,
+      ganttMonths: ["May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
+      team: [
+        { initials:"AG", name:"Adrián Gutiérrez", role:"Principal" },
+        { initials:"CM", name:"Camila Moreira", role:"Proyectista" },
+        { initials:"JP", name:"Juan P. Rosales", role:"Obra" },
+      ],
+      activity: [
+        { time:"HOY 16:45", text:"Pago recibido — Casa EG, cuota 2 de 3 ($11,200)" },
+        { time:"HOY 14:30", text:"Fachada principal V04 enviada a revisión del cliente" },
+        { time:"AYER", text:"Planos estructurales marcados como atrasados" },
+        { time:"20.08", text:"Camila Moreira actualizó Planta baja a V03" },
+        { time:"18.08", text:"Reunión de obra registrada — 3 observaciones" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

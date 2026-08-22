@@ -251,6 +251,72 @@ estructurales que introdujo, más allá de estilos:
   (nombre del estudio + equipo reales; sin los campos de color/dominio
   del mockup, que no existen en el modelo de datos).
 
+## 6e. Segundo rediseño visual sobre `DISEÑO PROFESIONAL/ARCHI.OS v2.dc.html`
+
+El usuario le pidió a Claude Design una guía visual distinta ("un diseño
+mejor"), entregada como `diseño profesional.zip` y extraída a
+`DISEÑO PROFESIONAL/`. Es una dirección de arte completamente nueva —no
+una iteración de §6d— y su propio `github.md` la declara "independiente
+de la marca del sitio público". Reemplaza el sistema de §6d por completo
+en el dashboard y el portal (el sitio público sigue sin tocarse).
+
+- **Segundo par de tokens en `app/globals.css`**: junto a los tokens del
+  sitio público (`--color-hueso/carbon/naranja/…`) y sin tocarlos, se
+  agregó una paleta "papel/tinta"
+  (`--color-papel/superficie/filete/corte/concreto/grafito/tinta/acento`)
+  y tres fuentes propias del dashboard/portal
+  (`--font-dp-serif` = Instrument Serif, `--font-dp-sans` = Archivo,
+  `--font-dp-mono` = JetBrains Mono, cargadas en `lib/dp-fonts.ts` vía
+  `next/font/google`). El `--color-noche` de §6d (sidebar oscuro) se
+  eliminó — este pase no tiene sidebar oscuro.
+- **Radio 0 en todo el dashboard/portal**: identidad explícita del
+  mockup ("la esquina viva es parte del sistema"), documentada también
+  en la propia lámina de referencia del producto
+  (`/dashboard/design-system`). Reemplaza los `rounded-[10px]`/`rounded-lg`
+  de §6d.
+- **Sin iconos**: se retiró `lucide-react` del dashboard/portal (y del
+  `package.json`) — todo es tipográfico: índices numerados (01, 02…),
+  flechas de texto (`←`/`→`) y una marca geométrica (`StatusMark`).
+- **Disciplina de estado reemplaza los badges de color**: `StatusBadge`
+  (pastilla de 5 tonos) se eliminó; en su lugar, `StatusLabel` (texto
+  con color/peso, 3 tonos: `resolved`/`attention`/`neutral`) para
+  estados nombrados en tablas/listas, y `StatusMark` (cuadrado
+  relleno/hueco/rombo rojo/cuadrado gris) para líneas de tiempo,
+  versiones de documento y prioridades. El mapeo estado→tono por
+  dominio (lead, proyecto, fase, cotización, contrato, pago) vive en
+  `lib/supabase/types.ts` junto a cada enum.
+- **Navegación reestructurada**: `SheetHeader` (barra superior fija con
+  breadcrumb + `CommandPalette` + fecha) reemplaza el header simple de
+  §6d; el sidebar pasa de oscuro a un índice numerado agrupado
+  (`components/dashboard/nav-items.ts` centraliza `NAV_GROUPS`,
+  `CRUMBS` y los atajos de la paleta de comandos). Leads/Clientes/
+  Pipeline son 3 entradas de nav separadas que siguen apuntando al mismo
+  `/dashboard/crm?tab=` de §6d — solo cambió el nav, no la arquitectura
+  de rutas.
+- **`CommandPalette` real** (`⌘K`/`Ctrl+K`): modal client-side que
+  filtra por texto una lista estática de destinos reales (rutas del
+  nav, accesos rápidos de creación, atajos a Archi AI) y navega con
+  `useRouter().push()` — sin búsqueda simulada.
+- **Nueva pantalla `/dashboard/design-system`**: lámina de referencia
+  estática (tipografía, paleta con hex reales, disciplina de estado,
+  retícula, componentes, breakpoints) — contenido 100% documental, sin
+  fetch de datos.
+- **Portal del cliente vuelve a ser una sola página larga sin tabs**: se
+  retiró la navegación `?tab=` que había introducido §6d en
+  `/portal/projects/[id]` — el mockup v2 muestra hero + progreso/fases
+  inline + próximo hito + aprobación destacada + documentos + pagos +
+  mensajes en un solo scroll.
+- **Website gana un tercer tab "Fuentes"**: la tabla "de la fuente al
+  ingreso" (antes en `/dashboard/marketing`) se movió a
+  `/dashboard/website?tab=fuentes`; Marketing pasó a ser un embudo
+  agregado de 5 etapas (Visitas–gated a GA4/Leads/Clientes/Proyectos/
+  Ingresos–reales) en vez de la tabla por canal.
+- **Archi AI gana "Señales detectadas"**: además de las sugerencias con
+  botón "Ejecutar" (que navegan a la pantalla real, ya existían en §6d
+  como texto), se agregaron dos señales calculadas con datos propios
+  (tarea más atrasada, mayor pendiente de cobro) — no hay insights de
+  IA inventados sin un LLM real detrás.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

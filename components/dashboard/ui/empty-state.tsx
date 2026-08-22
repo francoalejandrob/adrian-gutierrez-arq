@@ -1,24 +1,22 @@
-import type { LucideIcon } from "lucide-react";
+// No icon library in the dashboard/portal system — a hollow mark stands
+// in for an icon, matching the mockup's pure typography/mark language.
+import StatusMark from "./status-mark";
 
 export default function EmptyState({
-  icon: Icon,
   title,
   description,
   action,
 }: {
-  icon: LucideIcon;
   title: string;
   description?: string;
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-3 py-12 text-center">
-      <div className="flex h-11 w-11 items-center justify-center rounded-full border border-carbon/15 text-carbon/40">
-        <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
-      </div>
+    <div className="flex flex-col items-center gap-4 py-16 text-center">
+      <StatusMark tone="pending" className="h-3 w-3" />
       <div>
-        <p className="text-sm font-medium text-carbon/70">{title}</p>
-        {description && <p className="mt-1 text-sm text-carbon/40">{description}</p>}
+        <p className="font-dp-sans text-[13.5px] text-grafito">{title}</p>
+        {description && <p className="mt-1.5 font-dp-sans text-[12.5px] text-concreto">{description}</p>}
       </div>
       {action}
     </div>

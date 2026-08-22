@@ -11,25 +11,27 @@ const REPORTS = [
 export default function ReportsPage() {
   return (
     <div>
-      <PageHeader title="Reportes" />
+      <PageHeader eyebrow="Inteligencia" title="Reportes" />
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {REPORTS.map((report) => (
-          <div key={report.type} className="rounded-[10px] border border-carbon/[0.08] bg-white p-6">
-            <p className="mb-1.5 font-display text-[17px] font-medium text-carbon">{report.title}</p>
-            <p className="mb-[18px] text-[12.5px] text-carbon/50">{report.desc}</p>
-            <div className="flex gap-2">
+      <div>
+        {REPORTS.map((report, i) => (
+          <div key={report.type} className="flex items-center justify-between gap-8 border-b border-filete px-12 py-6">
+            <div className="flex items-baseline gap-4">
+              <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <p className="font-dp-serif text-xl text-tinta">{report.title}</p>
+                <p className="mt-1 font-dp-sans text-[12.5px] text-concreto">{report.desc}</p>
+              </div>
+            </div>
+            <div className="flex shrink-0 gap-6 font-dp-mono text-[10px] uppercase tracking-[0.1em]">
               <Link
                 href={`/dashboard/reports/${report.type}/print`}
                 target="_blank"
-                className="rounded-lg border border-carbon/15 px-3.5 py-1.5 text-xs text-carbon transition-colors duration-150 hover:border-carbon"
+                className="text-concreto hover:text-tinta"
               >
                 PDF
               </Link>
-              <a
-                href={`/api/reports/${report.type}/csv`}
-                className="rounded-lg border border-carbon/15 px-3.5 py-1.5 text-xs text-carbon transition-colors duration-150 hover:border-carbon"
-              >
+              <a href={`/api/reports/${report.type}/csv`} className="text-concreto hover:text-tinta">
                 CSV
               </a>
             </div>

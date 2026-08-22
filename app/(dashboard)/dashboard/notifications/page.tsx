@@ -1,16 +1,11 @@
-import { Bell } from "lucide-react";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
+import StatusMark from "@/components/dashboard/ui/status-mark";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { createClient } from "@/lib/supabase/server";
 import { markAllNotificationsRead, markNotificationRead } from "./actions";
 
-const TYPE_DOT: Record<string, string> = {
-  "lead.created": "bg-naranja-oscuro",
-  "document.responded": "bg-[#3a7a56]",
-  "quote.responded": "bg-[#3a7a56]",
-  "message.received": "bg-naranja-oscuro",
-};
+const ATTENTION_TYPES = new Set(["lead.created", "message.received"]);
 
 export default async function NotificationsPage() {
   const supabase = await createClient();
@@ -23,8 +18,9 @@ export default async function NotificationsPage() {
   const unreadCount = (notifications ?? []).filter((n) => !n.read_at).length;
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <PageHeader
+        eyebrow="Sistema"
         title="Notificaciones"
         action={
           unreadCount > 0 && (
@@ -38,22 +34,24 @@ export default async function NotificationsPage() {
       />
 
       {(notifications ?? []).length > 0 ? (
-        <div className="mt-8 flex flex-col">
+        <div>
           {(notifications ?? []).map((notification) => (
-            <div key={notification.id} className="flex items-start gap-3.5 border-b border-carbon/[0.07] py-4 last:border-0">
-              <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${TYPE_DOT[notification.type] ?? "bg-piedra"}`} />
+            <div key={notification.id} className="flex items-start gap-4 border-b border-filete px-12 py-5 last:border-0">
+              <span className="mt-1.5 shrink-0">
+                <StatusMark tone={notification.read_at ? "historic" : ATTENTION_TYPES.has(notification.type) ? "attention" : "pending"} />
+              </span>
               <div className="min-w-0 flex-1">
-                <p className={`text-[14px] ${notification.read_at ? "text-carbon/70" : "font-medium text-carbon"}`}>
+                <p className={`font-dp-sans text-[14px] ${notification.read_at ? "text-grafito" : "text-tinta"}`}>
                   {notification.title}
                 </p>
-                {notification.body && <p className="mt-1 text-[13px] text-carbon/55">{notification.body}</p>}
-                <p className="mt-1.5 font-mono text-[11.5px] text-carbon/40">
+                {notification.body && <p className="mt-1 font-dp-sans text-[13px] text-concreto">{notification.body}</p>}
+                <p className="mt-2 font-dp-mono text-[10.5px] text-concreto">
                   {new Date(notification.created_at).toLocaleString("es-EC")}
                 </p>
               </div>
               {!notification.read_at && (
                 <form action={markNotificationRead.bind(null, notification.id)} className="shrink-0">
-                  <SubmitButton variant="ghost" size="sm">
+                  <SubmitButton variant="tertiary" size="sm">
                     Marcar leída
                   </SubmitButton>
                 </form>
@@ -62,9 +60,7 @@ export default async function NotificationsPage() {
           ))}
         </div>
       ) : (
-        <div className="mt-8 rounded-[10px] border border-carbon/[0.08] bg-white">
-          <EmptyState icon={Bell} title="Sin notificaciones todavía" />
-        </div>
+        <EmptyState title="Sin notificaciones todavía" />
       )}
     </div>
   );

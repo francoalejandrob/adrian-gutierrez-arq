@@ -26,7 +26,7 @@ export default function DownloadButton({
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className="cursor-pointer text-carbon/60 underline underline-offset-2 hover:text-carbon disabled:cursor-wait"
+      className="cursor-pointer font-dp-mono text-[10.5px] uppercase tracking-[0.08em] text-concreto underline underline-offset-2 hover:text-tinta disabled:cursor-wait"
     >
       {loading ? "Generando…" : "Descargar"}
     </button>

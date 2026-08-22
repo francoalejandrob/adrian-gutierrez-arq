@@ -16,22 +16,22 @@ export default async function PortalHomePage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-medium text-carbon">Tus proyectos</h1>
-      <div className="mt-6 flex flex-col gap-3">
+      <h1 className="font-dp-serif text-3xl text-tinta">Tus proyectos</h1>
+      <div className="mt-7 flex flex-col">
         {(projects ?? []).map((project) => (
           <Link
             key={project.id}
             href={`/portal/projects/${project.id}`}
-            className="flex items-center justify-between rounded-[10px] border border-carbon/[0.08] bg-white p-[18px] text-sm transition-colors duration-150 hover:border-carbon/25"
+            className="flex items-center justify-between border-b border-filete py-4 last:border-0"
           >
-            <span className="font-medium text-carbon">{project.name}</span>
-            <span className="font-mono text-xs text-carbon/50">
+            <span className="font-dp-sans text-[14px] text-tinta">{project.name}</span>
+            <span className="font-dp-mono text-[11px] text-concreto">
               {PROJECT_STATUS_LABELS[project.status as ProjectStatus]} · {project.progress}%
             </span>
           </Link>
         ))}
         {(projects ?? []).length === 0 && (
-          <p className="text-sm text-carbon/50">
+          <p className="font-dp-sans text-sm text-concreto">
             Todavía no tienes proyectos asociados a esta cuenta. Si esperabas ver algo aquí,
             contacta al estudio.
           </p>

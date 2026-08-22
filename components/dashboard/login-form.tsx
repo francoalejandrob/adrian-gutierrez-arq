@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { CheckCircle2, Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/dashboard/ui/button";
 import { inputClass, labelClass } from "@/components/dashboard/ui/styles";
@@ -38,9 +37,8 @@ export default function LoginForm({ next = "/dashboard" }: { next?: string }) {
 
   if (status === "sent") {
     return (
-      <div className="flex items-start gap-3">
-        <CheckCircle2 size={20} strokeWidth={1.75} className="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" />
-        <p className="text-sm text-carbon/70">
+      <div className="border-l-2 border-tinta pl-4">
+        <p className="font-dp-sans text-sm leading-relaxed text-grafito">
           Te enviamos un enlace de acceso. Revisa tu correo y ábrelo en este
           mismo navegador.
         </p>
@@ -49,8 +47,8 @@ export default function LoginForm({ next = "/dashboard" }: { next?: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <div className="flex flex-col gap-2">
         <label htmlFor="email" className={labelClass}>
           Correo
         </label>
@@ -66,18 +64,17 @@ export default function LoginForm({ next = "/dashboard" }: { next?: string }) {
       </div>
 
       {status === "error" && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="font-dp-sans text-[13px] text-acento">
           {error}
         </p>
       )}
 
-      <Button type="submit" disabled={status === "loading"} size="lg" className="w-full">
-        {status !== "loading" && <Send size={15} strokeWidth={1.75} aria-hidden="true" />}
-        {status === "loading" ? "Enviando…" : "Enviar enlace mágico"}
+      <Button type="submit" disabled={status === "loading"} size="lg" className="w-full justify-center">
+        {status === "loading" ? "Enviando…" : "Enviar enlace de acceso"}
       </Button>
 
-      <p className="text-center text-[11.5px] text-carbon/40">
-        Sin contraseña — te enviamos un enlace de acceso.
+      <p className="text-center font-dp-sans text-[12px] leading-relaxed text-concreto">
+        Sin contraseñas. Enviamos un enlace de un solo uso válido por 15 minutos.
       </p>
     </form>
   );

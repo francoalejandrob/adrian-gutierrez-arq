@@ -1,17 +1,19 @@
 export default function PageHeader({
+  eyebrow,
   title,
-  description,
   action,
 }: {
+  eyebrow?: string;
   title: string;
-  description?: string;
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="flex items-end justify-between gap-10 border-b border-corte px-12 pb-[30px] pt-[52px]">
       <div>
-        <h1 className="font-display text-[30px] font-medium text-carbon">{title}</h1>
-        {description && <p className="mt-1.5 text-[13.5px] text-carbon/55">{description}</p>}
+        {eyebrow && (
+          <p className="mb-[18px] font-dp-mono text-[10px] uppercase tracking-[0.16em] text-concreto">{eyebrow}</p>
+        )}
+        <h1 className="font-dp-serif text-[52px] leading-none tracking-[-0.015em] text-tinta">{title}</h1>
       </div>
       {action}
     </div>

@@ -269,3 +269,35 @@ Dark del mockup es una demo del propio editor de diseño, no un sistema
 de temas pedido); el chrome de "⌘K Buscar" y los pills Admin/Portal/
 Login del mockup (son chrome del editor de diseño de Claude para
 previsualizar los 3 modos, no parte del producto).
+
+## Segundo rediseño visual (`DISEÑO PROFESIONAL/ARCHI.OS v2.dc.html`) ✅
+
+Pase transversal pedido después del anterior: el usuario le pidió a
+Claude Design "un diseño mejor", entregado como
+`diseño profesional.zip`. Es una dirección de arte completamente nueva
+(tipografía Instrument Serif/Archivo/JetBrains Mono, paleta
+papel/tinta con un único acento, radio 0px, cero iconos, disciplina de
+estado texto+marca en vez de badges de color) que reemplaza el pase
+anterior por completo en dashboard y portal — el sitio público no se
+tocó. Ver `ARCHITECTURE.md` §6e para el detalle técnico completo
+(tokens, componentes nuevos, mapeo de estado por dominio).
+
+Agregó una pantalla nueva:
+
+- **Design system** (`/dashboard/design-system`) — lámina de referencia
+  estática con la tipografía, paleta, disciplina de estado, retícula,
+  componentes y breakpoints reales del sistema. Contenido 100%
+  documental, sin datos.
+
+Y confirmó, con dos preguntas explícitas al usuario, dos decisiones que
+en el pase anterior habían quedado implícitas: la paleta de comandos
+(`⌘K`) se construyó real y funcional (no como chrome decorativo), y la
+lámina de Design System se construyó como página real del panel.
+
+**Deliberadamente no incluido** (mismo criterio que el pase anterior):
+el segmented control "Estudio / Cliente / Acceso" del mockup (chrome
+del editor de diseño — cada superficie ya vive en su propia ruta
+autenticada real); "17 Modo tinta" (dark mode, sigue siendo demo, no
+una feature pedida); datos que el mockup inventa y que no hay forma de
+calcular real (p. ej. "Impacto en cronograma" en Aprobaciones, "Revisor"
+como concepto distinto del cliente) — se omiten en vez de inventarse.

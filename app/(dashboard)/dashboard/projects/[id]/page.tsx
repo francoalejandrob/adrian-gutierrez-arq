@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import GanttChart from "@/components/dashboard/gantt-chart";
 import ProjectForm from "@/components/dashboard/project-form";
 import StatusSelect from "@/components/dashboard/status-select";
 import DownloadButton from "@/components/dashboard/download-button";
 import Section from "@/components/dashboard/ui/section";
-import StatusBadge from "@/components/dashboard/ui/status-badge";
+import StatusLabel from "@/components/dashboard/ui/status-label";
+import StatusMark from "@/components/dashboard/ui/status-mark";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { inputClass, selectClass } from "@/components/dashboard/ui/styles";
 import { createClient } from "@/lib/supabase/server";
@@ -61,9 +61,9 @@ const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "
 
 const TABS = [
   { key: "overview", label: "Overview" },
+  { key: "docs", label: "Documentos" },
   { key: "tasks", label: "Tareas" },
   { key: "gantt", label: "Cronograma" },
-  { key: "docs", label: "Documentos" },
   { key: "approvals", label: "Aprobaciones" },
   { key: "finance", label: "Finanzas" },
   { key: "activity", label: "Actividad" },
@@ -156,10 +156,8 @@ export default async function ProjectDetailPage(
   const boundCreatePayment = createPayment.bind(null, id);
   const boundCreateExpense = createExpense.bind(null, id);
 
-  const tasksByPhase = new Map<string | null, Task[]>();
   const tasksByStatus = new Map<string, Task[]>();
   for (const task of tasks ?? []) {
-    tasksByPhase.set(task.phase_id, [...(tasksByPhase.get(task.phase_id) ?? []), task]);
     tasksByStatus.set(task.status, [...(tasksByStatus.get(task.status) ?? []), task]);
   }
 
@@ -184,48 +182,52 @@ export default async function ProjectDetailPage(
     })
     .filter((x): x is { doc: DocumentRow; version: DocVersionRow } => x !== null);
 
+  const docsByCategory = new Map<string, number>();
+  for (const doc of documents ?? []) {
+    docsByCategory.set(doc.category, (docsByCategory.get(doc.category) ?? 0) + 1);
+  }
+
   return (
-    <div className="max-w-4xl">
-      <Link
-        href="/dashboard/projects"
-        className="mb-4 inline-flex items-center gap-1.5 text-[12.5px] text-carbon/45 transition-colors duration-150 hover:text-carbon"
-      >
-        <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
-        Proyectos
-      </Link>
-
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="font-display text-[30px] font-medium text-carbon">{project.name}</h1>
-          <p className="mt-1.5 text-[13.5px] text-carbon/50">
-            {project.category ?? "Proyecto"} · {project.clients?.name}
-            {project.location ? ` · ${project.location}` : ""}
-          </p>
+    <div>
+      <div className="border-b border-corte px-12 pb-[30px] pt-[52px]">
+        <Link
+          href="/dashboard/projects"
+          className="mb-[18px] inline-block font-dp-mono text-[10px] uppercase tracking-[0.14em] text-concreto hover:text-tinta"
+        >
+          ← Proyectos
+        </Link>
+        <div className="flex items-end justify-between gap-10">
+          <div>
+            <h1 className="font-dp-serif text-[44px] leading-none tracking-[-0.015em] text-tinta">{project.name}</h1>
+            <p className="mt-3 font-dp-sans text-[13px] text-concreto">
+              {project.category ?? "Proyecto"} · {project.clients?.name}
+              {project.location ? ` · ${project.location}` : ""}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="font-dp-mono text-[36px] leading-none text-tinta">{project.progress}%</p>
+            <p className="mt-2 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Completado</p>
+          </div>
         </div>
-        <div className="text-right">
-          <p className="font-mono text-[30px] font-medium text-carbon">{project.progress}%</p>
-          <p className="mt-0.5 text-[11px] uppercase tracking-[0.06em] text-carbon/45">Completado</p>
+        <div className="mt-5">
+          <StatusSelect
+            action={boundUpdateStatus}
+            defaultValue={project.status}
+            options={PROJECT_STATUSES.map((status) => ({
+              value: status,
+              label: PROJECT_STATUS_LABELS[status],
+            }))}
+          />
         </div>
       </div>
 
-      <div className="mt-3">
-        <StatusSelect
-          action={boundUpdateStatus}
-          defaultValue={project.status}
-          options={PROJECT_STATUSES.map((status) => ({
-            value: status,
-            label: PROJECT_STATUS_LABELS[status],
-          }))}
-        />
-      </div>
-
-      <div className="mt-6 flex gap-6 overflow-x-auto border-b border-carbon/[0.1]">
+      <div className="flex gap-8 overflow-x-auto border-b border-corte px-12">
         {TABS.map((t) => (
           <Link
             key={t.key}
             href={`/dashboard/projects/${id}?tab=${t.key}`}
-            className={`whitespace-nowrap border-b-2 pb-3 text-[13.5px] transition-colors duration-150 ${
-              tab === t.key ? "border-carbon font-medium text-carbon" : "border-transparent text-carbon/50 hover:text-carbon"
+            className={`whitespace-nowrap border-b-2 py-3.5 font-dp-mono text-[10.5px] uppercase tracking-[0.12em] transition-colors duration-150 ${
+              tab === t.key ? "border-tinta text-tinta" : "border-transparent text-concreto hover:text-tinta"
             }`}
           >
             {t.label}
@@ -234,54 +236,126 @@ export default async function ProjectDetailPage(
       </div>
 
       {tab === "overview" && (
-        <div className="mt-8">
-          <Section title="Fases del proyecto" variant="plain">
+        <div className="grid grid-cols-1 gap-12 px-12 py-10 lg:grid-cols-[1.4fr_1fr]">
+          <Section title="Fases del proyecto">
             <div className="flex flex-col">
               {(phases ?? []).map((phase, i) => (
                 <PhaseRow key={phase.id} phase={phase} isCurrent={isCurrentPhase(phases ?? [], i)} />
               ))}
-              {(phases ?? []).length === 0 && <p className="text-sm text-carbon/40">Sin fases todavía.</p>}
+              {(phases ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin fases todavía.</p>}
             </div>
           </Section>
 
-          <div className="mt-10 grid grid-cols-1 gap-10 sm:grid-cols-2">
-            <div>
-              <p className="mb-4 text-[11px] uppercase tracking-[0.09em] text-carbon/40">Próximos hitos</p>
+          <div className="flex flex-col gap-10">
+            <Section title="Próximos hitos">
               <div className="flex flex-col gap-3">
                 {upcomingTasks.map((t) => {
                   const overdue = (t.due_date ?? "") < today;
                   return (
-                    <div key={t.id} className="flex justify-between text-[13.5px]">
-                      <span className="text-carbon/80">{t.title}</span>
-                      <span className={`font-mono ${overdue ? "text-[#a4432b]" : "text-carbon/50"}`}>
+                    <div key={t.id} className="flex justify-between font-dp-sans text-[13px]">
+                      <span className="text-grafito">{t.title}</span>
+                      <span className={`font-dp-mono text-[11px] ${overdue ? "text-acento" : "text-concreto"}`}>
                         {overdue ? "vencido" : new Date(t.due_date!).toLocaleDateString("es-EC", { day: "numeric", month: "short" })}
                       </span>
                     </div>
                   );
                 })}
-                {upcomingTasks.length === 0 && <p className="text-sm text-carbon/40">Sin próximos hitos.</p>}
+                {upcomingTasks.length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin próximos hitos.</p>}
               </div>
-            </div>
-            <div>
-              <p className="mb-4 text-[11px] uppercase tracking-[0.09em] text-carbon/40">Documentos recientes</p>
+            </Section>
+            <Section title="Documentos recientes">
               <div className="flex flex-col gap-3">
                 {recentVersions.map((v) => (
-                  <div key={v.id} className="flex justify-between text-[13.5px]">
-                    <span className="truncate text-carbon/80">{v.docName} — v{v.version}</span>
-                    <span className="shrink-0 font-mono text-carbon/50">{relativeDay(v.created_at)}</span>
+                  <div key={v.id} className="flex justify-between gap-3 font-dp-sans text-[13px]">
+                    <span className="truncate text-grafito">{v.docName} — v{v.version}</span>
+                    <span className="shrink-0 font-dp-mono text-[11px] text-concreto">{relativeDay(v.created_at)}</span>
                   </div>
                 ))}
-                {recentVersions.length === 0 && <p className="text-sm text-carbon/40">Sin documentos todavía.</p>}
+                {recentVersions.length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin documentos todavía.</p>}
               </div>
-            </div>
+            </Section>
           </div>
         </div>
       )}
 
+      {tab === "docs" && (
+        <div className="px-12 py-10">
+          {docsByCategory.size > 0 && (
+            <div className="mb-8 flex flex-wrap gap-x-8 gap-y-2 border-b border-filete pb-6">
+              {[...docsByCategory.entries()].map(([category, count]) => (
+                <span key={category} className="font-dp-mono text-[10px] uppercase tracking-[0.1em] text-concreto">
+                  {DOC_CATEGORY_LABELS[category as keyof typeof DOC_CATEGORY_LABELS]} <span className="text-tinta">{count}</span>
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="flex flex-col">
+            {(documents ?? []).map((doc) => (
+              <div key={doc.id} className="border-b border-filete py-4 last:border-0">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-dp-sans text-[13.5px] text-tinta">
+                    {doc.name}{" "}
+                    <span className="font-dp-mono text-[10.5px] text-concreto">({DOC_CATEGORY_LABELS[doc.category]})</span>
+                    {doc.visibility === "client" && (
+                      <span className="ml-2.5 font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-acento">
+                        Visible para el cliente
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <ul className="mt-2.5 flex flex-col gap-1.5">
+                  {doc.document_versions
+                    .sort((a, b) => b.version - a.version)
+                    .map((version, vi) => (
+                      <li key={version.id} className="flex items-center gap-3 font-dp-sans text-xs text-concreto">
+                        <StatusMark tone={vi === 0 ? (version.status === "aprobado" ? "resolved" : "attention") : "historic"} />
+                        <span className="flex-1">
+                          v{version.version} — {new Date(version.created_at).toLocaleDateString("es-EC")}
+                          {version.comment ? ` — ${version.comment}` : ""}
+                        </span>
+                        <DownloadButton storagePath={version.storage_path} getUrl={getSignedDownloadUrl} />
+                      </li>
+                    ))}
+                </ul>
+                <form action={boundUpload} className="mt-3 flex items-center gap-2.5">
+                  <input type="hidden" name="document_id" value={doc.id} />
+                  <input type="file" name="file" required className="font-dp-sans text-xs text-grafito" />
+                  <input name="comment" placeholder="Comentario (opcional)" className={`flex-1 px-2.5 py-1.5 text-xs ${inputClass}`} />
+                  <SubmitButton variant="secondary" size="sm" pendingLabel="Subiendo…">
+                    Nueva versión
+                  </SubmitButton>
+                </form>
+              </div>
+            ))}
+            {(documents ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin documentos todavía.</p>}
+          </div>
+
+          <form action={boundUpload} className="mt-8 grid grid-cols-4 gap-2.5 border-t border-filete pt-8">
+            <input name="name" placeholder="Nombre del documento" required className={`col-span-2 ${inputClass}`} />
+            <select name="category" className={selectClass}>
+              {DOC_CATEGORIES.map((category) => (
+                <option key={category} value={category}>
+                  {DOC_CATEGORY_LABELS[category]}
+                </option>
+              ))}
+            </select>
+            <input type="file" name="file" required className="font-dp-sans text-sm text-grafito" />
+            <label className="col-span-4 flex items-center gap-2 font-dp-sans text-xs text-grafito">
+              <input type="checkbox" name="visible_to_client" value="1" />
+              Visible para el cliente en su portal
+            </label>
+            <SubmitButton variant="secondary" size="sm" pendingLabel="Subiendo…" className="col-span-4 w-fit">
+              Subir documento nuevo
+            </SubmitButton>
+          </form>
+        </div>
+      )}
+
       {tab === "tasks" && (
-        <div className="mt-8">
-          <div className="mb-4 flex justify-end">
-            <form action={boundCreateTask} className="flex gap-2">
+        <div className="px-12 py-10">
+          <div className="mb-6 flex justify-end">
+            <form action={boundCreateTask} className="flex gap-2.5">
               <input name="title" placeholder="Nueva tarea" required className={inputClass} />
               <select name="phase_id" className={selectClass}>
                 <option value="">Sin fase</option>
@@ -297,23 +371,23 @@ export default async function ProjectDetailPage(
               </SubmitButton>
             </form>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {TASK_STATUSES.map((status) => (
-              <div key={status}>
-                <p className="mb-2.5 text-[11.5px] uppercase tracking-wide text-carbon/45">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            {TASK_STATUSES.map((status, si) => (
+              <div key={status} className={si > 0 ? "lg:border-l lg:border-filete lg:pl-6" : ""}>
+                <p className="mb-3 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
                   {TASK_STATUS_LABELS[status]} · {(tasksByStatus.get(status) ?? []).length}
                 </p>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2.5">
                   {(tasksByStatus.get(status) ?? []).map((task) => (
-                    <div key={task.id} className="rounded-[10px] border border-carbon/[0.08] bg-white p-3">
-                      <p className="mb-2 text-[13px] font-medium text-carbon">{task.title}</p>
+                    <div key={task.id} className="border border-filete bg-superficie p-3.5">
+                      <p className="mb-2.5 font-dp-sans text-[12.5px] text-tinta">{task.title}</p>
                       <div className="flex items-center justify-between">
                         {task.due_date && (
-                          <span className="font-mono text-[11px] text-carbon/45">
+                          <span className="font-dp-mono text-[10.5px] text-concreto">
                             {new Date(task.due_date).toLocaleDateString("es-EC", { day: "numeric", month: "short" })}
                           </span>
                         )}
-                        <div className="ml-auto flex items-center gap-1.5">
+                        <div className="ml-auto flex items-center gap-2">
                           <StatusSelect
                             action={updateTaskStatus.bind(null, id, task.id)}
                             defaultValue={task.status}
@@ -336,87 +410,24 @@ export default async function ProjectDetailPage(
       )}
 
       {tab === "gantt" && (
-        <div className="mt-8 rounded-[10px] border border-carbon/[0.08] bg-white p-6">
+        <div className="px-12 py-10">
           <GanttChart phases={phases ?? []} />
         </div>
       )}
 
-      {tab === "docs" && (
-        <div className="mt-8">
-          <div className="flex flex-col">
-            {(documents ?? []).map((doc) => (
-              <div key={doc.id} className="border-b border-carbon/[0.06] py-3.5 last:border-0">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-carbon">
-                    {doc.name}{" "}
-                    <span className="text-xs font-normal text-carbon/40">({DOC_CATEGORY_LABELS[doc.category]})</span>
-                    {doc.visibility === "client" && (
-                      <span className="ml-2 rounded-full border border-naranja/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-naranja-oscuro">
-                        Visible para el cliente
-                      </span>
-                    )}
-                  </p>
-                </div>
-                <ul className="mt-1.5 flex flex-col gap-1">
-                  {doc.document_versions
-                    .sort((a, b) => b.version - a.version)
-                    .map((version) => (
-                      <li key={version.id} className="flex items-center justify-between text-xs text-carbon/60">
-                        <span>
-                          v{version.version} — {new Date(version.created_at).toLocaleDateString("es-EC")}
-                          {version.comment ? ` — ${version.comment}` : ""}
-                        </span>
-                        <DownloadButton storagePath={version.storage_path} getUrl={getSignedDownloadUrl} />
-                      </li>
-                    ))}
-                </ul>
-                <form action={boundUpload} className="mt-2.5 flex items-center gap-2">
-                  <input type="hidden" name="document_id" value={doc.id} />
-                  <input type="file" name="file" required className="text-xs" />
-                  <input name="comment" placeholder="Comentario (opcional)" className={`flex-1 px-2.5 py-1.5 text-xs ${inputClass}`} />
-                  <SubmitButton variant="secondary" size="sm" pendingLabel="Subiendo…">
-                    Nueva versión
-                  </SubmitButton>
-                </form>
-              </div>
-            ))}
-            {(documents ?? []).length === 0 && <p className="text-sm text-carbon/40">Sin documentos todavía.</p>}
-          </div>
-
-          <form action={boundUpload} className="mt-6 grid grid-cols-4 gap-2">
-            <input name="name" placeholder="Nombre del documento" required className={`col-span-2 ${inputClass}`} />
-            <select name="category" className={selectClass}>
-              {DOC_CATEGORIES.map((category) => (
-                <option key={category} value={category}>
-                  {DOC_CATEGORY_LABELS[category]}
-                </option>
-              ))}
-            </select>
-            <input type="file" name="file" required className="text-sm" />
-            <label className="col-span-4 flex items-center gap-2 text-xs text-carbon/70">
-              <input type="checkbox" name="visible_to_client" value="1" />
-              Visible para el cliente en su portal
-            </label>
-            <SubmitButton variant="secondary" size="sm" pendingLabel="Subiendo…" className="col-span-4 w-fit">
-              Subir documento nuevo
-            </SubmitButton>
-          </form>
-        </div>
-      )}
-
       {tab === "approvals" && (
-        <div className="mt-8 flex flex-col gap-6">
+        <div className="flex flex-col gap-8 px-12 py-10">
           {pendingApprovals.map(({ doc, version }) => (
-            <div key={version.id} className="max-w-lg rounded-[10px] border border-carbon/[0.08] bg-white">
-              <div className="flex aspect-[16/10] items-center justify-center bg-[repeating-linear-gradient(135deg,#e4dfd4,#e4dfd4_10px,#ecebe4_10px,#ecebe4_20px)]">
-                <span className="font-mono text-xs text-carbon/45">[ {doc.name} — v{version.version} ]</span>
+            <div key={version.id} className="max-w-lg border border-filete">
+              <div className="dp-grain-strong flex aspect-[16/10] items-center justify-center">
+                <span className="font-dp-mono text-xs text-grafito">[ {doc.name} — v{version.version} ]</span>
               </div>
-              <div className="p-6">
-                <p className="mb-1 text-[11px] uppercase tracking-[0.07em] text-carbon/40">
+              <div className="p-7">
+                <p className="mb-1.5 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
                   {doc.name} · Versión {version.version}
                 </p>
                 {version.comment && (
-                  <p className="mb-4 font-display text-sm italic text-carbon/70">&ldquo;{version.comment}&rdquo;</p>
+                  <p className="mb-5 font-dp-serif text-lg italic text-grafito">&ldquo;{version.comment}&rdquo;</p>
                 )}
                 <form action={updateDocumentVersionStatus.bind(null, id, version.id)} className="flex gap-2.5">
                   <SubmitButton size="md" variant="primary" className="flex-1" pendingLabel="Guardando…" name="status" value="aprobado">
@@ -429,41 +440,39 @@ export default async function ProjectDetailPage(
               </div>
             </div>
           ))}
-          {pendingApprovals.length === 0 && <p className="text-sm text-carbon/40">Sin aprobaciones pendientes.</p>}
+          {pendingApprovals.length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin aprobaciones pendientes.</p>}
         </div>
       )}
 
       {tab === "finance" && (
-        <div className="mt-8">
-          <Section title="Resumen financiero">
-            <div className="grid grid-cols-5 gap-4 text-center">
-              <SummaryStat label="Contratado" value={currency.format(contracted)} />
-              <SummaryStat label="Cobrado" value={currency.format(collected)} />
-              <SummaryStat label="Pendiente" value={currency.format(pending)} />
-              <SummaryStat label="Gastos" value={currency.format(spent)} />
-              <SummaryStat label="Margen" value={currency.format(margin)} />
-            </div>
-          </Section>
+        <div className="flex flex-col gap-10 px-12 py-10">
+          <div className="grid grid-cols-5 border-y border-corte">
+            <SummaryStat label="Contratado" value={currency.format(contracted)} />
+            <SummaryStat label="Cobrado" value={currency.format(collected)} />
+            <SummaryStat label="Pendiente" value={currency.format(pending)} />
+            <SummaryStat label="Gastos" value={currency.format(spent)} />
+            <SummaryStat label="Margen" value={currency.format(margin)} last />
+          </div>
 
           <Section title="Cotizaciones">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col">
               {(quotes ?? []).map((quote) => {
                 const { total } = quoteTotal(quote.quote_items, quote.discount, quote.tax_rate);
                 return (
                   <Link
                     key={quote.id}
                     href={`/dashboard/quotes/${quote.id}`}
-                    className="flex items-center justify-between gap-3 border-b border-carbon/5 pb-3 text-sm transition-colors duration-100 last:border-0 hover:text-naranja-oscuro"
+                    className="flex items-center justify-between gap-3 border-b border-filete py-3.5 font-dp-sans text-[13px] text-tinta last:border-0"
                   >
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-3">
                       Cotización del {new Date(quote.issue_date).toLocaleDateString("es-EC")}
-                      <StatusBadge label={QUOTE_STATUS_LABELS[quote.status]} tone={QUOTE_STATUS_TONE[quote.status]} />
+                      <StatusLabel label={QUOTE_STATUS_LABELS[quote.status]} tone={QUOTE_STATUS_TONE[quote.status]} />
                     </span>
-                    <span className="font-mono font-medium">{currency.format(total)}</span>
+                    <span className="font-dp-mono">{currency.format(total)}</span>
                   </Link>
                 );
               })}
-              {(quotes ?? []).length === 0 && <p className="text-sm text-carbon/40">Sin cotizaciones todavía.</p>}
+              {(quotes ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin cotizaciones todavía.</p>}
             </div>
             <form action={boundCreateQuote} className="mt-4">
               <SubmitButton variant="secondary" size="sm" pendingLabel="Creando…">
@@ -473,18 +482,18 @@ export default async function ProjectDetailPage(
           </Section>
 
           <Section title="Contratos">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col">
               {(contracts ?? []).map((contract) => (
-                <div key={contract.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0">
+                <div key={contract.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-filete py-3.5 last:border-0">
                   <div>
-                    <p className="font-mono text-sm font-medium text-carbon">{currency.format(contract.value)}</p>
-                    <p className="text-xs text-carbon/50">
+                    <p className="font-dp-mono text-[13px] text-tinta">{currency.format(contract.value)}</p>
+                    <p className="mt-1 font-dp-sans text-xs text-concreto">
                       {contract.start_date ?? "sin fecha"} → {contract.end_date ?? "sin fecha"}
                       {contract.payment_terms ? ` — ${contract.payment_terms}` : ""}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <StatusBadge label={CONTRACT_STATUS_LABELS[contract.status]} tone={CONTRACT_STATUS_TONE[contract.status]} />
+                  <div className="flex items-center gap-2.5">
+                    <StatusLabel label={CONTRACT_STATUS_LABELS[contract.status]} tone={CONTRACT_STATUS_TONE[contract.status]} />
                     <StatusSelect
                       action={updateContractStatus.bind(null, id, contract.id)}
                       defaultValue={contract.status}
@@ -493,9 +502,9 @@ export default async function ProjectDetailPage(
                   </div>
                 </div>
               ))}
-              {(contracts ?? []).length === 0 && <p className="text-sm text-carbon/40">Sin contratos todavía.</p>}
+              {(contracts ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin contratos todavía.</p>}
             </div>
-            <form action={boundCreateContract} className="mt-4 grid grid-cols-4 gap-2">
+            <form action={boundCreateContract} className="mt-4 grid grid-cols-4 gap-2.5">
               <input name="value" type="number" step="0.01" placeholder="Valor" required className={inputClass} />
               <input name="start_date" type="date" className={inputClass} />
               <input name="end_date" type="date" className={inputClass} />
@@ -507,19 +516,19 @@ export default async function ProjectDetailPage(
           </Section>
 
           <Section title="Pagos">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col">
               {(payments ?? []).map((payment) => (
-                <div key={payment.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0">
+                <div key={payment.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-filete py-3.5 last:border-0">
                   <div>
-                    <p className="font-mono text-sm font-medium text-carbon">{currency.format(payment.amount)}</p>
-                    <p className="text-xs text-carbon/50">
+                    <p className="font-dp-mono text-[13px] text-tinta">{currency.format(payment.amount)}</p>
+                    <p className="mt-1 font-dp-sans text-xs text-concreto">
                       Vence {payment.due_date ?? "sin fecha"}
                       {payment.method ? ` — ${payment.method}` : ""}
                       {payment.reference ? ` — ${payment.reference}` : ""}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <StatusBadge label={PAYMENT_STATUS_LABELS[payment.status]} tone={PAYMENT_STATUS_TONE[payment.status]} />
+                  <div className="flex items-center gap-2.5">
+                    <StatusLabel label={PAYMENT_STATUS_LABELS[payment.status]} tone={PAYMENT_STATUS_TONE[payment.status]} />
                     <StatusSelect
                       action={updatePaymentStatus.bind(null, id, payment.id)}
                       defaultValue={payment.status}
@@ -528,9 +537,9 @@ export default async function ProjectDetailPage(
                   </div>
                 </div>
               ))}
-              {(payments ?? []).length === 0 && <p className="text-sm text-carbon/40">Sin pagos todavía.</p>}
+              {(payments ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin pagos todavía.</p>}
             </div>
-            <form action={boundCreatePayment} className="mt-4 grid grid-cols-4 gap-2">
+            <form action={boundCreatePayment} className="mt-4 grid grid-cols-4 gap-2.5">
               <input name="amount" type="number" step="0.01" placeholder="Monto" required className={inputClass} />
               <input name="due_date" type="date" className={inputClass} />
               <input name="method" placeholder="Método" className={inputClass} />
@@ -542,15 +551,15 @@ export default async function ProjectDetailPage(
           </Section>
 
           <Section title="Gastos">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col">
               {(expenses ?? []).map((expense) => (
-                <div key={expense.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0">
+                <div key={expense.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-filete py-3.5 last:border-0">
                   <div>
-                    <p className="font-mono text-sm font-medium text-carbon">
+                    <p className="font-dp-mono text-[13px] text-tinta">
                       {currency.format(expense.amount)}{" "}
-                      <span className="font-sans text-xs font-normal text-carbon/40">({EXPENSE_CATEGORY_LABELS[expense.category]})</span>
+                      <span className="font-dp-sans text-xs text-concreto">({EXPENSE_CATEGORY_LABELS[expense.category]})</span>
                     </p>
-                    <p className="text-xs text-carbon/50">
+                    <p className="mt-1 font-dp-sans text-xs text-concreto">
                       {expense.date}
                       {expense.supplier ? ` — ${expense.supplier}` : ""}
                       {expense.description ? ` — ${expense.description}` : ""}
@@ -563,9 +572,9 @@ export default async function ProjectDetailPage(
                   </form>
                 </div>
               ))}
-              {(expenses ?? []).length === 0 && <p className="text-sm text-carbon/40">Sin gastos todavía.</p>}
+              {(expenses ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin gastos todavía.</p>}
             </div>
-            <form action={boundCreateExpense} className="mt-4 grid grid-cols-4 gap-2">
+            <form action={boundCreateExpense} className="mt-4 grid grid-cols-4 gap-2.5">
               <input name="amount" type="number" step="0.01" placeholder="Monto" required className={inputClass} />
               <select name="category" className={selectClass}>
                 {EXPENSE_CATEGORIES.map((category) => (
@@ -584,16 +593,16 @@ export default async function ProjectDetailPage(
           </Section>
 
           <Section title="Fases">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col">
               {(phases ?? []).map((phase) => (
-                <div key={phase.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon/5 pb-3 last:border-0">
+                <div key={phase.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-filete py-3.5 last:border-0">
                   <div>
-                    <p className="text-sm font-medium text-carbon">{phase.name}</p>
-                    <p className="font-mono text-xs text-carbon/50">
+                    <p className="font-dp-sans text-[13px] text-tinta">{phase.name}</p>
+                    <p className="mt-1 font-dp-mono text-[10.5px] text-concreto">
                       {phase.start_date ?? "sin fecha"} → {phase.end_date ?? "sin fecha"}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2.5">
                     <StatusSelect
                       action={updatePhaseStatus.bind(null, id, phase.id)}
                       defaultValue={phase.status}
@@ -607,9 +616,9 @@ export default async function ProjectDetailPage(
                   </div>
                 </div>
               ))}
-              {(phases ?? []).length === 0 && <p className="text-sm text-carbon/40">Sin fases todavía.</p>}
+              {(phases ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin fases todavía.</p>}
             </div>
-            <form action={boundCreatePhase} className="mt-4 grid grid-cols-4 gap-2">
+            <form action={boundCreatePhase} className="mt-4 grid grid-cols-4 gap-2.5">
               <input name="name" placeholder="Nombre de la fase" required className={`col-span-2 ${inputClass}`} />
               <input name="start_date" type="date" className={inputClass} />
               <input name="end_date" type="date" className={inputClass} />
@@ -620,10 +629,10 @@ export default async function ProjectDetailPage(
           </Section>
 
           <Section title="Acceso del cliente al portal">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2.5">
               {(portalAccess ?? []).map((access) => (
-                <div key={access.id} className="flex items-center justify-between text-sm">
-                  <span className="text-carbon/80">{access.email}</span>
+                <div key={access.id} className="flex items-center justify-between font-dp-sans text-[13px]">
+                  <span className="text-grafito">{access.email}</span>
                   <form action={revokePortalAccess.bind(null, id, access.id)}>
                     <SubmitButton variant="danger" size="sm">
                       Quitar acceso
@@ -631,9 +640,9 @@ export default async function ProjectDetailPage(
                   </form>
                 </div>
               ))}
-              {(portalAccess ?? []).length === 0 && <p className="text-sm text-carbon/40">El cliente todavía no tiene acceso al portal.</p>}
+              {(portalAccess ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">El cliente todavía no tiene acceso al portal.</p>}
             </div>
-            <form action={boundInvitePortal} className="mt-4 flex gap-2">
+            <form action={boundInvitePortal} className="mt-4 flex gap-2.5">
               <input
                 name="email"
                 type="email"
@@ -648,28 +657,28 @@ export default async function ProjectDetailPage(
             </form>
           </Section>
 
-          <Section title="Editar información">
+          <Section title="Editar información" className="max-w-xl">
             <ProjectForm action={boundUpdate} clients={clients ?? []} defaultValues={project} />
           </Section>
         </div>
       )}
 
       {tab === "activity" && (
-        <div className="mt-8">
-          <form action={boundAddNote} className="flex gap-2">
+        <div className="px-12 py-10">
+          <form action={boundAddNote} className="flex gap-2.5">
             <input name="body" placeholder="Agregar una nota…" className={`flex-1 ${inputClass}`} />
             <SubmitButton variant="secondary" pendingLabel="Agregando…">
               Agregar
             </SubmitButton>
           </form>
-          <ul className="mt-5 flex flex-col">
+          <ul className="mt-6 flex flex-col">
             {(activity ?? []).map((item) => (
-              <li key={item.id} className="border-b border-carbon/[0.06] py-3 text-sm last:border-0">
-                <p className="text-carbon/80">{item.body}</p>
-                <p className="mt-1 font-mono text-xs text-carbon/40">{new Date(item.created_at).toLocaleString("es-EC")}</p>
+              <li key={item.id} className="border-b border-filete py-3.5 last:border-0">
+                <p className="font-dp-sans text-[13px] text-grafito">{item.body}</p>
+                <p className="mt-1.5 font-dp-mono text-[10.5px] text-concreto">{new Date(item.created_at).toLocaleString("es-EC")}</p>
               </li>
             ))}
-            {(activity ?? []).length === 0 && <li className="text-sm text-carbon/40">Sin actividad todavía.</li>}
+            {(activity ?? []).length === 0 && <li className="font-dp-sans text-sm text-concreto">Sin actividad todavía.</li>}
           </ul>
         </div>
       )}
@@ -684,26 +693,24 @@ function isCurrentPhase(phases: Phase[], index: number) {
 
 function PhaseRow({ phase, isCurrent }: { phase: Phase; isCurrent: boolean }) {
   const done = phase.status === "completada";
-  const mark = done ? "✓" : isCurrent ? "◉" : "○";
-  const markColor = done ? "text-[#3a7a56]" : isCurrent ? "text-naranja-oscuro" : "text-carbon/30";
-  const textColor = isCurrent ? "font-medium text-carbon" : done ? "text-carbon/55" : "text-carbon/40";
+  const textColor = isCurrent ? "text-tinta" : done ? "text-grafito" : "text-concreto";
 
   return (
-    <div className="flex items-center gap-3.5 border-b border-carbon/[0.06] py-2.5 last:border-0">
-      <span className={`w-[18px] text-sm ${markColor}`}>{mark}</span>
-      <span className={`flex-1 text-sm ${textColor}`}>{phase.name}</span>
-      <span className="font-mono text-xs text-carbon/40">
+    <div className="flex items-center gap-3.5 border-b border-filete py-3 last:border-0">
+      <StatusMark tone={done ? "resolved" : isCurrent ? "attention" : "pending"} />
+      <span className={`flex-1 font-dp-sans text-[13px] ${textColor}`}>{phase.name}</span>
+      <span className="font-dp-mono text-[10.5px] text-concreto">
         {phase.start_date ? new Date(phase.start_date).toLocaleDateString("es-EC", { month: "short", year: "numeric" }) : "—"}
       </span>
     </div>
   );
 }
 
-function SummaryStat({ label, value }: { label: string; value: string }) {
+function SummaryStat({ label, value, last }: { label: string; value: string; last?: boolean }) {
   return (
-    <div>
-      <p className="text-xs uppercase tracking-wide text-carbon/40">{label}</p>
-      <p className="mt-1 font-mono text-lg font-medium text-carbon">{value}</p>
+    <div className={`p-6 text-center ${last ? "" : "border-r border-filete"}`}>
+      <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">{label}</p>
+      <p className="mt-2.5 font-dp-mono text-lg text-tinta">{value}</p>
     </div>
   );
 }

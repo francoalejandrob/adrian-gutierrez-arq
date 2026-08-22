@@ -18,7 +18,7 @@ export default function StatusSelect({
 
   return (
     <form ref={formRef} action={action} className="flex items-center gap-3">
-      <label htmlFor="status" className="text-xs uppercase tracking-wide text-carbon/60">
+      <label htmlFor="status" className="font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
         Estado
       </label>
       <select

@@ -1,17 +1,19 @@
-// Shared class strings for form controls across the dashboard. Centralized
-// so every input/select/textarea gets the same focus-visible ring (plain
-// `outline-none focus:border-carbon` has no keyboard-focus indicator once
-// the outline is removed — a real accessibility gap the previous version
-// had everywhere) and the same disabled treatment, instead of each form
-// re-typing (and slowly drifting from) the same class string.
+// Shared class strings for form controls across the dashboard/portal.
+// Per the "16 Design system" sheet of the mockup: surface = superficie,
+// border = corte, focus = border turns tinta with no halo (the ring on
+// mouse click is deliberately absent — keyboard users still get a
+// visible :focus-visible outline via the .dp-scope rule in globals.css,
+// which is a separate, keyboard-only mechanism, not a conflict with the
+// "no halo" resting-state aesthetic).
 
-export const labelClass = "text-[11.5px] text-carbon/50";
+export const labelClass =
+  "font-dp-mono text-[9.5px] font-medium uppercase tracking-[0.13em] text-grafito";
 
 export const inputClass =
-  "rounded-lg border border-carbon/15 bg-white px-3.5 py-2.5 text-[13.5px] text-carbon outline-none transition-colors " +
-  "duration-150 placeholder:text-carbon/30 focus:border-carbon focus:ring-2 focus:ring-naranja/25 " +
-  "disabled:cursor-not-allowed disabled:bg-hueso/60 disabled:text-carbon/40";
+  "h-[38px] w-full border border-corte bg-superficie px-3.5 font-dp-sans text-[13px] text-tinta outline-none " +
+  "transition-colors duration-150 placeholder:text-concreto focus:border-tinta " +
+  "disabled:cursor-not-allowed disabled:bg-papel disabled:text-concreto";
 
 export const selectClass = `cursor-pointer ${inputClass}`;
 
-export const textareaClass = `${inputClass} resize-none`;
+export const textareaClass = `${inputClass} h-auto resize-none py-2.5`;

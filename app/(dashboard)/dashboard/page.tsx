@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { computePipeline } from "@/lib/pipeline";
 import { createClient } from "@/lib/supabase/server";
+import PageHeader from "@/components/dashboard/ui/page-header";
+import Section from "@/components/dashboard/ui/section";
+import ProgressBar from "@/components/dashboard/ui/progress-bar";
 
 const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
@@ -29,7 +32,7 @@ export default async function DashboardPage() {
     { count: newLeadsCount },
     { data: payments },
     { count: pendingApprovalsCount },
-    { count: meetingsTodayCount },
+    { data: todayEvents },
     { data: activeProjects },
     { data: allLeads },
     { data: activity },
@@ -46,9 +49,10 @@ export default async function DashboardPage() {
     supabase.from("document_versions").select("*", { count: "exact", head: true }).eq("status", "enviado"),
     supabase
       .from("calendar_events")
-      .select("*", { count: "exact", head: true })
+      .select("id, title, starts_at")
       .gte("starts_at", todayStart.toISOString())
-      .lte("starts_at", todayEnd.toISOString()),
+      .lte("starts_at", todayEnd.toISOString())
+      .order("starts_at"),
     supabase
       .from("projects")
       .select("id, name, progress, clients(name)")
@@ -87,50 +91,63 @@ export default async function DashboardPage() {
   const pipelineTotal = pipeline.reduce((sum, s) => sum + s.value, 0);
   const maxStageValue = Math.max(1, ...pipeline.map((s) => s.value));
 
+  const instruments = [
+    { label: "Tareas críticas", value: String(overdueCount), attention: overdueCount > 0 },
+    { label: "Reuniones hoy", value: String((todayEvents ?? []).length), attention: false },
+    { label: "Leads nuevos", value: String(newLeadsCount ?? 0), attention: false },
+    { label: "Por cobrar", value: currency.format(pendingCollection), attention: pendingCollection > 0 },
+  ];
+
+  const attentionRows = [
+    overdueCount > 0 ? `${overdueCount} tarea${overdueCount === 1 ? "" : "s"} atrasada${overdueCount === 1 ? "" : "s"}` : null,
+    overduePaymentsCount > 0
+      ? `${overduePaymentsCount} pago${overduePaymentsCount === 1 ? "" : "s"} vencido${overduePaymentsCount === 1 ? "" : "s"}`
+      : null,
+    (pendingApprovalsCount ?? 0) > 0
+      ? `${pendingApprovalsCount} aprobación${pendingApprovalsCount === 1 ? "" : "es"} pendiente${pendingApprovalsCount === 1 ? "" : "s"}`
+      : null,
+  ].filter((row): row is string => row !== null);
+
   return (
     <div>
-      <div className="flex items-start justify-between gap-6 border-b border-carbon/[0.08] pb-7">
-        <div>
-          <span className="mb-3.5 inline-block bg-naranja-oscuro px-2.5 py-1 text-[11px] uppercase tracking-[0.09em] text-white">
-            {greeting()}{firstName ? `, ${firstName}` : ""}
-          </span>
-          <h1 className="max-w-xl font-display text-[34px] font-medium leading-[1.1] tracking-[-0.01em] text-carbon sm:text-[38px]">
-            Esto es lo importante hoy.
-          </h1>
-        </div>
-      </div>
+      <PageHeader eyebrow={`${greeting()}${firstName ? `, ${firstName}` : ""}`} title="Esto es lo importante hoy." />
 
-      <div className="mt-9 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Kpi label="Tareas críticas" value={overdueCount} accent={overdueCount > 0 ? "#a4432b" : "#6e6659"} tint={overdueCount > 0} />
-        <Kpi label="Reuniones hoy" value={meetingsTodayCount ?? 0} accent="#6e6659" />
-        <Kpi label="Leads nuevos" value={newLeadsCount ?? 0} accent="#b26a45" tint={(newLeadsCount ?? 0) > 0} />
-        <Kpi label="Pendiente de cobro" value={currency.format(pendingCollection)} accent="#b26a45" dark />
-      </div>
-
-      <div className="mt-12 grid grid-cols-1 gap-14 lg:grid-cols-[1.4fr_1fr]">
-        <div>
-          <div className="mb-4 flex items-baseline justify-between">
-            <h2 className="font-display text-xl font-medium text-carbon">Proyectos activos</h2>
-            <Link href="/dashboard/projects" className="text-xs text-carbon/45 underline underline-offset-2 hover:text-naranja-oscuro">
-              Ver todos
-            </Link>
+      <div className="grid grid-cols-2 border-b border-corte lg:grid-cols-4">
+        {instruments.map((item, i) => (
+          <div key={item.label} className={`p-8 ${i > 0 ? "border-l border-filete" : ""}`}>
+            <p className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</p>
+            <p className={`mt-4 font-dp-mono text-[30px] leading-none ${item.attention ? "text-acento" : "text-tinta"}`}>
+              {item.value}
+            </p>
+            <p className="mt-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-grafito">{item.label}</p>
           </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-12 px-12 py-10 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
+        <Section
+          title="Proyectos activos"
+          action={
+            <Link href="/dashboard/projects" className="font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto hover:text-tinta">
+              Ver todos →
+            </Link>
+          }
+        >
           <div className="flex flex-col">
-            {(activeProjects ?? []).map((project) => (
+            {(activeProjects ?? []).map((project, i) => (
               <Link
                 key={project.id}
                 href={`/dashboard/projects/${project.id}`}
-                className="flex items-center gap-4 border-b border-carbon/[0.06] py-3.5 transition-colors duration-150 last:border-0 hover:bg-white"
+                className="flex items-baseline gap-5 border-b border-filete py-4 last:border-0"
               >
+                <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
                 <div className="min-w-0 flex-1">
-                  <div className="mb-2 flex items-baseline justify-between">
-                    <span className="text-[14.5px] font-medium text-carbon">{project.name}</span>
-                    <span className="font-mono text-[13px] text-carbon/55">{project.progress}%</span>
+                  <div className="mb-2.5 flex items-baseline justify-between gap-4">
+                    <span className="truncate font-dp-serif text-lg text-tinta">{project.name}</span>
+                    <span className="shrink-0 font-dp-mono text-[12px] text-concreto">{project.progress}%</span>
                   </div>
-                  <div className="h-1 w-full bg-carbon/[0.08]">
-                    <div className="h-1 bg-naranja" style={{ width: `${project.progress}%` }} />
-                  </div>
-                  <p className="mt-2 text-xs text-carbon/45">
+                  <ProgressBar value={project.progress} animate />
+                  <p className="mt-2.5 font-dp-sans text-xs text-concreto">
                     {project.clients?.name}
                     {currentPhaseByProject.get(project.id) ? ` · ${currentPhaseByProject.get(project.id)}` : ""}
                   </p>
@@ -138,114 +155,78 @@ export default async function DashboardPage() {
               </Link>
             ))}
             {(activeProjects ?? []).length === 0 && (
-              <p className="py-6 text-sm text-carbon/40">Sin proyectos activos.</p>
+              <p className="py-6 font-dp-sans text-sm text-concreto">Sin proyectos activos.</p>
             )}
           </div>
-        </div>
+        </Section>
 
-        <div>
-          <h2 className="mb-4 font-display text-xl font-medium text-carbon">Pipeline</h2>
-          <p className="mb-3.5 font-mono text-[26px] font-medium text-carbon">{currency.format(pipelineTotal)}</p>
-          <div className="mb-4 flex h-3 w-full gap-0.5">
-            {pipeline.map((stage) => (
-              <div
-                key={stage.status}
-                className="h-3 bg-naranja"
-                style={{
-                  width: pipelineTotal > 0 ? `${(stage.value / pipelineTotal) * 100}%` : `${100 / pipeline.length}%`,
-                  opacity: 0.35 + (0.65 * stage.value) / maxStageValue,
-                }}
-              />
-            ))}
-          </div>
-          <div className="flex flex-col gap-2">
-            {pipeline.map((stage) => (
-              <div key={stage.status} className="flex items-center justify-between text-[12.5px]">
-                <span className="flex items-center gap-2 text-carbon/60">
-                  <span
-                    className="h-2 w-2 shrink-0 bg-naranja"
-                    style={{ opacity: 0.35 + (0.65 * stage.value) / maxStageValue }}
-                  />
-                  {stage.label}
+        <div className="flex flex-col gap-10">
+          <Section title="Hoy">
+            <div className="flex flex-col">
+              {(todayEvents ?? []).map((event) => (
+                <div key={event.id} className="flex items-baseline gap-4 border-b border-filete py-2.5 last:border-0">
+                  <span className="w-12 shrink-0 font-dp-mono text-[11px] text-concreto">
+                    {new Date(event.starts_at).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                  <span className="truncate font-dp-sans text-[13px] text-tinta">{event.title}</span>
+                </div>
+              ))}
+              {(todayEvents ?? []).length === 0 && <p className="font-dp-sans text-[13px] text-concreto">Sin reuniones hoy.</p>}
+            </div>
+          </Section>
+
+          <Section title="Pipeline">
+            <p className="mb-4 font-dp-mono text-2xl text-tinta">{currency.format(pipelineTotal)}</p>
+            <div className="mb-4 flex h-[3px] w-full gap-px bg-filete">
+              {pipeline.map((stage) => (
+                <div
+                  key={stage.status}
+                  className="h-[3px] bg-tinta"
+                  style={{
+                    width: pipelineTotal > 0 ? `${(stage.value / pipelineTotal) * 100}%` : `${100 / pipeline.length}%`,
+                    opacity: 0.35 + (0.65 * stage.value) / maxStageValue,
+                  }}
+                />
+              ))}
+            </div>
+            <div className="flex flex-col gap-2">
+              {pipeline.map((stage) => (
+                <div key={stage.status} className="flex items-center justify-between font-dp-sans text-[12.5px]">
+                  <span className="text-grafito">{stage.label}</span>
+                  <span className="font-dp-mono text-tinta">{currency.format(stage.value)}</span>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          <Section title="Atención">
+            <div className="flex flex-col gap-2.5">
+              {attentionRows.map((row) => (
+                <p key={row} className="border-l-2 border-acento pl-3 font-dp-sans text-[13px] text-tinta">
+                  {row}
+                </p>
+              ))}
+              {attentionRows.length === 0 && <p className="font-dp-sans text-[13px] text-concreto">Sin pendientes por ahora.</p>}
+            </div>
+          </Section>
+        </div>
+      </div>
+
+      <div className="border-t border-corte px-12 py-10">
+        <Section title="Actividad reciente">
+          <div className="flex flex-col">
+            {(activity ?? []).map((item) => (
+              <div key={item.id} className="flex gap-5 border-b border-filete py-3 font-dp-sans text-[13px] last:border-0">
+                <span className="w-14 shrink-0 font-dp-mono text-[11px] text-concreto">
+                  {new Date(item.created_at).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })}
                 </span>
-                <span className="font-mono font-medium text-carbon">{currency.format(stage.value)}</span>
+                <span className="text-grafito">{item.body}</span>
               </div>
             ))}
+            {(activity ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin actividad todavía.</p>}
           </div>
-
-          <h2 className="mb-3.5 mt-9 font-display text-lg font-medium text-carbon">Alertas</h2>
-          <div className="flex flex-col gap-1.5">
-            {overdueCount > 0 && <AlertRow label={`${overdueCount} tarea${overdueCount === 1 ? "" : "s"} atrasada${overdueCount === 1 ? "" : "s"}`} tone="danger" />}
-            {overduePaymentsCount > 0 && (
-              <AlertRow label={`${overduePaymentsCount} pago${overduePaymentsCount === 1 ? "" : "s"} vencido${overduePaymentsCount === 1 ? "" : "s"}`} tone="danger" />
-            )}
-            {(pendingApprovalsCount ?? 0) > 0 && (
-              <AlertRow label={`${pendingApprovalsCount} aprobación${pendingApprovalsCount === 1 ? "" : "es"} pendiente${pendingApprovalsCount === 1 ? "" : "s"}`} tone="warning" />
-            )}
-            {overdueCount === 0 && overduePaymentsCount === 0 && (pendingApprovalsCount ?? 0) === 0 && (
-              <p className="text-sm text-carbon/40">Sin alertas por ahora.</p>
-            )}
-          </div>
-        </div>
+        </Section>
       </div>
-
-      <div className="mt-14">
-        <h2 className="mb-4 font-display text-lg font-medium text-carbon">Actividad reciente</h2>
-        <div className="flex flex-col">
-          {(activity ?? []).map((item) => (
-            <div key={item.id} className="flex gap-4 border-b border-carbon/[0.06] py-3 text-[13.5px] last:border-0">
-              <span className="w-14 shrink-0 font-mono text-[11.5px] text-carbon/40">
-                {new Date(item.created_at).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })}
-              </span>
-              <span className="text-carbon/80">{item.body}</span>
-            </div>
-          ))}
-          {(activity ?? []).length === 0 && <p className="text-sm text-carbon/40">Sin actividad todavía.</p>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Kpi({
-  label,
-  value,
-  accent,
-  dark,
-  tint,
-}: {
-  label: string;
-  value: number | string;
-  accent: string;
-  dark?: boolean;
-  tint?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-xl p-6 transition-all duration-150 hover:-translate-y-[3px] ${
-        dark ? "bg-noche shadow-[0_8px_20px_rgba(0,0,0,0.2)] hover:shadow-[0_10px_24px_rgba(0,0,0,0.28)]" : "bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.08)]"
-      }`}
-      style={{ borderTop: `3px solid ${accent}` }}
-    >
-      <p
-        className="font-mono text-[34px] font-medium"
-        style={{ color: dark ? "#f1eee8" : tint ? accent : undefined }}
-      >
-        {value}
-      </p>
-      <p className={`mt-2 text-[12.5px] ${dark ? "text-hueso/55" : "text-carbon/55"}`}>{label}</p>
-    </div>
-  );
-}
-
-function AlertRow({ label, tone }: { label: string; tone: "danger" | "warning" }) {
-  return (
-    <div
-      className={`border-l-2 px-3 py-2.5 text-[13px] ${
-        tone === "danger" ? "border-[#a4432b] bg-[#fdf1ee] text-[#7a2e1c]" : "border-naranja-oscuro bg-[#faf2ec] text-naranja-oscuro"
-      }`}
-    >
-      {label}
     </div>
   );
 }

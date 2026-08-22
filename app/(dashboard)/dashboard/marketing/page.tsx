@@ -1,66 +1,64 @@
-import { Megaphone } from "lucide-react";
-import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
-import { computeMarketingFunnel } from "@/lib/marketing";
+import { getTrafficSummary } from "@/lib/integrations/google-analytics";
 import { createClient } from "@/lib/supabase/server";
 
-const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD" });
+const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
 export default async function MarketingPage() {
   const supabase = await createClient();
 
-  const [{ data: leads }, { data: clients }, { data: projects }, { data: contracts }] =
+  const [traffic, { count: leadsCount }, { count: clientsCount }, { count: projectsCount }, { data: contracts }] =
     await Promise.all([
-      supabase.from("leads").select("id, source, utm_source, created_at"),
-      supabase.from("clients").select("id, converted_from_lead_id"),
-      supabase.from("projects").select("id, client_id"),
-      supabase.from("contracts").select("project_id, value"),
+      safeCall(() => getTrafficSummary()),
+      supabase.from("leads").select("*", { count: "exact", head: true }),
+      supabase.from("clients").select("*", { count: "exact", head: true }),
+      supabase.from("projects").select("*", { count: "exact", head: true }),
+      supabase.from("contracts").select("value"),
     ]);
 
-  const rows = computeMarketingFunnel({
-    leads: leads ?? [],
-    clients: clients ?? [],
-    projects: projects ?? [],
-    contracts: contracts ?? [],
-  });
+  const income = (contracts ?? []).reduce((sum, c) => sum + c.value, 0);
+
+  const stages = [
+    { label: "Visitas", value: traffic.configured ? traffic.data.totals.sessions.toLocaleString("es-EC") : null },
+    { label: "Leads", value: String(leadsCount ?? 0) },
+    { label: "Clientes", value: String(clientsCount ?? 0) },
+    { label: "Proyectos", value: String(projectsCount ?? 0) },
+    { label: "Ingresos", value: currency.format(income) },
+  ];
 
   return (
-    <div className="max-w-4xl">
-      <PageHeader
-        title="Marketing Intelligence"
-        description="De la fuente al ingreso — qué canal realmente construye el estudio (calculado desde datos propios; sin GA4/Search Console todavía, ver Website)."
-      />
+    <div>
+      <PageHeader eyebrow="Inteligencia · De la visita al ingreso, calculado con datos propios" title="Marketing intelligence" />
 
-      {rows.length > 0 ? (
-        <div className="mt-8 flex flex-col divide-y divide-carbon/[0.08] overflow-hidden rounded-[10px] border border-carbon/[0.08]">
-          {rows.map((row) => (
-            <div key={row.source} className="grid grid-cols-2 items-center gap-3 bg-white p-6 sm:grid-cols-5">
-              <span className="font-display text-base font-medium text-carbon">{row.source}</span>
-              <FunnelStat label="Leads" value={String(row.leads)} />
-              <FunnelStat label="Clientes" value={String(row.clients)} />
-              <FunnelStat label="Proyectos" value={String(row.projects)} />
-              <FunnelStat label="Ingresos" value={currency.format(row.contractedValue)} accent />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="mt-8 rounded-[10px] border border-carbon/[0.08] bg-white">
-          <EmptyState
-            icon={Megaphone}
-            title="Sin leads todavía"
-            description="En cuanto lleguen leads (web o manuales) vas a ver de dónde vienen acá."
-          />
-        </div>
+      <div className="grid grid-cols-5 border-y border-corte">
+        {stages.map((stage, i) => (
+          <div key={stage.label} className={`p-8 ${i > 0 ? "border-l border-filete" : ""}`}>
+            <p className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</p>
+            <p className="mt-4 font-dp-mono text-2xl leading-none text-tinta">{stage.value ?? "—"}</p>
+            <p className="mt-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-grafito">{stage.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {!traffic.configured && (
+        <p className="px-12 pt-8 font-dp-sans text-[13px] text-concreto">
+          Visitas requiere Google Analytics configurado — ver <span className="font-dp-mono text-[11.5px]">INTEGRATION_SETUP.md</span>. El
+          resto del embudo es real y ya está disponible.
+        </p>
       )}
     </div>
   );
 }
 
-function FunnelStat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
-  return (
-    <div>
-      <p className={`font-mono text-[19px] font-medium ${accent ? "text-naranja-oscuro" : "text-carbon"}`}>{value}</p>
-      <p className="mt-0.5 text-[11px] uppercase tracking-[0.05em] text-carbon/45">{label}</p>
-    </div>
-  );
+async function safeCall<T extends { configured: boolean }>(
+  fn: () => Promise<T>,
+): Promise<T | { configured: false; reason: string }> {
+  try {
+    return await fn();
+  } catch (error) {
+    return {
+      configured: false,
+      reason: error instanceof Error ? error.message : "Error inesperado al consultar la API de Google.",
+    };
+  }
 }

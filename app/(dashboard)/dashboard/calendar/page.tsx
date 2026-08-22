@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { inputClass, selectClass } from "@/components/dashboard/ui/styles";
@@ -56,29 +55,30 @@ export default async function CalendarPage(props: PageProps<"/dashboard/calendar
   return (
     <div>
       <PageHeader
+        eyebrow="Producción"
         title="Agenda"
         action={
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-5">
             <Link
               href={`/dashboard/calendar?year=${prevMonth.year}&month=${prevMonth.month}`}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-carbon/15 text-carbon/50 transition-colors hover:border-carbon hover:text-carbon"
+              className="font-dp-mono text-[13px] text-concreto hover:text-tinta"
             >
-              <ChevronLeft size={16} strokeWidth={2} aria-hidden="true" />
+              ←
             </Link>
-            <span className="font-mono text-[13px] text-carbon/60">
+            <span className="font-dp-mono text-[12px] uppercase tracking-[0.1em] text-tinta">
               {MONTH_NAMES[month]} {year}
             </span>
             <Link
               href={`/dashboard/calendar?year=${nextMonth.year}&month=${nextMonth.month}`}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-carbon/15 text-carbon/50 transition-colors hover:border-carbon hover:text-carbon"
+              className="font-dp-mono text-[13px] text-concreto hover:text-tinta"
             >
-              <ChevronRight size={16} strokeWidth={2} aria-hidden="true" />
+              →
             </Link>
           </div>
         }
       />
 
-      <form action={createEvent} className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-5">
+      <form action={createEvent} className="grid grid-cols-2 gap-2.5 border-b border-filete px-12 py-6 sm:grid-cols-5">
         <input name="title" placeholder="Título de la reunión" required className={`col-span-2 ${inputClass}`} />
         <input name="date" type="date" required defaultValue={new Date().toISOString().slice(0, 10)} className={inputClass} />
         <input name="time" type="time" defaultValue="09:00" className={inputClass} />
@@ -95,31 +95,31 @@ export default async function CalendarPage(props: PageProps<"/dashboard/calendar
         </SubmitButton>
       </form>
 
-      <div className="mt-7 overflow-hidden rounded-[10px] border border-carbon/[0.08]">
-        <div className="grid grid-cols-7 gap-px bg-carbon/[0.08]">
+      <div className="px-12 py-8">
+        <div className="grid grid-cols-7 border-l border-t border-filete">
           {DAY_LABELS.map((label) => (
-            <div key={label} className="bg-hueso px-2 py-1.5 text-center text-[10.5px] uppercase tracking-wide text-carbon/45">
+            <div key={label} className="border-b border-r border-filete px-2 py-2 text-center font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">
               {label}
             </div>
           ))}
           {cells.map((day, i) => (
-            <div key={i} className={`min-h-[92px] bg-white p-2 ${day === null ? "bg-hueso/40" : ""}`}>
+            <div key={i} className={`min-h-[92px] border-b border-r border-filete p-2 ${day === null ? "bg-[#EDEBE4]" : ""}`}>
               {day !== null && (
                 <>
                   <span
-                    className={`font-mono text-[11.5px] ${
-                      todayMatches && day === now.getDate() ? "font-semibold text-naranja-oscuro" : "text-carbon/45"
+                    className={`font-dp-mono text-[11.5px] ${
+                      todayMatches && day === now.getDate() ? "text-acento" : "text-concreto"
                     }`}
                   >
                     {day}
                   </span>
-                  <div className="mt-1 flex flex-col gap-1">
+                  <div className="mt-1.5 flex flex-col gap-1">
                     {(eventsByDay.get(day) ?? []).map((event) => (
-                      <form key={event.id} action={deleteEvent.bind(null, event.id)} className="group">
+                      <form key={event.id} action={deleteEvent.bind(null, event.id)}>
                         <button
                           type="submit"
                           title="Eliminar evento"
-                          className="w-full cursor-pointer truncate border-l-2 border-naranja bg-hueso px-1.5 py-0.5 text-left text-[10.5px] text-carbon/75 transition-colors hover:bg-[#fdf1ee] hover:text-[#a4432b]"
+                          className="w-full cursor-pointer truncate border-l-2 border-tinta bg-superficie px-1.5 py-0.5 text-left font-dp-sans text-[10.5px] text-grafito transition-colors hover:border-acento hover:text-acento"
                         >
                           {new Date(event.starts_at).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })} {event.title}
                         </button>

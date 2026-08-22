@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import LoginForm from "@/components/dashboard/login-form";
+import { dpFontVars } from "@/lib/dp-fonts";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Ingresar — ARCHI.OS",
   robots: { index: false, follow: false },
 };
+
+const currency = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 });
 
 export default async function LoginPage() {
   const supabase = await createClient();
@@ -18,19 +21,47 @@ export default async function LoginPage() {
     redirect("/dashboard");
   }
 
-  const { data: org } = await supabase.from("organizations").select("name").limit(1).maybeSingle();
+  const [{ count: projectCount }, { count: clientCount }, { data: contracts }] = await Promise.all([
+    supabase.from("projects").select("*", { count: "exact", head: true }),
+    supabase.from("clients").select("*", { count: "exact", head: true }),
+    supabase.from("contracts").select("value"),
+  ]);
+  const contracted = (contracts ?? []).reduce((sum, c) => sum + c.value, 0);
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-hueso px-6">
-      <div className="w-full max-w-[380px]">
-        <p className="text-center font-display text-[22px] font-semibold text-carbon">ARCHI.OS</p>
-        <p className="mb-10 text-center text-[13px] text-carbon/50">
-          {org?.name ?? "Adrián Gutiérrez Arquitectura"}
-        </p>
-        <div className="rounded-[10px] border border-carbon/[0.08] bg-white p-8">
+    <main className={`dp-scope ${dpFontVars} grid min-h-dvh grid-cols-1 font-dp-sans text-tinta md:grid-cols-2`}>
+      <div className="dp-grain-strong hidden flex-col justify-between border-r border-corte p-16 md:flex">
+        <p className="font-dp-mono text-[10px] uppercase tracking-[0.18em] text-grafito">ARCHI.OS &nbsp;·&nbsp; v2.0</p>
+        <div>
+          <h1 className="mb-6 max-w-[18ch] font-dp-serif text-[52px] leading-none tracking-[-0.025em] text-tinta">
+            El estudio como sistema.
+          </h1>
+          <p className="max-w-[40ch] font-dp-serif text-xl italic leading-relaxed text-grafito">
+            Comercial, producción, documentación y finanzas en una sola lámina de trabajo.
+          </p>
+        </div>
+        <div className="flex gap-11">
+          <Stat value={String(projectCount ?? 0).padStart(2, "0")} label="Proyectos" />
+          <Stat value={`$${currency.format(contracted)}`} label="Contratado" />
+          <Stat value={String(clientCount ?? 0)} label="Clientes" />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-center p-16">
+        <div className="w-full max-w-[352px]">
+          <p className="mb-7 font-dp-mono text-[9.5px] uppercase tracking-[0.16em] text-concreto">Acceso al estudio</p>
           <LoginForm />
         </div>
       </div>
     </main>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div>
+      <p className="font-dp-mono text-2xl text-tinta">{value}</p>
+      <p className="mt-2.5 font-dp-mono text-[9.5px] uppercase tracking-[0.14em] text-grafito">{label}</p>
+    </div>
   );
 }

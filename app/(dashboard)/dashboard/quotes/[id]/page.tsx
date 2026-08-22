@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ArrowLeft, Printer } from "lucide-react";
 import { notFound } from "next/navigation";
 import StatusSelect from "@/components/dashboard/status-select";
 import { buttonClass } from "@/components/dashboard/ui/button";
@@ -37,183 +36,171 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
   const boundUpdateMeta = updateQuoteMeta.bind(null, id);
 
   return (
-    <div className="max-w-3xl">
-      <Link
-        href="/dashboard/quotes"
-        className="mb-4 inline-flex items-center gap-1.5 text-[12.5px] text-carbon/45 transition-colors duration-150 hover:text-carbon"
-      >
-        <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
-        Cotizaciones
-      </Link>
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-wide text-carbon/50">
-            <Link href={`/dashboard/projects/${quote.project_id}?tab=finance`} className="transition-colors hover:text-naranja-oscuro">
+    <div>
+      <div className="border-b border-corte px-12 pb-[30px] pt-[52px]">
+        <Link
+          href="/dashboard/quotes"
+          className="mb-[18px] inline-block font-dp-mono text-[10px] uppercase tracking-[0.14em] text-concreto hover:text-tinta"
+        >
+          ← Cotizaciones
+        </Link>
+        <div className="flex items-end justify-between gap-10">
+          <div>
+            <Link
+              href={`/dashboard/projects/${quote.project_id}?tab=finance`}
+              className="font-dp-mono text-[10px] uppercase tracking-[0.13em] text-concreto hover:text-tinta"
+            >
               {quote.projects?.clients?.name} — {quote.projects?.name}
             </Link>
-          </p>
-          <h1 className="font-display text-[26px] font-medium text-carbon">
-            Cotización del {new Date(quote.issue_date).toLocaleDateString("es-EC")}
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href={`/dashboard/quotes/${id}/print`} target="_blank" className={buttonClass("secondary", "sm")}>
-            <Printer size={14} strokeWidth={1.75} aria-hidden="true" />
-            Vista imprimible
-          </Link>
-          <StatusSelect
-            action={boundUpdateStatus}
-            defaultValue={quote.status}
-            options={QUOTE_STATUSES.map((status) => ({
-              value: status,
-              label: QUOTE_STATUS_LABELS[status],
-            }))}
-          />
+            <h1 className="mt-3 font-dp-serif text-[38px] leading-none tracking-[-0.015em] text-tinta">
+              Cotización del {new Date(quote.issue_date).toLocaleDateString("es-EC")}
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link href={`/dashboard/quotes/${id}/print`} target="_blank" className={buttonClass("secondary", "sm")}>
+              Vista imprimible
+            </Link>
+            <StatusSelect
+              action={boundUpdateStatus}
+              defaultValue={quote.status}
+              options={QUOTE_STATUSES.map((status) => ({
+                value: status,
+                label: QUOTE_STATUS_LABELS[status],
+              }))}
+            />
+          </div>
         </div>
       </div>
 
-      <Section title="Ítems">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-carbon/10 text-left text-xs uppercase tracking-wide text-carbon/40">
-              <th className="pb-2">Descripción</th>
-              <th className="pb-2 text-right">Cantidad</th>
-              <th className="pb-2 text-right">Precio unit.</th>
-              <th className="pb-2 text-right">Total</th>
-              <th className="pb-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr
-                key={item.id}
-                className="border-b border-carbon/5 transition-colors duration-100 last:border-0 hover:bg-hueso/60"
-              >
-                <td className="py-2.5">{item.description}</td>
-                <td className="py-2.5 text-right font-mono">{item.quantity}</td>
-                <td className="py-2.5 text-right font-mono">{currency.format(item.unit_price)}</td>
-                <td className="py-2.5 text-right font-mono">{currency.format(item.quantity * item.unit_price)}</td>
-                <td className="py-2.5 text-right">
-                  <form action={deleteQuoteItem.bind(null, id, item.id)}>
-                    <SubmitButton variant="danger" size="sm">
-                      Eliminar
-                    </SubmitButton>
-                  </form>
-                </td>
-              </tr>
-            ))}
-            {items.length === 0 && (
-              <tr>
-                <td colSpan={5} className="py-3 text-sm text-carbon/40">
-                  Sin ítems todavía.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="px-12 py-10">
+        <Section title="Ítems">
+          <div className="grid grid-cols-[2fr_0.8fr_1fr_1fr_0.8fr] gap-4 border-b border-corte pb-3 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
+            <span>Descripción</span>
+            <span className="text-right">Cantidad</span>
+            <span className="text-right">Precio unit.</span>
+            <span className="text-right">Total</span>
+            <span></span>
+          </div>
+          {items.map((item) => (
+            <div key={item.id} className="grid grid-cols-[2fr_0.8fr_1fr_1fr_0.8fr] items-center gap-4 border-b border-filete py-3">
+              <span className="font-dp-sans text-[13px] text-tinta">{item.description}</span>
+              <span className="text-right font-dp-mono text-[12.5px] text-tinta">{item.quantity}</span>
+              <span className="text-right font-dp-mono text-[12.5px] text-tinta">{currency.format(item.unit_price)}</span>
+              <span className="text-right font-dp-mono text-[12.5px] text-tinta">{currency.format(item.quantity * item.unit_price)}</span>
+              <form action={deleteQuoteItem.bind(null, id, item.id)} className="text-right">
+                <SubmitButton variant="danger" size="sm">
+                  Eliminar
+                </SubmitButton>
+              </form>
+            </div>
+          ))}
+          {items.length === 0 && <p className="py-3 font-dp-sans text-sm text-concreto">Sin ítems todavía.</p>}
 
-        <form action={boundAddItem} className="mt-4 grid grid-cols-4 gap-2">
-          <input name="description" placeholder="Descripción" required className={`col-span-2 ${inputClass}`} />
-          <input
-            name="quantity"
-            type="number"
-            step="0.01"
-            placeholder="Cantidad"
-            defaultValue="1"
-            className={inputClass}
-          />
-          <input
-            name="unit_price"
-            type="number"
-            step="0.01"
-            placeholder="Precio unitario"
-            required
-            className={inputClass}
-          />
-          <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
-            Agregar ítem
-          </SubmitButton>
-        </form>
+          <form action={boundAddItem} className="mt-5 grid grid-cols-4 gap-2.5">
+            <input name="description" placeholder="Descripción" required className={`col-span-2 ${inputClass}`} />
+            <input
+              name="quantity"
+              type="number"
+              step="0.01"
+              placeholder="Cantidad"
+              defaultValue="1"
+              className={inputClass}
+            />
+            <input
+              name="unit_price"
+              type="number"
+              step="0.01"
+              placeholder="Precio unitario"
+              required
+              className={inputClass}
+            />
+            <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
+              Agregar ítem
+            </SubmitButton>
+          </form>
 
-        <div className="mt-6 flex justify-end">
-          <div className="w-64 text-sm">
-            <div className="flex justify-between py-1">
-              <span className="text-carbon/60">Subtotal</span>
-              <span className="font-mono">{currency.format(subtotal)}</span>
-            </div>
-            <div className="flex justify-between py-1">
-              <span className="text-carbon/60">Descuento</span>
-              <span className="font-mono">-{currency.format(quote.discount)}</span>
-            </div>
-            <div className="flex justify-between py-1">
-              <span className="text-carbon/60">Impuesto ({quote.tax_rate}%)</span>
-              <span className="font-mono">{currency.format(tax)}</span>
-            </div>
-            <div className="flex justify-between border-t border-carbon/10 py-2 font-medium">
-              <span>Total</span>
-              <span className="font-mono">{currency.format(total)}</span>
+          <div className="mt-8 flex justify-end">
+            <div className="w-64 font-dp-sans text-[13px]">
+              <div className="flex justify-between py-1.5">
+                <span className="text-concreto">Subtotal</span>
+                <span className="font-dp-mono text-tinta">{currency.format(subtotal)}</span>
+              </div>
+              <div className="flex justify-between py-1.5">
+                <span className="text-concreto">Descuento</span>
+                <span className="font-dp-mono text-tinta">-{currency.format(quote.discount)}</span>
+              </div>
+              <div className="flex justify-between py-1.5">
+                <span className="text-concreto">Impuesto ({quote.tax_rate}%)</span>
+                <span className="font-dp-mono text-tinta">{currency.format(tax)}</span>
+              </div>
+              <div className="flex justify-between border-t border-corte py-2.5">
+                <span className="text-tinta">Total</span>
+                <span className="font-dp-mono text-tinta">{currency.format(total)}</span>
+              </div>
             </div>
           </div>
+        </Section>
+
+        <div className="mt-10 border-t border-filete pt-10">
+          <Section title="Detalles">
+            <form action={boundUpdateMeta} className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="discount" className={labelClass}>
+                  Descuento
+                </label>
+                <input
+                  id="discount"
+                  name="discount"
+                  type="number"
+                  step="0.01"
+                  defaultValue={quote.discount}
+                  className={inputClass}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="tax_rate" className={labelClass}>
+                  Impuesto (%)
+                </label>
+                <input
+                  id="tax_rate"
+                  name="tax_rate"
+                  type="number"
+                  step="0.01"
+                  defaultValue={quote.tax_rate}
+                  className={inputClass}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="valid_until" className={labelClass}>
+                  Válida hasta
+                </label>
+                <input
+                  id="valid_until"
+                  name="valid_until"
+                  type="date"
+                  defaultValue={quote.valid_until ?? ""}
+                  className={inputClass}
+                />
+              </div>
+              <div className="col-span-2 flex flex-col gap-2">
+                <label htmlFor="notes" className={labelClass}>
+                  Notas
+                </label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  defaultValue={quote.notes ?? ""}
+                  rows={3}
+                  className={textareaClass}
+                />
+              </div>
+              <SubmitButton size="md" pendingLabel="Guardando…" className="col-span-2 w-fit">
+                Guardar
+              </SubmitButton>
+            </form>
+          </Section>
         </div>
-      </Section>
-
-      <Section title="Detalles">
-        <form action={boundUpdateMeta} className="grid grid-cols-2 gap-3">
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="discount" className={labelClass}>
-              Descuento
-            </label>
-            <input
-              id="discount"
-              name="discount"
-              type="number"
-              step="0.01"
-              defaultValue={quote.discount}
-              className={inputClass}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="tax_rate" className={labelClass}>
-              Impuesto (%)
-            </label>
-            <input
-              id="tax_rate"
-              name="tax_rate"
-              type="number"
-              step="0.01"
-              defaultValue={quote.tax_rate}
-              className={inputClass}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="valid_until" className={labelClass}>
-              Válida hasta
-            </label>
-            <input
-              id="valid_until"
-              name="valid_until"
-              type="date"
-              defaultValue={quote.valid_until ?? ""}
-              className={inputClass}
-            />
-          </div>
-          <div className="col-span-2 flex flex-col gap-1.5">
-            <label htmlFor="notes" className={labelClass}>
-              Notas
-            </label>
-            <textarea
-              id="notes"
-              name="notes"
-              defaultValue={quote.notes ?? ""}
-              rows={3}
-              className={textareaClass}
-            />
-          </div>
-          <SubmitButton size="md" pendingLabel="Guardando…" className="col-span-2 w-fit">
-            Guardar
-          </SubmitButton>
-        </form>
-      </Section>
+      </div>
     </div>
   );
 }

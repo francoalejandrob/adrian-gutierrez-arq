@@ -1,5 +1,5 @@
 import type { Database } from "./database.types";
-import type { StatusTone } from "@/components/dashboard/ui/status-badge";
+import type { LabelTone } from "@/components/dashboard/ui/status-label";
 
 export type Lead = Database["public"]["Tables"]["leads"]["Row"];
 export type LeadInsert = Database["public"]["Tables"]["leads"]["Insert"];
@@ -67,12 +67,12 @@ export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
   expired: "Expirada",
 };
 
-export const QUOTE_STATUS_TONE: Record<QuoteStatus, StatusTone> = {
+export const QUOTE_STATUS_TONE: Record<QuoteStatus, LabelTone> = {
   draft: "neutral",
-  sent: "info",
-  negotiation: "warning",
-  accepted: "success",
-  rejected: "danger",
+  sent: "attention",
+  negotiation: "attention",
+  accepted: "resolved",
+  rejected: "neutral",
   expired: "neutral",
 };
 
@@ -85,11 +85,11 @@ export const CONTRACT_STATUS_LABELS: Record<ContractStatus, string> = {
   cancelled: "Cancelado",
 };
 
-export const CONTRACT_STATUS_TONE: Record<ContractStatus, StatusTone> = {
+export const CONTRACT_STATUS_TONE: Record<ContractStatus, LabelTone> = {
   draft: "neutral",
-  active: "info",
-  completed: "success",
-  cancelled: "danger",
+  active: "neutral",
+  completed: "resolved",
+  cancelled: "attention",
 };
 
 export const PAYMENT_STATUSES: PaymentStatus[] = ["pendiente", "pagada", "vencida"];
@@ -100,10 +100,10 @@ export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
   vencida: "Vencida",
 };
 
-export const PAYMENT_STATUS_TONE: Record<PaymentStatus, StatusTone> = {
-  pendiente: "warning",
-  pagada: "success",
-  vencida: "danger",
+export const PAYMENT_STATUS_TONE: Record<PaymentStatus, LabelTone> = {
+  pendiente: "neutral",
+  pagada: "resolved",
+  vencida: "attention",
 };
 
 export const EXPENSE_CATEGORIES: ExpenseCategory[] = [
@@ -155,17 +155,17 @@ export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   cancelled: "Cancelado",
 };
 
-export const PROJECT_STATUS_TONE: Record<ProjectStatus, StatusTone> = {
+export const PROJECT_STATUS_TONE: Record<ProjectStatus, LabelTone> = {
   planning: "neutral",
-  design: "info",
-  documentation: "info",
-  permits: "warning",
-  construction: "warning",
-  supervision: "warning",
-  delivery: "info",
-  completed: "success",
-  on_hold: "warning",
-  cancelled: "danger",
+  design: "neutral",
+  documentation: "neutral",
+  permits: "neutral",
+  construction: "neutral",
+  supervision: "neutral",
+  delivery: "neutral",
+  completed: "resolved",
+  on_hold: "attention",
+  cancelled: "attention",
 };
 
 export const PROJECT_CATEGORIES: ProjectCategory[] = [
@@ -184,10 +184,10 @@ export const PHASE_STATUS_LABELS: Record<PhaseStatus, string> = {
   completada: "Completada",
 };
 
-export const PHASE_STATUS_TONE: Record<PhaseStatus, StatusTone> = {
+export const PHASE_STATUS_TONE: Record<PhaseStatus, LabelTone> = {
   pendiente: "neutral",
-  en_progreso: "info",
-  completada: "success",
+  en_progreso: "attention",
+  completada: "resolved",
 };
 
 export const TASK_STATUSES: TaskStatus[] = ["backlog", "todo", "in_progress", "review", "completed"];
@@ -200,12 +200,12 @@ export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {
   completed: "Completada",
 };
 
-export const TASK_STATUS_TONE: Record<TaskStatus, StatusTone> = {
+export const TASK_STATUS_TONE: Record<TaskStatus, LabelTone> = {
   backlog: "neutral",
   todo: "neutral",
-  in_progress: "info",
-  review: "warning",
-  completed: "success",
+  in_progress: "neutral",
+  review: "attention",
+  completed: "resolved",
 };
 
 export const TASK_PRIORITIES: TaskPriority[] = ["low", "medium", "high", "critical"];
@@ -246,11 +246,11 @@ export const DOC_VERSION_STATUS_LABELS: Record<DocVersionStatus, string> = {
   cambios_solicitados: "Cambios solicitados",
 };
 
-export const DOC_VERSION_STATUS_TONE: Record<DocVersionStatus, StatusTone> = {
+export const DOC_VERSION_STATUS_TONE: Record<DocVersionStatus, LabelTone> = {
   borrador: "neutral",
-  enviado: "info",
-  aprobado: "success",
-  cambios_solicitados: "warning",
+  enviado: "neutral",
+  aprobado: "resolved",
+  cambios_solicitados: "attention",
 };
 
 export const LEAD_STATUSES: LeadStatus[] = [
@@ -271,11 +271,11 @@ export const LEAD_STATUS_LABELS: Record<LeadStatus, string> = {
   perdido: "Perdido",
 };
 
-export const LEAD_STATUS_TONE: Record<LeadStatus, StatusTone> = {
-  nuevo: "info",
+export const LEAD_STATUS_TONE: Record<LeadStatus, LabelTone> = {
+  nuevo: "neutral",
   contactado: "neutral",
-  propuesta: "warning",
-  negociacion: "warning",
-  ganado: "success",
-  perdido: "danger",
+  propuesta: "attention",
+  negociacion: "attention",
+  ganado: "resolved",
+  perdido: "neutral",
 };

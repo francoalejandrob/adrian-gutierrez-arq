@@ -1,4 +1,3 @@
-import { ArrowLeft, ArrowRightCircle } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import LeadForm from "@/components/dashboard/lead-form";
@@ -35,65 +34,64 @@ export default async function LeadDetailPage(
   const boundConvert = convertLeadToClient.bind(null, id);
 
   return (
-    <div className="max-w-3xl">
-      <Link
-        href="/dashboard/crm?tab=leads"
-        className="mb-4 inline-flex items-center gap-1.5 text-[12.5px] text-carbon/45 transition-colors duration-150 hover:text-carbon"
-      >
-        <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
-        CRM
-      </Link>
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-[26px] font-medium text-carbon">{lead.name}</h1>
-          <p className="mt-1 text-sm text-carbon/55">{lead.email}</p>
-        </div>
-        {lead.status !== "ganado" && (
-          <form action={boundConvert}>
-            <Button type="submit">
-              <ArrowRightCircle size={16} strokeWidth={2} aria-hidden="true" />
-              Convertir en cliente
-            </Button>
-          </form>
-        )}
-      </div>
-
-      <div className="mt-6">
-        <StatusSelect
-          action={boundUpdateStatus}
-          defaultValue={lead.status}
-          options={LEAD_STATUSES.map((status) => ({
-            value: status,
-            label: LEAD_STATUS_LABELS[status],
-          }))}
-        />
-      </div>
-
-      <Section title="Editar información">
-        <LeadForm action={boundUpdate} defaultValues={lead} />
-      </Section>
-
-      <Section title="Actividad">
-        <form action={boundAddNote} className="flex gap-2">
-          <input name="body" placeholder="Agregar una nota…" className={`flex-1 ${inputClass}`} />
-          <SubmitButton variant="secondary" pendingLabel="Agregando…">
-            Agregar
-          </SubmitButton>
-        </form>
-        <ul className="mt-4 flex flex-col gap-3">
-          {(activity ?? []).map((item) => (
-            <li key={item.id} className="border-b border-carbon/5 pb-3 text-sm last:border-0">
-              <p className="text-carbon/80">{item.body}</p>
-              <p className="mt-1 text-xs text-carbon/40">
-                {new Date(item.created_at).toLocaleString("es-EC")}
-              </p>
-            </li>
-          ))}
-          {(activity ?? []).length === 0 && (
-            <li className="text-sm text-carbon/40">Sin actividad todavía.</li>
+    <div>
+      <div className="border-b border-corte px-12 pb-[30px] pt-[52px]">
+        <Link
+          href="/dashboard/crm?tab=leads"
+          className="mb-[18px] inline-block font-dp-mono text-[10px] uppercase tracking-[0.14em] text-concreto hover:text-tinta"
+        >
+          ← CRM
+        </Link>
+        <div className="flex items-end justify-between gap-10">
+          <div>
+            <h1 className="font-dp-serif text-[44px] leading-none tracking-[-0.015em] text-tinta">{lead.name}</h1>
+            <p className="mt-3 font-dp-sans text-[13px] text-concreto">{lead.email}</p>
+          </div>
+          {lead.status !== "ganado" && (
+            <form action={boundConvert}>
+              <Button type="submit">Convertir en cliente</Button>
+            </form>
           )}
-        </ul>
-      </Section>
+        </div>
+        <div className="mt-5">
+          <StatusSelect
+            action={boundUpdateStatus}
+            defaultValue={lead.status}
+            options={LEAD_STATUSES.map((status) => ({
+              value: status,
+              label: LEAD_STATUS_LABELS[status],
+            }))}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-10 px-12 py-10 lg:grid-cols-2">
+        <Section title="Editar información">
+          <LeadForm action={boundUpdate} defaultValues={lead} />
+        </Section>
+
+        <Section title="Actividad">
+          <form action={boundAddNote} className="flex gap-2.5">
+            <input name="body" placeholder="Agregar una nota…" className={`flex-1 ${inputClass}`} />
+            <SubmitButton variant="secondary" pendingLabel="Agregando…">
+              Agregar
+            </SubmitButton>
+          </form>
+          <ul className="mt-5 flex flex-col gap-3.5">
+            {(activity ?? []).map((item) => (
+              <li key={item.id} className="border-b border-filete pb-3.5 last:border-0">
+                <p className="font-dp-sans text-[13px] text-grafito">{item.body}</p>
+                <p className="mt-1.5 font-dp-mono text-[10.5px] text-concreto">
+                  {new Date(item.created_at).toLocaleString("es-EC")}
+                </p>
+              </li>
+            ))}
+            {(activity ?? []).length === 0 && (
+              <li className="font-dp-sans text-sm text-concreto">Sin actividad todavía.</li>
+            )}
+          </ul>
+        </Section>
+      </div>
     </div>
   );
 }

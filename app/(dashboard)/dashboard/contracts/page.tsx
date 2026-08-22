@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { FileSignature } from "lucide-react";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
-import StatusBadge from "@/components/dashboard/ui/status-badge";
+import StatusLabel from "@/components/dashboard/ui/status-label";
 import { createClient } from "@/lib/supabase/server";
 import { CONTRACT_STATUS_LABELS, CONTRACT_STATUS_TONE } from "@/lib/supabase/types";
 
@@ -17,52 +16,41 @@ export default async function ContractsPage() {
 
   return (
     <div>
-      <PageHeader title="Contratos" description="Todos los contratos, en cualquier proyecto." />
+      <PageHeader eyebrow="Comercial · Todos los contratos, en cualquier proyecto" title="Contratos" />
 
       {(contracts ?? []).length > 0 ? (
-        <div className="mt-6 overflow-x-auto rounded-[10px] border border-carbon/[0.08] bg-white">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-carbon/[0.08] text-[11px] uppercase tracking-wide text-carbon/40">
-                <th className="px-4 py-3">Cliente</th>
-                <th className="px-4 py-3">Proyecto</th>
-                <th className="px-4 py-3">Valor</th>
-                <th className="px-4 py-3">Firmado</th>
-                <th className="px-4 py-3">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(contracts ?? []).map((contract) => (
-                <tr key={contract.id} className="border-b border-carbon/5 transition-colors duration-100 last:border-0 hover:bg-hueso/60">
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/dashboard/projects/${contract.project_id}?tab=finance`}
-                      className="font-medium text-carbon hover:text-naranja-oscuro hover:underline"
-                    >
-                      {contract.projects?.clients?.name ?? "—"}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-carbon/60">{contract.projects?.name ?? "—"}</td>
-                  <td className="px-4 py-3 font-mono">{currency.format(contract.value)}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-carbon/50">
-                    {contract.signed_at ? new Date(contract.signed_at).toLocaleDateString("es-EC") : "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge label={CONTRACT_STATUS_LABELS[contract.status]} tone={CONTRACT_STATUS_TONE[contract.status]} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div>
+          <div className="grid grid-cols-[1.6fr_1.6fr_1fr_1fr_1fr] gap-4 border-b border-filete px-12 py-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">
+            <span>Cliente</span>
+            <span>Proyecto</span>
+            <span>Valor</span>
+            <span>Firmado</span>
+            <span>Estado</span>
+          </div>
+          {(contracts ?? []).map((contract, i) => (
+            <Link
+              key={contract.id}
+              href={`/dashboard/projects/${contract.project_id}?tab=finance`}
+              className="grid grid-cols-[1.6fr_1.6fr_1fr_1fr_1fr] items-center gap-4 border-b border-filete px-12 py-4 transition-colors duration-100 hover:bg-[#EDEBE4]"
+            >
+              <span className="flex items-baseline gap-3 font-dp-sans text-[13.5px] text-tinta">
+                <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
+                {contract.projects?.clients?.name ?? "—"}
+              </span>
+              <span className="truncate font-dp-sans text-[12.5px] text-grafito">{contract.projects?.name ?? "—"}</span>
+              <span className="font-dp-mono text-[12.5px] text-tinta">{currency.format(contract.value)}</span>
+              <span className="font-dp-mono text-[11px] text-concreto">
+                {contract.signed_at ? new Date(contract.signed_at).toLocaleDateString("es-EC") : "—"}
+              </span>
+              <StatusLabel label={CONTRACT_STATUS_LABELS[contract.status]} tone={CONTRACT_STATUS_TONE[contract.status]} />
+            </Link>
+          ))}
         </div>
       ) : (
-        <div className="mt-6 rounded-[10px] border border-carbon/[0.08] bg-white">
-          <EmptyState
-            icon={FileSignature}
-            title="Todavía no hay contratos"
-            description="Creá uno desde la ficha de un proyecto, en la pestaña Finanzas."
-          />
-        </div>
+        <EmptyState
+          title="Todavía no hay contratos"
+          description="Creá uno desde la ficha de un proyecto, en la pestaña Finanzas."
+        />
       )}
     </div>
   );

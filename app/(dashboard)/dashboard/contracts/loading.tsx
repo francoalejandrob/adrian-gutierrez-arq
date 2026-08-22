@@ -1,5 +1,5 @@
 import { PageSkeleton } from "@/components/dashboard/ui/skeleton";
 
 export default function ContractsLoading() {
-  return <PageSkeleton rows={6} cols={5} />;
+  return <PageSkeleton rows={6} />;
 }
