@@ -39,6 +39,7 @@ import {
   createTask,
   deletePhase,
   deleteTask,
+  getSignedDownloadUrl,
   invitePortalAccess,
   revokePortalAccess,
   updateDocumentVersionStatus,
@@ -365,7 +366,7 @@ export default async function ProjectDetailPage(
                           v{version.version} — {new Date(version.created_at).toLocaleDateString("es-EC")}
                           {version.comment ? ` — ${version.comment}` : ""}
                         </span>
-                        <DownloadButton storagePath={version.storage_path} />
+                        <DownloadButton storagePath={version.storage_path} getUrl={getSignedDownloadUrl} />
                       </li>
                     ))}
                 </ul>

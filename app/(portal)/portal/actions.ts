@@ -85,6 +85,16 @@ export async function respondToQuote(projectId: string, quoteId: string, formDat
   revalidatePath(`/portal/projects/${projectId}`);
 }
 
+// RLS ("portal clients read their visible document objects", storage
+// policy) only allows this to reach an object whose document is
+// visibility='client' and belongs to the caller's own project.
+export async function getPortalDownloadUrl(storagePath: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase.storage.from("documents").createSignedUrl(storagePath, 60);
+  if (error) throw new Error(error.message);
+  return data.signedUrl;
+}
+
 export async function addPortalMessage(projectId: string, formData: FormData) {
   const body = String(formData.get("body") ?? "").trim();
   if (!body) return;

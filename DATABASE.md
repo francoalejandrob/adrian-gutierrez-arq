@@ -312,6 +312,51 @@ Las tres acciones de portal además envían un email al estudio vía Resend
 best-effort: si Resend falla, la acción del cliente en el portal igual
 se guarda, solo se pierde el aviso por correo.
 
+## 1f. Agenda (construida al replicar la guía visual del usuario)
+
+Migración `0009_calendar.sql`.
+
+### `calendar_events`
+| columna | tipo | notas |
+|---|---|---|
+| id, organization_id | uuid | |
+| project_id | uuid, FK → projects, nullable, `on delete set null` | evento interno (sin proyecto) si es `null` |
+| title | text | |
+| starts_at | timestamptz | |
+| ends_at | timestamptz | nullable |
+| notes | text | nullable |
+| created_by | uuid, FK → profiles, nullable | |
+| created_at | timestamptz | |
+
+RLS: policy org-scoped estándar + policy adicional de portal (SELECT
+únicamente, eventos cuyo `project_id` pertenece a un proyecto del
+cliente — un evento sin proyecto nunca es visible en el portal).
+Verificado con test E2E (anon sin acceso, org member ve todo, portal
+solo ve eventos de su propio proyecto, portal no puede insertar).
+
+Alimenta el KPI "Reuniones hoy" del dashboard y la tarjeta "Próxima
+reunión" del portal de cliente.
+
+### Storage: descarga de documentos desde el portal
+Migración `0010_portal_document_downloads.sql`. Hasta esta migración,
+`storage.objects` solo tenía policy para `organization_members` — un
+cliente de portal podía ver los metadatos de `document_versions` (Fase
+3) pero nunca pudo descargar el archivo real. Se agregó una policy de
+`select` adicional sobre `storage.objects` que valida **dos cosas** a la
+vez contra la ruta del archivo (`{organization_id}/{project_id}/{document_id}/...`,
+`storage.foldername(name)[3]` = `document_id`):
+1. el `project_id` de la ruta pertenece a un proyecto del cliente
+   (`my_portal_client_ids()`), y
+2. el `documents.visibility` de ese `document_id` es `'client'`.
+
+La verificación por `documents.visibility` es necesaria porque la
+estructura de carpetas por sí sola solo prueba "este proyecto es del
+cliente", no que el estudio haya marcado ese documento específico como
+compartible — sin ese segundo chequeo, un cliente podría generar una URL
+firmada para un documento interno con solo adivinar/enumerar su ruta.
+Verificado con test E2E (incluye una descarga real end-to-end del
+archivo, no solo que la policy no tire error).
+
 ## 2. RLS (todas las tablas de arriba)
 
 Policy única por tabla: el usuario debe estar autenticado y pertenecer

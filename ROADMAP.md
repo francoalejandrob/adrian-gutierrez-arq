@@ -163,6 +163,13 @@ al estudio o al cliente (Fase 6).
       pieza de automatización real más obviamente útil de ahí, y quotes
       ya existían) en vez de reimplementarla aquí como un "workflow"
       genérico separado
+- [x] Agenda interna (`calendar_events`, migración `0009_calendar.sql`):
+      agregada más tarde, al replicar la guía visual del usuario (que
+      incluía "Agenda" en el nav) — eventos internos con fecha/proyecto
+      opcional, RLS org-scoped + adicional de portal de solo lectura.
+      Es la agenda *del estudio*, no una sincronización con Google
+      Calendar — esa integración externa (`lib/integrations/
+      google-calendar.ts`, abajo) sigue sin implementar.
 
 **No incluido en Fase 6**:
 - Motor de workflows configurable (if this → that por UI) — con un único
@@ -229,3 +236,36 @@ solo usarlo para el de Adrián.
   aprobación de pago).
 - Documentación: `AUDIT.md`/`ARCHITECTURE.md`/`DATABASE.md` se actualizan
   cuando cambie la arquitectura, no quedan como snapshot de un solo día.
+
+## Rediseño visual (`DISEÑO/ARCHI.OS.dc.html`) ✅
+
+No es una fase del master prompt — es un pase transversal pedido después
+de cerrar la Fase 7: reemplazar el estilo genérico de un pulido anterior
+por la guía visual específica que el usuario diseñó con Claude (carpeta
+`DISEÑO/`). Cubrió dashboard admin + portal de cliente + login, y de
+paso agregó tres pantallas que la guía incluía en el nav pero que no
+existían como feature real:
+
+- **Agenda** — ver Fase 6 arriba.
+- **Reportes** (`/dashboard/reports`) — 4 reportes (comercial/
+  financiero/proyectos/marketing) con exportación real: CSV vía
+  `app/api/reports/[type]/csv/route.ts`, PDF vía vista imprimible
+  (`/dashboard/reports/[type]/print`, mismo truco de impresión de Fase
+  4). Nunca un botón decorativo que no hace nada.
+- **Configuración** (`/dashboard/settings`) — solo lectura: nombre del
+  estudio y equipo reales (`organization_members` + `profiles`). Sin
+  edición todavía, sin los campos de color/dominio del mockup porque no
+  existen en el modelo de datos.
+
+También reestructuró la navegación: Leads/Clientes se unificaron en un
+solo módulo `/dashboard/crm` (tabs Leads/Clientes/Pipeline, con vista
+Kanban nueva para leads), y el workspace de un proyecto pasó de una
+página larga a 7 tabs. Ver `ARCHITECTURE.md` §6d para el detalle técnico
+completo, incluida la policy de storage que faltaba para que el portal
+pudiera descargar documentos (no solo ver sus metadatos).
+
+**Deliberadamente no incluido**: un modo oscuro real (el toggle Light/
+Dark del mockup es una demo del propio editor de diseño, no un sistema
+de temas pedido); el chrome de "⌘K Buscar" y los pills Admin/Portal/
+Login del mockup (son chrome del editor de diseño de Claude para
+previsualizar los 3 modos, no parte del producto).

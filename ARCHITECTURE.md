@@ -198,6 +198,59 @@ en `print:p-0`; el navegador genera el PDF (Ctrl+P) mostrando solo el
 contenido de la página. Mismo criterio que el Gantt propio de Fase 2: sin
 dependencia nueva que mantener.
 
+## 6d. Rediseño visual sobre `DISEÑO/ARCHI.OS.dc.html`
+
+El usuario diseñó una guía visual completa con Claude (mockup HTML
+interactivo en `DISEÑO/`) y pidió replicarla en el dashboard real,
+reemplazando el "pulido" genérico de un turno anterior. Cambios
+estructurales que introdujo, más allá de estilos:
+
+- **Token nuevo `--color-noche` (`#141210`)** en `app/globals.css`: el
+  gris-carbón cálido del sidebar. Distinto de `--color-carbon`
+  (`#000000`, ya usado como color de *texto* en todo el sitio) para no
+  pisar ese significado.
+- **Patrón de tabs vía `?tab=`**: en vez de un componente de tabs con
+  estado de cliente, cada pestaña (CRM, workspace de proyecto, Website,
+  portal de cliente) es un `Link` a la misma ruta con un query param
+  distinto, leído server-side (`searchParams.tab`) para decidir qué
+  renderizar. Mismo patrón que los filtros de estado que ya existían en
+  `/dashboard/leads` y `/dashboard/projects` — sin sumar una librería de
+  tabs ni JS de cliente nuevo, y el estado de la pestaña sobrevive un
+  refresh o un link compartido.
+- **CRM unificado**: `/dashboard/leads` y `/dashboard/clients` (los
+  índices) pasan a `redirect()` hacia `/dashboard/crm?tab=leads` /
+  `?tab=clientes` — la guía los pide como un solo módulo con tabs
+  (Leads/Clientes/Pipeline) en vez de dos páginas separadas en el nav.
+  Las rutas de detalle/creación (`leads/[id]`, `leads/new`,
+  `clients/[id]`, `clients/new`) no cambiaron de URL.
+- **Workspace de proyecto en tabs**: `/dashboard/projects/[id]` pasó de
+  una sola página larga a 7 tabs (Overview/Tareas/Cronograma/
+  Documentos/Aprobaciones/Finanzas/Actividad) vía el mismo patrón
+  `?tab=`. El fetch de datos no cambió (sigue trayendo todo en un
+  `Promise.all`); solo cambió qué sección se renderiza.
+- **Descarga de documentos habilitada en el portal**: la guía muestra un
+  link "Descargar" en la pestaña Documentos del portal, que no existía
+  antes (Fase 3 solo exponía metadatos, nunca el archivo). Se agregó la
+  policy de `storage.objects` que faltaba — ver `DATABASE.md` §1f.
+  `components/dashboard/download-button.tsx` pasó de importar la Server
+  Action del dashboard directo a recibir `getUrl` como prop, para poder
+  reusarse con la Server Action del portal (`getPortalDownloadUrl`) sin
+  duplicar el componente.
+- **Aprobaciones desde el dashboard**: la guía muestra botones Aprobar/
+  Solicitar cambios también en el panel del estudio, no solo en el
+  portal. Se agregó `updateDocumentVersionStatus` (Server Action de
+  dashboard) que reutiliza el permiso RLS org-scoped que
+  `organization_members` ya tenía sobre `document_versions` desde Fase
+  2 — no es una policy nueva, es una superficie de UI nueva sobre un
+  permiso existente.
+- **Agenda, Reportes y Configuración son pantallas nuevas** (la guía las
+  incluye en el nav aunque no existían como feature). Agenda tiene tabla
+  propia (`calendar_events`, ver `DATABASE.md` §1f). Reportes exporta
+  CSV real (`app/api/reports/[type]/csv/route.ts`) y PDF vía vista
+  imprimible (mismo truco de §6c). Configuración es de solo lectura
+  (nombre del estudio + equipo reales; sin los campos de color/dominio
+  del mockup, que no existen en el modelo de datos).
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

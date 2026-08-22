@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { createClient } from "@/lib/supabase/server";
 import { portalSignOut } from "../auth-actions";
 
 export const metadata: Metadata = {
@@ -6,21 +7,23 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function PortalAuthenticatedLayout({ children }: LayoutProps<"/portal">) {
+export default async function PortalAuthenticatedLayout({ children }: LayoutProps<"/portal">) {
+  const supabase = await createClient();
+  const { data: org } = await supabase.from("organizations").select("name").limit(1).maybeSingle();
+
   return (
     <div className="min-h-dvh bg-hueso">
-      <header className="flex items-center justify-between border-b border-carbon/10 bg-white px-6 py-4">
-        <p className="font-display text-lg text-carbon">Adrián Gutiérrez — Portal</p>
-        <form action={portalSignOut}>
-          <button
-            type="submit"
-            className="cursor-pointer text-xs uppercase tracking-wide text-carbon/50 hover:text-carbon"
-          >
-            Cerrar sesión
-          </button>
-        </form>
-      </header>
-      <main className="mx-auto max-w-3xl px-6 py-10">{children}</main>
+      <div className="mx-auto max-w-[520px] px-6 pb-24 pt-10">
+        <div className="mb-10 flex items-center justify-between">
+          <p className="font-display text-base font-semibold text-carbon">{org?.name ?? "Adrián Gutiérrez Arq."}</p>
+          <form action={portalSignOut}>
+            <button type="submit" className="cursor-pointer text-xs text-carbon/40 transition-colors duration-150 hover:text-carbon">
+              Salir
+            </button>
+          </form>
+        </div>
+        {children}
+      </div>
     </div>
   );
 }

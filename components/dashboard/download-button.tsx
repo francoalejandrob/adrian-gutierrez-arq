@@ -1,15 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { getSignedDownloadUrl } from "@/app/(dashboard)/dashboard/projects/[id]/actions";
 
-export default function DownloadButton({ storagePath }: { storagePath: string }) {
+export default function DownloadButton({
+  storagePath,
+  getUrl,
+}: {
+  storagePath: string;
+  getUrl: (storagePath: string) => Promise<string>;
+}) {
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
     setLoading(true);
     try {
-      const url = await getSignedDownloadUrl(storagePath);
+      const url = await getUrl(storagePath);
       window.open(url, "_blank", "noopener,noreferrer");
     } finally {
       setLoading(false);
