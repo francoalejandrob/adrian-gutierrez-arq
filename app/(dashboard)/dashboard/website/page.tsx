@@ -111,7 +111,7 @@ export default async function WebsitePage(props: PageProps<"/dashboard/website">
                   <FunnelStat label="Leads" value={String(row.leads)} />
                   <FunnelStat label="Clientes" value={String(row.clients)} />
                   <FunnelStat label="Proyectos" value={String(row.projects)} />
-                  <FunnelStat label="Ingresos" value={currency.format(row.contractedValue)} accent />
+                  <FunnelStat label="Ingresos" value={currency.format(row.contractedValue)} positive />
                 </div>
               ))}
             </div>
@@ -137,10 +137,10 @@ function WebsiteTab({ href, label, active }: { href: string; label: string; acti
   );
 }
 
-function FunnelStat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function FunnelStat({ label, value, positive }: { label: string; value: string; positive?: boolean }) {
   return (
     <div>
-      <p className={`font-dp-mono text-[15px] ${accent ? "text-acento" : "text-tinta"}`}>{value}</p>
+      <p className={`font-dp-mono text-[15px] ${positive ? "text-verde" : "text-tinta"}`}>{value}</p>
       <p className="mt-1 font-dp-mono text-[9px] uppercase tracking-[0.08em] text-concreto">{label}</p>
     </div>
   );

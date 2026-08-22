@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { inputClass, selectClass } from "@/components/dashboard/ui/styles";
@@ -61,18 +62,18 @@ export default async function CalendarPage(props: PageProps<"/dashboard/calendar
           <div className="flex items-center gap-5">
             <Link
               href={`/dashboard/calendar?year=${prevMonth.year}&month=${prevMonth.month}`}
-              className="font-dp-mono text-[13px] text-concreto hover:text-tinta"
+              className="flex h-7 w-7 items-center justify-center rounded-full text-concreto transition-colors hover:bg-[#EDEBE4] hover:text-tinta"
             >
-              ←
+              <ChevronLeft size={16} strokeWidth={1.75} aria-hidden="true" />
             </Link>
             <span className="font-dp-mono text-[12px] uppercase tracking-[0.1em] text-tinta">
               {MONTH_NAMES[month]} {year}
             </span>
             <Link
               href={`/dashboard/calendar?year=${nextMonth.year}&month=${nextMonth.month}`}
-              className="font-dp-mono text-[13px] text-concreto hover:text-tinta"
+              className="flex h-7 w-7 items-center justify-center rounded-full text-concreto transition-colors hover:bg-[#EDEBE4] hover:text-tinta"
             >
-              →
+              <ChevronRight size={16} strokeWidth={1.75} aria-hidden="true" />
             </Link>
           </div>
         }
@@ -96,7 +97,7 @@ export default async function CalendarPage(props: PageProps<"/dashboard/calendar
       </form>
 
       <div className="px-12 py-8">
-        <div className="grid grid-cols-7 border-l border-t border-filete">
+        <div className="dp-card grid grid-cols-7">
           {DAY_LABELS.map((label) => (
             <div key={label} className="border-b border-r border-filete px-2 py-2 text-center font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">
               {label}
