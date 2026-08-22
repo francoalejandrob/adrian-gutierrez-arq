@@ -1,8 +1,30 @@
+import type { BadgeTone } from "@/components/dashboard/ui/status-badge";
+
+// Same 5-tone map StatusBadge uses (resolved/attention/warning/info/
+// neutral → verde/acento/ambar/azul/concreto) — one source of truth for
+// "what color means what status" reused by every chart that breaks data
+// down by status, instead of each chart picking its own colors.
+export const TONE_STROKE: Record<BadgeTone, string> = {
+  resolved: "stroke-verde",
+  attention: "stroke-acento",
+  warning: "stroke-ambar",
+  info: "stroke-azul",
+  neutral: "stroke-concreto",
+};
+
+export const TONE_BG: Record<BadgeTone, string> = {
+  resolved: "bg-verde",
+  attention: "bg-acento",
+  warning: "bg-ambar",
+  info: "bg-azul",
+  neutral: "bg-concreto",
+};
+
 // Shared ordinal color scale for categories that carry no inherent
 // resolved/attention meaning (lead source, traffic channel, …) — a single
 // hue (tinta) stepped down in opacity per rank, instead of assigning an
-// arbitrary rainbow color per category. Keeps every chart inside the "two
-// meaningful colors (acento/verde), everything else neutral" grammar.
+// arbitrary rainbow color per category. Keeps every chart inside the
+// deliberate palette instead of an arbitrary per-category rainbow.
 export const TINTA_STROKE_SCALE = [
   "stroke-tinta",
   "stroke-tinta/72",

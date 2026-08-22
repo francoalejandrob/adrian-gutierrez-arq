@@ -2,7 +2,7 @@ import Link from "next/link";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
-import StatusLabel from "@/components/dashboard/ui/status-label";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import { computePipeline } from "@/lib/pipeline";
 import { createClient } from "@/lib/supabase/server";
 import { LEAD_STATUS_LABELS, LEAD_STATUS_TONE, LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/supabase/types";
@@ -123,7 +123,7 @@ async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; stat
               <span className="truncate font-dp-sans text-[12.5px] text-grafito">{lead.need || "—"}</span>
               <span className="font-dp-mono text-[12.5px] text-tinta">{lead.estimated_value ? currency.format(lead.estimated_value) : "—"}</span>
               <span className="font-dp-sans text-[12.5px] text-grafito">{lead.source}</span>
-              <StatusLabel label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} tone={LEAD_STATUS_TONE[lead.status as LeadStatus]} />
+              <StatusBadge label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} tone={LEAD_STATUS_TONE[lead.status as LeadStatus]} />
               <span className="font-dp-mono text-[11px] text-concreto">{new Date(lead.created_at).toLocaleDateString("es-EC")}</span>
             </Link>
           ))}

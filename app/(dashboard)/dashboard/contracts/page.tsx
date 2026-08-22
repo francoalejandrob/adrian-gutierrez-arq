@@ -1,7 +1,7 @@
 import Link from "next/link";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
-import StatusLabel from "@/components/dashboard/ui/status-label";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
 import { CONTRACT_STATUS_LABELS, CONTRACT_STATUS_TONE } from "@/lib/supabase/types";
 
@@ -42,7 +42,7 @@ export default async function ContractsPage() {
               <span className="font-dp-mono text-[11px] text-concreto">
                 {contract.signed_at ? new Date(contract.signed_at).toLocaleDateString("es-EC") : "—"}
               </span>
-              <StatusLabel label={CONTRACT_STATUS_LABELS[contract.status]} tone={CONTRACT_STATUS_TONE[contract.status]} />
+              <StatusBadge label={CONTRACT_STATUS_LABELS[contract.status]} tone={CONTRACT_STATUS_TONE[contract.status]} />
             </Link>
           ))}
         </div>

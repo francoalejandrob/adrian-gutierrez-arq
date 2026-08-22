@@ -1,6 +1,7 @@
+import { LogOut } from "lucide-react";
 import { signOut } from "@/app/(dashboard)/dashboard/auth-actions";
-import { initials } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
+import Avatar from "@/components/dashboard/ui/avatar";
 import SidebarNav from "./sidebar-nav";
 import RecentProjects from "./recent-projects";
 
@@ -26,9 +27,7 @@ export default async function Sidebar() {
       <RecentProjects />
 
       <div className="mx-5 mt-6 flex items-center gap-2.5 border-t border-filete pt-4">
-        <span className="flex h-[27px] w-[27px] shrink-0 items-center justify-center bg-tinta font-dp-mono text-[11px] text-papel">
-          {initials(displayName)}
-        </span>
+        <Avatar name={displayName} size={30} />
         <div className="min-w-0 flex-1">
           <p className="truncate font-dp-sans text-[12px] leading-tight text-tinta">{displayName}</p>
           <p className="mt-0.5 font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-[#6E6A60]">{member?.role ?? "—"}</p>
@@ -36,9 +35,10 @@ export default async function Sidebar() {
         <form action={signOut}>
           <button
             type="submit"
-            className="cursor-pointer font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-[#6E6A60] transition-colors duration-150 hover:text-acento"
+            title="Salir"
+            className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-[#6E6A60] transition-colors duration-150 hover:bg-[#EDEBE4] hover:text-acento"
           >
-            Salir
+            <LogOut size={15} strokeWidth={1.75} aria-hidden="true" />
           </button>
         </form>
       </div>

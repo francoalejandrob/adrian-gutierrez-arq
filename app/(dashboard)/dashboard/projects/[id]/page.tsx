@@ -5,7 +5,7 @@ import ProjectForm from "@/components/dashboard/project-form";
 import StatusSelect from "@/components/dashboard/status-select";
 import DownloadButton from "@/components/dashboard/download-button";
 import Section from "@/components/dashboard/ui/section";
-import StatusLabel from "@/components/dashboard/ui/status-label";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import StatusMark from "@/components/dashboard/ui/status-mark";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { inputClass, selectClass } from "@/components/dashboard/ui/styles";
@@ -466,7 +466,7 @@ export default async function ProjectDetailPage(
                   >
                     <span className="flex items-center gap-3">
                       Cotización del {new Date(quote.issue_date).toLocaleDateString("es-EC")}
-                      <StatusLabel label={QUOTE_STATUS_LABELS[quote.status]} tone={QUOTE_STATUS_TONE[quote.status]} />
+                      <StatusBadge label={QUOTE_STATUS_LABELS[quote.status]} tone={QUOTE_STATUS_TONE[quote.status]} />
                     </span>
                     <span className="font-dp-mono">{currency.format(total)}</span>
                   </Link>
@@ -493,7 +493,7 @@ export default async function ProjectDetailPage(
                     </p>
                   </div>
                   <div className="flex items-center gap-2.5">
-                    <StatusLabel label={CONTRACT_STATUS_LABELS[contract.status]} tone={CONTRACT_STATUS_TONE[contract.status]} />
+                    <StatusBadge label={CONTRACT_STATUS_LABELS[contract.status]} tone={CONTRACT_STATUS_TONE[contract.status]} />
                     <StatusSelect
                       action={updateContractStatus.bind(null, id, contract.id)}
                       defaultValue={contract.status}
@@ -528,7 +528,7 @@ export default async function ProjectDetailPage(
                     </p>
                   </div>
                   <div className="flex items-center gap-2.5">
-                    <StatusLabel label={PAYMENT_STATUS_LABELS[payment.status]} tone={PAYMENT_STATUS_TONE[payment.status]} />
+                    <StatusBadge label={PAYMENT_STATUS_LABELS[payment.status]} tone={PAYMENT_STATUS_TONE[payment.status]} />
                     <StatusSelect
                       action={updatePaymentStatus.bind(null, id, payment.id)}
                       defaultValue={payment.status}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import Section from "@/components/dashboard/ui/section";
-import StatusLabel from "@/components/dashboard/ui/status-label";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
 import { PAYMENT_STATUS_LABELS, PAYMENT_STATUS_TONE, type PaymentStatus } from "@/lib/supabase/types";
 
@@ -139,7 +139,7 @@ export default async function FinancePage() {
                   {payment.due_date ?? "sin fecha"}
                 </span>
                 <span className="text-right font-dp-mono text-[12.5px] text-tinta">{currency.format(payment.amount)}</span>
-                <StatusLabel
+                <StatusBadge
                   label={PAYMENT_STATUS_LABELS[payment.status as PaymentStatus]}
                   tone={overdue ? "attention" : PAYMENT_STATUS_TONE[payment.status as PaymentStatus]}
                 />

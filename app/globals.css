@@ -27,6 +27,12 @@
      en StatusLabel/StatusMark y para la etapa "ganado" del pipeline —
      el único otro lugar donde el color transmite información real. */
   --color-verde: #3f6b52;
+  /* Cuarto y quinto color — se agregaron para adoptar el lenguaje de
+     pastillas de estado con más matices (5 tonos en vez de 2) que pidió
+     el usuario mostrando una referencia de dashboard SaaS. Misma familia
+     desaturada que acento/verde, nunca un azul/ámbar saturado genérico. */
+  --color-ambar: #b07a34;
+  --color-azul: #47607a;
 }
 
 @theme inline {
@@ -49,6 +55,8 @@
   --color-tinta: var(--color-tinta);
   --color-acento: var(--color-acento);
   --color-verde: var(--color-verde);
+  --color-ambar: var(--color-ambar);
+  --color-azul: var(--color-azul);
   --font-dp-serif: var(--font-instrument-serif);
   --font-dp-sans: var(--font-archivo);
   --font-dp-mono: var(--font-jetbrains-mono);
@@ -198,6 +206,14 @@ textarea:focus-visible,
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* Draw-in for Sparkline — pathLength is normalized to 100, so this is
+   stack-independent of the actual line length. */
+@keyframes dp-draw-line {
+  to {
+    stroke-dashoffset: 0;
   }
 }
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
-import StatusLabel from "@/components/dashboard/ui/status-label";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
 import { QUOTE_STATUS_LABELS, QUOTE_STATUS_TONE, quoteTotal } from "@/lib/supabase/types";
 
@@ -42,7 +42,7 @@ export default async function QuotesPage() {
                 <span className="truncate font-dp-sans text-[12.5px] text-grafito">{quote.projects?.name ?? "—"}</span>
                 <span className="font-dp-mono text-[12.5px] text-tinta">{currency.format(total)}</span>
                 <span className="font-dp-mono text-[11px] text-concreto">{new Date(quote.issue_date).toLocaleDateString("es-EC")}</span>
-                <StatusLabel label={QUOTE_STATUS_LABELS[quote.status]} tone={QUOTE_STATUS_TONE[quote.status]} />
+                <StatusBadge label={QUOTE_STATUS_LABELS[quote.status]} tone={QUOTE_STATUS_TONE[quote.status]} />
               </Link>
             );
           })}

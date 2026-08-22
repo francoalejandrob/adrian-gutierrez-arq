@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import ClientForm from "@/components/dashboard/client-form";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import Section from "@/components/dashboard/ui/section";
-import StatusLabel from "@/components/dashboard/ui/status-label";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import StatusMark from "@/components/dashboard/ui/status-mark";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { inputClass } from "@/components/dashboard/ui/styles";
@@ -114,7 +114,7 @@ export default async function ClientDetailPage(
                 className="flex items-center justify-between gap-4 border-b border-filete py-3 last:border-0"
               >
                 <span className="truncate font-dp-sans text-[13.5px] text-tinta">{project.name}</span>
-                <StatusLabel
+                <StatusBadge
                   label={PROJECT_STATUS_LABELS[project.status as ProjectStatus]}
                   tone={PROJECT_STATUS_TONE[project.status as ProjectStatus]}
                 />

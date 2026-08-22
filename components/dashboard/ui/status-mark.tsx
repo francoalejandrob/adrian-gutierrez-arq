@@ -1,19 +1,28 @@
-// The geometric half of the state discipline: filled square = resolved,
-// hollow square = pending, red diamond = needs attention, gray filled
-// square = historical/superseded. Used for phase timelines, document
-// version markers, and notification dots — StatusLabel (text) is used
-// for named statuses in tables/lists instead.
+import { AlertCircle, CheckCircle2, Circle } from "lucide-react";
+import type { ComponentType } from "react";
+
+// The geometric half of the old state discipline (filled/hollow square,
+// red diamond) is now an icon, matching the rest of the system after
+// bringing lucide-react back — one visual vocabulary (icons) instead of
+// abstract marks + icons coexisting. Same tone API as before, so every
+// existing call site keeps working unchanged.
 export type MarkTone = "resolved" | "pending" | "attention" | "historic";
 
+const TONE_ICON: Record<MarkTone, ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
+  resolved: CheckCircle2,
+  pending: Circle,
+  attention: AlertCircle,
+  historic: Circle,
+};
+
+const TONE_COLOR: Record<MarkTone, string> = {
+  resolved: "text-verde",
+  pending: "text-corte",
+  attention: "text-acento",
+  historic: "text-concreto",
+};
+
 export default function StatusMark({ tone = "pending", className = "" }: { tone?: MarkTone; className?: string }) {
-  if (tone === "attention") {
-    return <span className={`inline-block h-[9px] w-[9px] rotate-45 bg-acento ${className}`} />;
-  }
-  if (tone === "resolved") {
-    return <span className={`inline-block h-[9px] w-[9px] bg-verde ${className}`} />;
-  }
-  if (tone === "historic") {
-    return <span className={`inline-block h-[9px] w-[9px] bg-corte ${className}`} />;
-  }
-  return <span className={`inline-block h-[9px] w-[9px] border border-[#B5B1A6] bg-superficie ${className}`} />;
+  const Icon = TONE_ICON[tone];
+  return <Icon size={14} strokeWidth={2.25} className={`shrink-0 ${TONE_COLOR[tone]} ${className}`} aria-hidden="true" />;
 }

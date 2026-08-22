@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { CMD_ASK, CMD_CREATE, NAV_GROUPS } from "./nav-items";
+import { CMD_ASK, CMD_CREATE, NAV_GROUPS, type NavItem } from "./nav-items";
 
-type Entry = { label: string; href: string };
+type Entry = { label: string; href: string; icon?: NavItem["icon"] };
 
-const GO_ENTRIES: Entry[] = NAV_GROUPS.flatMap((g) => g.items.map((item) => ({ label: item.label, href: item.href })));
+const GO_ENTRIES: Entry[] = NAV_GROUPS.flatMap((g) => g.items.map((item) => ({ label: item.label, href: item.href, icon: item.icon })));
 
 // Real, functional ⌘K/Ctrl+K palette — every result is a real navigation
 // target (dashboard routes, quick-create links, or a shortcut into Archi
@@ -63,9 +64,11 @@ export default function CommandPalette() {
         type="button"
         onClick={openPalette}
         title="Buscar o navegar"
-        className="flex h-[29px] shrink-0 cursor-pointer items-center justify-center rounded-md border border-filete px-2.5 font-dp-mono text-[10.5px] uppercase tracking-[0.1em] text-concreto transition-colors duration-150 hover:border-tinta hover:text-tinta"
+        className="flex h-[34px] max-w-[280px] flex-1 cursor-pointer items-center gap-2 rounded-full border border-filete bg-superficie px-3.5 text-left transition-colors duration-150 hover:border-tinta"
       >
-        ⌘K
+        <Search size={14} strokeWidth={2} className="shrink-0 text-concreto" aria-hidden="true" />
+        <span className="min-w-0 flex-1 truncate font-dp-sans text-[12.5px] text-concreto">Buscar cualquier cosa</span>
+        <span className="shrink-0 rounded-md border border-filete px-1.5 py-0.5 font-dp-mono text-[9.5px] text-[#6E6A60]">⌘K</span>
       </button>
 
       {open && (
@@ -78,7 +81,7 @@ export default function CommandPalette() {
             className="dp-scope w-[592px] max-w-[92vw] overflow-hidden rounded-2xl border border-tinta bg-superficie shadow-[0_30px_70px_rgba(15,15,14,0.22)]"
           >
             <div className="flex items-center gap-3 border-b border-filete px-5 py-[17px]">
-              <span className="font-dp-mono text-[13px] text-acento">&gt;</span>
+              <Search size={16} strokeWidth={2} className="shrink-0 text-acento" aria-hidden="true" />
               <input
                 ref={inputRef}
                 value={query}
@@ -102,6 +105,7 @@ export default function CommandPalette() {
                       onClick={() => go(item.href)}
                       className="flex w-full cursor-pointer items-center gap-3.5 px-5 py-2.5 text-left transition-colors duration-100 hover:bg-[#EDEBE4]"
                     >
+                      {item.icon && <item.icon size={15} strokeWidth={1.75} className="shrink-0 text-concreto" aria-hidden="true" />}
                       <span className="flex-1 font-dp-sans text-[13.5px] text-tinta">{item.label}</span>
                     </button>
                   ))}

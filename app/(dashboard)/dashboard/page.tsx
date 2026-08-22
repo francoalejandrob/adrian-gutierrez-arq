@@ -1,14 +1,24 @@
 import Link from "next/link";
+import { AlertTriangle, Calendar, CircleDollarSign, FileSignature, FolderKanban, UserPlus, Users, Wallet } from "lucide-react";
 import { computePipeline } from "@/lib/pipeline";
 import { createClient } from "@/lib/supabase/server";
 import { getTrafficSummary } from "@/lib/integrations/google-analytics";
-import { bucketTopN, TINTA_BG_SCALE, TINTA_STROKE_SCALE } from "@/lib/chart-colors";
+import { bucketTopN, TINTA_BG_SCALE, TINTA_STROKE_SCALE, TONE_BG, TONE_STROKE } from "@/lib/chart-colors";
+import { bucketByDay, percentChange } from "@/lib/sparkline";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import Section from "@/components/dashboard/ui/section";
 import ProgressBar from "@/components/dashboard/ui/progress-bar";
 import BarChart from "@/components/dashboard/ui/bar-chart";
 import DonutChart from "@/components/dashboard/ui/donut-chart";
-import { PROJECT_STATUS_TONE, TASK_STATUS_LABELS, TASK_STATUS_TONE, TASK_STATUSES } from "@/lib/supabase/types";
+import Sparkline from "@/components/dashboard/ui/sparkline";
+import {
+  PROJECT_STATUS_LABELS,
+  PROJECT_STATUS_TONE,
+  PROJECT_STATUSES,
+  TASK_STATUS_LABELS,
+  TASK_STATUS_TONE,
+  TASK_STATUSES,
+} from "@/lib/supabase/types";
 
 const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const currencyCompact = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 });
@@ -29,6 +39,15 @@ async function safeTraffic() {
   } catch (error) {
     return { configured: false as const, reason: error instanceof Error ? error.message : "Error inesperado." };
   }
+}
+
+// Real 7-day-vs-previous-7-day trend from a timestamped log — only ever
+// called on tables that actually have a meaningful date to bucket by.
+function trend(rows: { date: string }[]) {
+  const buckets = bucketByDay(rows, (r) => r.date, () => 1, 14);
+  const current = buckets.slice(7).reduce((a, b) => a + b, 0);
+  const previous = buckets.slice(0, 7).reduce((a, b) => a + b, 0);
+  return { buckets: buckets.slice(7), change: percentChange(current, previous) };
 }
 
 export default async function DashboardPage() {
@@ -53,7 +72,7 @@ export default async function DashboardPage() {
     { data: allProjects },
     { data: allTasks },
     { data: contracts },
-    { count: clientsCount },
+    { data: allClients },
     { data: activity },
     traffic,
   ] = await Promise.all([
@@ -65,7 +84,7 @@ export default async function DashboardPage() {
       .neq("status", "completed")
       .order("due_date"),
     supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "nuevo"),
-    supabase.from("payments").select("amount, status"),
+    supabase.from("payments").select("amount, status, paid_date"),
     supabase.from("document_versions").select("*", { count: "exact", head: true }).eq("status", "enviado"),
     supabase
       .from("calendar_events")
@@ -83,11 +102,11 @@ export default async function DashboardPage() {
       .from("projects")
       .select("*", { count: "exact", head: true })
       .not("status", "in", "(completed,cancelled,on_hold)"),
-    supabase.from("leads").select("status, estimated_value, source, utm_source"),
+    supabase.from("leads").select("status, estimated_value, source, utm_source, created_at"),
     supabase.from("projects").select("status"),
     supabase.from("tasks").select("status"),
-    supabase.from("contracts").select("value"),
-    supabase.from("clients").select("*", { count: "exact", head: true }),
+    supabase.from("contracts").select("value, created_at"),
+    supabase.from("clients").select("created_at"),
     supabase.from("activity_log").select("*").order("created_at", { ascending: false }).limit(6),
     safeTraffic(),
   ]);
@@ -101,7 +120,8 @@ export default async function DashboardPage() {
   const pendingCollection = (payments ?? [])
     .filter((p) => p.status === "pendiente" || p.status === "vencida")
     .reduce((sum, p) => sum + p.amount, 0);
-  const collected = (payments ?? []).filter((p) => p.status === "pagada").reduce((sum, p) => sum + p.amount, 0);
+  const paidPayments = (payments ?? []).filter((p) => p.status === "pagada" && p.paid_date);
+  const collected = paidPayments.reduce((sum, p) => sum + p.amount, 0);
   const overduePaymentsCount = (payments ?? []).filter((p) => p.status === "vencida").length;
   const contracted = (contracts ?? []).reduce((sum, c) => sum + c.value, 0);
 
@@ -121,18 +141,27 @@ export default async function DashboardPage() {
   const pipeline = computePipeline(allLeads ?? []);
   const pipelineTotal = pipeline.reduce((sum, s) => sum + s.value, 0);
 
+  // Sparklines — solo para métricas con un log real de fechas detrás
+  // (leads/pagos/contratos/clientes). Tareas críticas, reuniones hoy y
+  // por cobrar son una foto del momento, no una serie — se dejan sin
+  // sparkline en vez de inventar una tendencia.
+  const leadsTrend = trend((allLeads ?? []).map((l) => ({ date: l.created_at })));
+  const collectedTrend = trend(paidPayments.map((p) => ({ date: p.paid_date! })));
+  const clientsTrend = trend((allClients ?? []).map((c) => ({ date: c.created_at })));
+  const contractsTrend = trend((contracts ?? []).map((c) => ({ date: c.created_at })));
+
   const instruments = [
-    { label: "Tareas críticas", value: String(overdueCount), attention: overdueCount > 0 },
-    { label: "Reuniones hoy", value: String((todayEvents ?? []).length), attention: false },
-    { label: "Leads nuevos", value: String(newLeadsCount ?? 0), attention: false },
-    { label: "Por cobrar", value: currency.format(pendingCollection), attention: pendingCollection > 0 },
+    { label: "Tareas críticas", value: String(overdueCount), attention: overdueCount > 0, icon: AlertTriangle, trend: undefined },
+    { label: "Reuniones hoy", value: String((todayEvents ?? []).length), attention: false, icon: Calendar, trend: undefined },
+    { label: "Leads nuevos", value: String(newLeadsCount ?? 0), attention: false, icon: UserPlus, trend: leadsTrend },
+    { label: "Por cobrar", value: currency.format(pendingCollection), attention: pendingCollection > 0, icon: Wallet, trend: undefined },
   ];
 
   const summary = [
-    { label: "Contratado", value: currencyCompact.format(contracted) },
-    { label: "Cobrado", value: currencyCompact.format(collected), tone: "positive" as const },
-    { label: "Clientes", value: String(clientsCount ?? 0) },
-    { label: "Proyectos activos", value: String(activeProjectsCount ?? 0) },
+    { label: "Contratado", value: currencyCompact.format(contracted), icon: FileSignature, trend: contractsTrend },
+    { label: "Cobrado", value: currencyCompact.format(collected), tone: "positive" as const, icon: CircleDollarSign, trend: collectedTrend },
+    { label: "Clientes", value: String((allClients ?? []).length), icon: Users, trend: clientsTrend },
+    { label: "Proyectos activos", value: String(activeProjectsCount ?? 0), icon: FolderKanban },
   ];
 
   const attentionRows = [
@@ -157,18 +186,18 @@ export default async function DashboardPage() {
     5,
   ).map((row, i) => ({ ...row, colorClass: TINTA_STROKE_SCALE[i] }));
 
-  // Proyectos por estado — reusa la misma semántica resolved/attention/
-  // neutral que StatusLabel/StatusMark en el resto del producto, en vez
-  // de un color por cada uno de los 10 estados posibles.
-  const projectBuckets = { resolved: 0, attention: 0, neutral: 0 };
+  // Proyectos por estado — cada estado real con su propio tono (mismo
+  // mapeo de PROJECT_STATUS_TONE que usan las pastillas en el resto del
+  // producto), no un bucket de 3 — más matiz, una sola fuente de verdad.
+  const projectStatusCounts = new Map<string, number>();
   for (const project of allProjects ?? []) {
-    projectBuckets[PROJECT_STATUS_TONE[project.status]] += 1;
+    projectStatusCounts.set(project.status, (projectStatusCounts.get(project.status) ?? 0) + 1);
   }
-  const projectStatusData = [
-    { label: "Completados", value: projectBuckets.resolved, colorClass: "stroke-verde" },
-    { label: "En curso", value: projectBuckets.neutral, colorClass: "stroke-tinta" },
-    { label: "Pausados / cancelados", value: projectBuckets.attention, colorClass: "stroke-acento" },
-  ].filter((row) => row.value > 0);
+  const projectStatusData = PROJECT_STATUSES.map((status) => ({
+    label: PROJECT_STATUS_LABELS[status],
+    value: projectStatusCounts.get(status) ?? 0,
+    colorClass: TONE_STROKE[PROJECT_STATUS_TONE[status]],
+  })).filter((row) => row.value > 0);
 
   // Tareas por estado — todas las tareas de todos los proyectos, mismo
   // mapeo de tono que TASK_STATUS_TONE usa en el workspace de proyecto.
@@ -176,11 +205,10 @@ export default async function DashboardPage() {
   for (const task of allTasks ?? []) {
     taskCounts.set(task.status, (taskCounts.get(task.status) ?? 0) + 1);
   }
-  const TASK_TONE_COLOR = { resolved: "bg-verde", attention: "bg-acento", neutral: "bg-tinta" } as const;
   const taskStatusData = TASK_STATUSES.map((status) => ({
     label: TASK_STATUS_LABELS[status],
     value: taskCounts.get(status) ?? 0,
-    colorClass: TASK_TONE_COLOR[TASK_STATUS_TONE[status]],
+    colorClass: TONE_BG[TASK_STATUS_TONE[status]],
   }));
 
   const trafficChannelData = traffic.configured
@@ -198,11 +226,22 @@ export default async function DashboardPage() {
         {instruments.map((item, i) => (
           <div key={item.label} className={`dp-card relative p-7 ${item.attention ? "border-acento/30" : ""}`}>
             {item.attention && <span className="absolute left-0 top-0 h-full w-[3px] bg-acento" />}
-            <p className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</p>
+            <div className="flex items-start justify-between">
+              <p className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</p>
+              <item.icon size={16} strokeWidth={1.75} className={item.attention ? "text-acento" : "text-corte"} aria-hidden="true" />
+            </div>
             <p className={`mt-4 font-dp-mono text-[30px] leading-none ${item.attention ? "text-acento" : "text-tinta"}`}>
               {item.value}
             </p>
-            <p className="mt-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-grafito">{item.label}</p>
+            <div className="mt-3 flex items-center justify-between gap-2">
+              <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-grafito">{item.label}</p>
+              {item.trend && (
+                <span className={`shrink-0 font-dp-mono text-[10px] ${item.trend.change >= 0 ? "text-verde" : "text-acento"}`}>
+                  {item.trend.change >= 0 ? "+" : ""}
+                  {item.trend.change}%
+                </span>
+              )}
+            </div>
           </div>
         ))}
       </div>
@@ -210,8 +249,20 @@ export default async function DashboardPage() {
       <div className="dp-card mx-12 mt-6 grid grid-cols-2 lg:grid-cols-4">
         {summary.map((item, i) => (
           <div key={item.label} className={`p-6 ${i > 0 ? "border-l border-filete" : ""}`}>
-            <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">{item.label}</p>
+            <div className="flex items-start justify-between gap-2">
+              <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">{item.label}</p>
+              <item.icon size={15} strokeWidth={1.75} className="shrink-0 text-corte" aria-hidden="true" />
+            </div>
             <p className={`mt-2.5 font-dp-mono text-xl ${item.tone === "positive" ? "text-verde" : "text-tinta"}`}>{item.value}</p>
+            {item.trend && (
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <Sparkline data={item.trend.buckets} positive={item.trend.change >= 0} width={64} height={22} />
+                <span className={`shrink-0 font-dp-mono text-[10.5px] ${item.trend.change >= 0 ? "text-verde" : "text-acento"}`}>
+                  {item.trend.change >= 0 ? "+" : ""}
+                  {item.trend.change}%
+                </span>
+              </div>
+            )}
           </div>
         ))}
       </div>

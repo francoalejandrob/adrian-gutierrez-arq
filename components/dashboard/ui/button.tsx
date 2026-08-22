@@ -8,23 +8,18 @@ const base =
   "uppercase tracking-[0.12em] transition-[transform,box-shadow,background-color,border-color,color] duration-150 " +
   "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50";
 
-// Hard offset shadows (no blur, tinted to the accent) instead of a soft
-// SaaS drop-shadow — reads as a stacked/layered card in the same
-// technical-drafting language as the zero-radius system, and gives every
-// primary/secondary button real depth + a second color on the surface.
-// Press physics: the button travels toward its own shadow on :active, so
-// it reads as a physical, pushable object rather than a flat rectangle.
+// Soft, subtle shadow (not the previous pass's hard offset "stacked
+// card" shadow) — superseded by the reference dashboard the user shared,
+// which uses clean flat buttons with barely-there elevation. Tactile
+// feedback on :active is now a small translateY, not a shadow-offset
+// press.
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "border border-tinta bg-tinta text-papel shadow-[3px_3px_0_0_var(--color-acento)] " +
-    "hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--color-acento)] " +
-    "active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_0_var(--color-acento)] " +
-    "disabled:shadow-[3px_3px_0_0_var(--color-corte)]",
+    "border border-tinta bg-tinta text-papel shadow-[0_1px_2px_rgba(15,15,14,0.05),0_4px_10px_rgba(15,15,14,0.12)] " +
+    "hover:bg-grafito active:translate-y-px active:shadow-[0_1px_2px_rgba(15,15,14,0.08)]",
   secondary:
-    "border border-corte bg-superficie text-tinta shadow-[2px_2px_0_0_var(--color-tinta)] " +
-    "hover:border-tinta hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_var(--color-tinta)] " +
-    "active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--color-tinta)] " +
-    "disabled:shadow-[2px_2px_0_0_var(--color-corte)]",
+    "border border-corte bg-superficie text-tinta shadow-[0_1px_2px_rgba(15,15,14,0.04)] " +
+    "hover:border-tinta hover:bg-papel active:translate-y-px",
   tertiary: "border-none bg-transparent p-0 text-concreto hover:text-tinta",
   danger: "border-none bg-transparent p-0 text-concreto hover:text-acento",
 };

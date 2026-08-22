@@ -1,6 +1,6 @@
 import PageHeader from "@/components/dashboard/ui/page-header";
 import Section from "@/components/dashboard/ui/section";
-import StatusLabel from "@/components/dashboard/ui/status-label";
+import StatusBadge from "@/components/dashboard/ui/status-badge";
 import StatusMark from "@/components/dashboard/ui/status-mark";
 import Button from "@/components/dashboard/ui/button";
 
@@ -68,15 +68,15 @@ export default function DesignSystemPage() {
           </p>
           <div className="flex flex-wrap gap-x-10 gap-y-5">
             <div className="flex items-center gap-3">
-              <StatusLabel label="Ganado" tone="resolved" />
+              <StatusBadge label="Ganado" tone="resolved" />
               <span className="font-dp-sans text-[12px] text-concreto">texto — resuelto</span>
             </div>
             <div className="flex items-center gap-3">
-              <StatusLabel label="Negociación" tone="attention" />
+              <StatusBadge label="Negociación" tone="attention" />
               <span className="font-dp-sans text-[12px] text-concreto">texto — atención</span>
             </div>
             <div className="flex items-center gap-3">
-              <StatusLabel label="Nuevo" tone="neutral" />
+              <StatusBadge label="Nuevo" tone="neutral" />
               <span className="font-dp-sans text-[12px] text-concreto">texto — neutral</span>
             </div>
           </div>
