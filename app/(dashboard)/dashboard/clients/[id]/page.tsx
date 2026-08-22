@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ClientForm from "@/components/dashboard/client-form";
+import Avatar from "@/components/dashboard/ui/avatar";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import Section from "@/components/dashboard/ui/section";
 import StatusBadge from "@/components/dashboard/ui/status-badge";
@@ -168,12 +169,15 @@ function PageHeaderWithBack({ client }: { client: { id: string; name: string; cr
         ← Clientes
       </Link>
       <div className="flex items-end justify-between gap-10">
-        <div>
-          <h1 className="font-dp-serif text-[44px] leading-none tracking-[-0.015em] text-tinta">{client.name}</h1>
-          <p className="mt-3 font-dp-sans text-[13px] text-concreto">
-            Cliente desde {new Date(client.created_at).toLocaleDateString("es-EC", { month: "short", year: "numeric" })}
-            {client.company ? ` · ${client.company}` : ""}
-          </p>
+        <div className="flex items-center gap-4">
+          <Avatar name={client.name} size={44} />
+          <div>
+            <h1 className="font-dp-serif text-[44px] leading-none tracking-[-0.015em] text-tinta">{client.name}</h1>
+            <p className="mt-3 font-dp-sans text-[13px] text-concreto">
+              Cliente desde {new Date(client.created_at).toLocaleDateString("es-EC", { month: "short", year: "numeric" })}
+              {client.company ? ` · ${client.company}` : ""}
+            </p>
+          </div>
         </div>
         <Link href={`/dashboard/projects/new?client_id=${client.id}`} className={buttonClass("primary", "md")}>
           Nuevo proyecto

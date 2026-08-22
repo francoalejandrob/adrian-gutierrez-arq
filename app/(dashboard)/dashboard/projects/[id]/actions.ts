@@ -83,6 +83,7 @@ const taskSchema = z.object({
   priority: z.enum(TASK_PRIORITIES as [string, ...string[]]).optional(),
   due_date: dateOrNull,
   estimated_hours: numberOrNull,
+  assigned_to: z.string().uuid().optional().or(z.literal("")),
 });
 
 export async function createTask(projectId: string, formData: FormData) {
@@ -93,11 +94,12 @@ export async function createTask(projectId: string, formData: FormData) {
   const organizationId = await getCurrentOrganizationId(supabase);
   if (!organizationId) throw new Error("Sin organización asociada");
 
-  const { phase_id, ...rest } = parsed.data;
+  const { phase_id, assigned_to, ...rest } = parsed.data;
   const { error } = await supabase.from("tasks").insert({
     organization_id: organizationId,
     project_id: projectId,
     phase_id: phase_id || null,
+    assigned_to: assigned_to || null,
     ...rest,
   });
   if (error) throw new Error(error.message);

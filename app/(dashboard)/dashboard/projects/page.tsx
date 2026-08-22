@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FolderKanban } from "lucide-react";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
@@ -84,6 +85,7 @@ export default async function ProjectsPage(
         </div>
       ) : (
         <EmptyState
+          icon={FolderKanban}
           title="Todavía no hay proyectos"
           description="Creá un proyecto directamente o desde la ficha de un cliente."
           action={

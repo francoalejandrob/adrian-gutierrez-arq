@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FileText } from "lucide-react";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import StatusBadge from "@/components/dashboard/ui/status-badge";
@@ -49,6 +50,7 @@ export default async function QuotesPage() {
         </div>
       ) : (
         <EmptyState
+          icon={FileText}
           title="Todavía no hay cotizaciones"
           description="Creá una desde la ficha de un proyecto, en la pestaña Finanzas."
         />

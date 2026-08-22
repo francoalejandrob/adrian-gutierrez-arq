@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FileSignature } from "lucide-react";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import StatusBadge from "@/components/dashboard/ui/status-badge";
@@ -48,6 +49,7 @@ export default async function ContractsPage() {
         </div>
       ) : (
         <EmptyState
+          icon={FileSignature}
           title="Todavía no hay contratos"
           description="Creá uno desde la ficha de un proyecto, en la pestaña Finanzas."
         />

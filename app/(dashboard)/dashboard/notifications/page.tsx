@@ -1,3 +1,4 @@
+import { Bell } from "lucide-react";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import StatusMark from "@/components/dashboard/ui/status-mark";
@@ -60,7 +61,7 @@ export default async function NotificationsPage() {
           ))}
         </div>
       ) : (
-        <EmptyState title="Sin notificaciones todavía" />
+        <EmptyState icon={Bell} title="Sin notificaciones todavía" />
       )}
     </div>
   );

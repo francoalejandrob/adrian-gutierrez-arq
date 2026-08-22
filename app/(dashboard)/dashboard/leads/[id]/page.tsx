@@ -6,6 +6,7 @@ import Button from "@/components/dashboard/ui/button";
 import Section from "@/components/dashboard/ui/section";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { inputClass } from "@/components/dashboard/ui/styles";
+import { getAssignableMembers } from "@/lib/members";
 import { createClient } from "@/lib/supabase/server";
 import { LEAD_STATUS_LABELS, LEAD_STATUSES } from "@/lib/supabase/types";
 import { addLeadNote, convertLeadToClient, updateLead, updateLeadStatus } from "../actions";
@@ -16,7 +17,7 @@ export default async function LeadDetailPage(
   const { id } = await props.params;
   const supabase = await createClient();
 
-  const [{ data: lead }, { data: activity }] = await Promise.all([
+  const [{ data: lead }, { data: activity }, members] = await Promise.all([
     supabase.from("leads").select("*").eq("id", id).maybeSingle(),
     supabase
       .from("activity_log")
@@ -24,6 +25,7 @@ export default async function LeadDetailPage(
       .eq("entity_type", "lead")
       .eq("entity_id", id)
       .order("created_at", { ascending: false }),
+    getAssignableMembers(supabase),
   ]);
 
   if (!lead) notFound();
@@ -67,7 +69,7 @@ export default async function LeadDetailPage(
 
       <div className="grid grid-cols-1 gap-10 px-12 py-10 lg:grid-cols-2">
         <Section title="Editar información">
-          <LeadForm action={boundUpdate} defaultValues={lead} />
+          <LeadForm action={boundUpdate} defaultValues={lead} members={members} />
         </Section>
 
         <Section title="Actividad">

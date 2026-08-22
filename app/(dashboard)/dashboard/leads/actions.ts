@@ -18,6 +18,12 @@ const leadSchema = z.object({
     .string()
     .optional()
     .transform((v) => (v ? Number(v) : null)),
+  assigned_to: z
+    .string()
+    .uuid()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || null),
 });
 
 export async function createLead(formData: FormData) {

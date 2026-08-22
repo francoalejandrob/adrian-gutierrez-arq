@@ -1,11 +1,24 @@
 import Link from "next/link";
+import { Briefcase, Target } from "lucide-react";
+import Avatar from "@/components/dashboard/ui/avatar";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import StatusBadge from "@/components/dashboard/ui/status-badge";
 import { computePipeline } from "@/lib/pipeline";
 import { createClient } from "@/lib/supabase/server";
-import { LEAD_STATUS_LABELS, LEAD_STATUS_TONE, LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/supabase/types";
+import { LEAD_STATUS_LABELS, LEAD_STATUS_TONE, LEAD_STATUSES, type LeadStatus } from "@/lib/supabase/types";
+
+type LeadWithAssignee = {
+  id: string;
+  name: string;
+  need: string | null;
+  estimated_value: number | null;
+  source: string;
+  status: string;
+  created_at: string;
+  profiles: { full_name: string | null; email: string } | null;
+};
 
 const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
@@ -64,7 +77,10 @@ function CrmTab({ href, label, active }: { href: string; label: string; active: 
 type Supa = Awaited<ReturnType<typeof createClient>>;
 
 async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; statusFilter?: string; view: string }) {
-  let query = supabase.from("leads").select("*").order("created_at", { ascending: false });
+  let query = supabase
+    .from("leads")
+    .select("id, name, need, estimated_value, source, status, created_at, profiles(full_name, email)")
+    .order("created_at", { ascending: false });
   if (statusFilter && (LEAD_STATUSES as string[]).includes(statusFilter)) {
     query = query.eq("status", statusFilter);
   }
@@ -102,19 +118,20 @@ async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; stat
         </div>
       ) : (
         <div>
-          <div className="grid grid-cols-[2.4fr_1.6fr_1fr_1.2fr_1fr_0.9fr] gap-4 border-b border-filete px-12 py-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">
+          <div className="grid grid-cols-[2.1fr_1.4fr_1fr_1.1fr_1fr_36px_0.9fr] gap-4 border-b border-filete px-12 py-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">
             <span>Lead</span>
             <span>Necesidad</span>
             <span>Valor</span>
             <span>Fuente</span>
             <span>Estado</span>
+            <span></span>
             <span>Creado</span>
           </div>
           {(leads ?? []).map((lead, i) => (
             <Link
               key={lead.id}
               href={`/dashboard/leads/${lead.id}`}
-              className="grid grid-cols-[2.4fr_1.6fr_1fr_1.2fr_1fr_0.9fr] items-center gap-4 border-b border-filete px-12 py-4 transition-colors duration-100 hover:bg-[#EDEBE4]"
+              className="grid grid-cols-[2.1fr_1.4fr_1fr_1.1fr_1fr_36px_0.9fr] items-center gap-4 border-b border-filete px-12 py-4 transition-colors duration-100 hover:bg-[#EDEBE4]"
             >
               <span className="flex items-baseline gap-3 font-dp-sans text-[13.5px] text-tinta">
                 <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
@@ -124,11 +141,17 @@ async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; stat
               <span className="font-dp-mono text-[12.5px] text-tinta">{lead.estimated_value ? currency.format(lead.estimated_value) : "—"}</span>
               <span className="font-dp-sans text-[12.5px] text-grafito">{lead.source}</span>
               <StatusBadge label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} tone={LEAD_STATUS_TONE[lead.status as LeadStatus]} />
+              {lead.profiles ? (
+                <Avatar name={lead.profiles.full_name || lead.profiles.email} size={24} />
+              ) : (
+                <span className="h-6 w-6 rounded-full border border-dashed border-corte" title="Sin asignar" />
+              )}
               <span className="font-dp-mono text-[11px] text-concreto">{new Date(lead.created_at).toLocaleDateString("es-EC")}</span>
             </Link>
           ))}
           {(leads ?? []).length === 0 && (
             <EmptyState
+              icon={Target}
               title="Todavía no hay leads"
               description="Los leads que lleguen desde el sitio web o que cargues manualmente aparecerán aquí."
               action={
@@ -144,7 +167,7 @@ async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; stat
   );
 }
 
-function LeadsKanban({ leads }: { leads: Lead[] }) {
+function LeadsKanban({ leads }: { leads: LeadWithAssignee[] }) {
   return (
     <div className="flex gap-5 overflow-x-auto pb-2">
       {LEAD_STATUSES.map((status) => {
@@ -158,7 +181,10 @@ function LeadsKanban({ leads }: { leads: Lead[] }) {
             <div className="flex flex-col gap-2.5">
               {inColumn.map((lead) => (
                 <Link key={lead.id} href={`/dashboard/leads/${lead.id}`} className="block border border-filete bg-superficie p-3.5 transition-colors duration-150 hover:border-tinta">
-                  <p className="mb-1.5 font-dp-sans text-[12.5px] text-tinta">{lead.name}</p>
+                  <div className="mb-1.5 flex items-start justify-between gap-2">
+                    <p className="font-dp-sans text-[12.5px] text-tinta">{lead.name}</p>
+                    {lead.profiles && <Avatar name={lead.profiles.full_name || lead.profiles.email} size={20} />}
+                  </div>
                   <p className="mb-2.5 font-dp-sans text-[11.5px] text-concreto">{lead.need || "—"}</p>
                   {lead.estimated_value != null && (
                     <p className="font-dp-mono text-[12px] text-tinta">{currency.format(lead.estimated_value)}</p>
@@ -194,9 +220,10 @@ async function ClientesTab({ supabase }: { supabase: Supa }) {
             <Link
               key={client.id}
               href={`/dashboard/clients/${client.id}`}
-              className="flex items-baseline gap-6 border-b border-filete px-12 py-5 transition-colors duration-100 hover:bg-[#EDEBE4]"
+              className="flex items-center gap-6 border-b border-filete px-12 py-5 transition-colors duration-100 hover:bg-[#EDEBE4]"
             >
               <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
+              <Avatar name={client.name} size={30} />
               <span className="min-w-[220px] font-dp-serif text-xl text-tinta">{client.name}</span>
               <span className="flex-1 font-dp-sans text-[12.5px] text-concreto">{info?.category ?? client.company ?? "—"}</span>
               <span className="font-dp-mono text-[11px] text-concreto">{info?.count ?? 0} proyecto{info?.count === 1 ? "" : "s"}</span>
@@ -205,6 +232,7 @@ async function ClientesTab({ supabase }: { supabase: Supa }) {
         })
       ) : (
         <EmptyState
+          icon={Briefcase}
           title="Todavía no hay clientes"
           description="Convertí un lead ganado o creá un cliente directamente."
           action={
