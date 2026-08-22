@@ -37,8 +37,8 @@ export async function createLead(formData: FormData) {
   });
   if (error) throw new Error(error.message);
 
-  revalidatePath("/dashboard/leads");
-  redirect("/dashboard/leads");
+  revalidatePath("/dashboard/crm");
+  redirect("/dashboard/crm?tab=leads");
 }
 
 export async function updateLead(id: string, formData: FormData) {
@@ -55,7 +55,7 @@ export async function updateLead(id: string, formData: FormData) {
   if (error) throw new Error(error.message);
 
   revalidatePath(`/dashboard/leads/${id}`);
-  revalidatePath("/dashboard/leads");
+  revalidatePath("/dashboard/crm");
 }
 
 const statusSchema = z.enum(LEAD_STATUSES as [string, ...string[]]);
@@ -70,7 +70,7 @@ export async function updateLeadStatus(id: string, formData: FormData) {
   if (error) throw new Error(error.message);
 
   revalidatePath(`/dashboard/leads/${id}`);
-  revalidatePath("/dashboard/leads");
+  revalidatePath("/dashboard/crm");
   revalidatePath("/dashboard");
 }
 
@@ -128,7 +128,6 @@ export async function convertLeadToClient(id: string) {
     .update({ status: "ganado", updated_at: new Date().toISOString() })
     .eq("id", id);
 
-  revalidatePath("/dashboard/leads");
-  revalidatePath("/dashboard/clients");
+  revalidatePath("/dashboard/crm");
   redirect(`/dashboard/clients/${client.id}`);
 }

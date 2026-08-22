@@ -18,14 +18,18 @@ export default async function LoginPage() {
     redirect("/dashboard");
   }
 
+  const { data: org } = await supabase.from("organizations").select("name").limit(1).maybeSingle();
+
   return (
     <main className="flex min-h-dvh items-center justify-center bg-hueso px-6">
-      <div className="w-full max-w-sm border border-carbon/10 bg-white p-8">
-        <h1 className="font-display text-2xl text-carbon">ARCHI.OS</h1>
-        <p className="mt-1 mb-6 text-sm text-carbon/60">
-          Acceso al panel de Adrián Gutiérrez Arquitectura.
+      <div className="w-full max-w-[380px]">
+        <p className="text-center font-display text-[22px] font-semibold text-carbon">ARCHI.OS</p>
+        <p className="mb-10 text-center text-[13px] text-carbon/50">
+          {org?.name ?? "Adrián Gutiérrez Arquitectura"}
         </p>
-        <LoginForm />
+        <div className="rounded-[10px] border border-carbon/[0.08] bg-white p-8">
+          <LoginForm />
+        </div>
       </div>
     </main>
   );

@@ -13,7 +13,7 @@ export default function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center gap-3 py-12 text-center">
-      <div className="flex h-11 w-11 items-center justify-center border border-carbon/15 text-carbon/40">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full border border-carbon/15 text-carbon/40">
         <Icon size={20} strokeWidth={1.5} aria-hidden="true" />
       </div>
       <div>

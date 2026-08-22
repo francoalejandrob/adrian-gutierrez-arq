@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#f1eee8;color:#000;font-family:'IBM Plex Sans',sans-serif;text-wrap:pretty}
+  * { box-sizing: border-box; }
+  a{color:#8c5335}
+  a:hover{color:#b26a45}
+  ::selection{background:#b26a45;color:#f1eee8}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15);border-radius:4px}
+</style>
+</helmet>
+
+<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 24px;background:#000;border-bottom:2px solid #b26a45;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(241,238,232,0.55)">
+  <span style="display:flex;align-items:center;gap:10px;color:#f1eee8"><span style="width:8px;height:8px;background:#b26a45;flex-shrink:0"></span>ARCHI.OS &mdash; sistema de diseño &amp; pantallas</span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span style="border:1px solid rgba(241,238,232,0.2);color:rgba(241,238,232,0.4);padding:5px 10px;font-size:10.5px">&#8984;K Buscar</span>
+    <button onclick="{{ setModeAdmin }}" style="{{ pillAdmin }}">Admin</button>
+    <button onclick="{{ setModePortal }}" style="{{ pillPortal }}">Portal cliente</button>
+    <button onclick="{{ setModeLogin }}" style="{{ pillLogin }}">Login</button>
+  </div>
+</div>
+
+<sc-if value="{{ isAdminMode }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;min-height:100vh;background:#f1eee8">
+
+  <aside style="width:252px;flex-shrink:0;background:#141210;padding:26px 14px;display:flex;flex-direction:column;justify-content:space-between;position:sticky;top:0;height:100vh;overflow-y:auto;box-shadow:1px 0 0 rgba(0,0,0,0.4)">
+    <div>
+      <div style="padding:2px 12px 22px;border-bottom:1px solid rgba(241,238,232,0.1);margin-bottom:18px;display:flex;align-items:center;gap:10px">
+        <span style="width:20px;height:20px;border-radius:6px;background:#b26a45;flex-shrink:0"></span>
+        <div>
+          <p style="font-family:'Fraunces',serif;font-weight:600;font-size:18px;margin:0;letter-spacing:0.01em;color:#f1eee8">ARCHI.OS</p>
+          <p style="font-size:11.5px;color:rgba(241,238,232,0.45);margin:1px 0 0">Adrián Gutiérrez Arq.</p>
+        </div>
+      </div>
+
+      <button onclick="{{ goDashboard }}" style="{{ navStyles.dashboard }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;background:currentColor;flex-shrink:0"></span>
+        Dashboard
+      </button>
+
+      <p style="font-size:10.5px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(241,238,232,0.3);margin:20px 12px 7px;font-weight:500">CRM</p>
+      <button onclick="{{ goCrmLeads }}" style="{{ navStyles.crmLeads }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;border:1.4px solid currentColor;border-radius:50%;flex-shrink:0"></span>
+        Leads
+      </button>
+      <button onclick="{{ goCrmClientes }}" style="{{ navStyles.crmClientes }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;border:1.4px solid currentColor;border-radius:50%;flex-shrink:0"></span>
+        Clientes
+      </button>
+      <button onclick="{{ goCrmPipeline }}" style="{{ navStyles.crmPipeline }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;border:1.4px solid currentColor;border-radius:50%;flex-shrink:0"></span>
+        Pipeline
+      </button>
+
+      <p style="font-size:10.5px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(241,238,232,0.3);margin:20px 12px 7px;font-weight:500">Proyectos</p>
+      <button onclick="{{ goProjects }}" style="{{ navStyles.projects }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;border:1.4px solid currentColor;flex-shrink:0"></span>
+        Todos los proyectos
+      </button>
+
+      <p style="font-size:10.5px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(241,238,232,0.3);margin:20px 12px 7px;font-weight:500">Comercial</p>
+      <button onclick="{{ goQuoteBuilder }}" style="{{ navStyles.quotes }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;transform:rotate(45deg);border:1.4px solid currentColor;flex-shrink:0"></span>
+        Cotizaciones
+      </button>
+      <button onclick="{{ goContracts }}" style="{{ navStyles.contracts }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;transform:rotate(45deg);border:1.4px solid currentColor;flex-shrink:0"></span>
+        Contratos
+      </button>
+
+      <button onclick="{{ goFinance }}" style="{{ navStyles.finance }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;background:currentColor;border-radius:50%;flex-shrink:0"></span>
+        Finanzas
+      </button>
+
+      <p style="font-size:10.5px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(241,238,232,0.3);margin:20px 12px 7px;font-weight:500">Website</p>
+      <button onclick="{{ goWebsiteAnalytics }}" style="{{ navStyles.websiteAnalytics }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid currentColor;flex-shrink:0"></span>
+        Analytics &amp; SEO
+      </button>
+      <button onclick="{{ goMarketing }}" style="{{ navStyles.marketing }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid currentColor;flex-shrink:0"></span>
+        Marketing
+      </button>
+
+      <button onclick="{{ goCalendar }}" style="{{ navStyles.calendar }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;border:1.4px solid currentColor;flex-shrink:0"></span>
+        Agenda
+      </button>
+      <button onclick="{{ goNotifications }}" style="{{ navStyles.notifications }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;background:currentColor;border-radius:50%;flex-shrink:0"></span>
+        Notificaciones
+        <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}">
+          <span style="margin-left:auto;background:#b26a45;color:#141210;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;padding:1px 6px">5</span>
+        </sc-if>
+      </button>
+      <button onclick="{{ goAi }}" style="{{ navStyles.ai }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;transform:rotate(45deg);background:currentColor;flex-shrink:0"></span>
+        Archi AI
+      </button>
+      <button onclick="{{ goReports }}" style="{{ navStyles.reports }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="display:flex;align-items:flex-end;gap:1px;width:9px;height:8px;flex-shrink:0">
+          <span style="width:2px;height:4px;background:currentColor"></span>
+          <span style="width:2px;height:8px;background:currentColor"></span>
+          <span style="width:2px;height:6px;background:currentColor"></span>
+        </span>
+        Reportes
+      </button>
+      <button onclick="{{ goSettings }}" style="{{ navStyles.settings }}" style-hover="background:rgba(241,238,232,0.06);color:#f1eee8">
+        <span style="width:7px;height:7px;border:1.4px solid currentColor;border-radius:50%;flex-shrink:0"></span>
+        Configuración
+      </button>
+    </div>
+
+    <div>
+      <button onclick="{{ setModePortal }}" style="width:100%;text-align:left;background:none;border:none;padding:9px 12px;font-size:12px;color:rgba(241,238,232,0.45);cursor:pointer;text-decoration:underline;text-decoration-color:rgba(241,238,232,0.25);font-family:inherit;transition:color 150ms" style-hover="color:#cf8657">Ver portal del cliente &rarr;</button>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-top:6px;border-top:1px solid rgba(241,238,232,0.1)">
+        <div style="width:29px;height:29px;border-radius:50%;background:#b26a45;color:#141210;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:13px;font-weight:600;flex-shrink:0">AG</div>
+        <div style="min-width:0">
+          <p style="margin:0;font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f1eee8">Adrián Gutiérrez</p>
+          <p style="margin:0;font-size:11px;color:rgba(241,238,232,0.4)">org_admin</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main style="flex:1;min-width:0;padding:40px 56px 80px">
+
+    <!-- ============ DASHBOARD ============ -->
+    <sc-if value="{{ screenIs.dashboard }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid rgba(0,0,0,0.08)">
+        <div>
+          <span style="display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:#fff;background:#8c5335;padding:4px 10px;margin:0 0 14px">Buenos días, Adrián</span>
+          <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:38px;margin:0;letter-spacing:-0.01em;max-width:560px">Esto es lo importante hoy.</h1>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button onclick="{{ setLight }}" style="{{ demoLightBtn }}">Light</button>
+          <button onclick="{{ setDark }}" style="{{ demoDarkBtn }}">Dark</button>
+        </div>
+      </div>
+
+      <sc-if value="{{ lightDemo }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:48px">
+          <div style="background:#fff;padding:24px;border-radius:12px;border-top:3px solid #a4432b;transition:transform 150ms,box-shadow 150ms" style-hover="transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.08)">
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:34px;margin:0;font-weight:500;color:#a4432b">3</p>
+            <p style="font-size:12.5px;color:rgba(0,0,0,0.55);margin:8px 0 0">Tareas críticas</p>
+          </div>
+          <div style="background:#fff;padding:24px;border-radius:12px;border-top:3px solid #6e6659;transition:transform 150ms,box-shadow 150ms" style-hover="transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.08)">
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:34px;margin:0;font-weight:500">2</p>
+            <p style="font-size:12.5px;color:rgba(0,0,0,0.55);margin:8px 0 0">Reuniones hoy</p>
+          </div>
+          <div style="background:#fff;padding:24px;border-radius:12px;border-top:3px solid #b26a45;transition:transform 150ms,box-shadow 150ms" style-hover="transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.08)">
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:34px;margin:0;font-weight:500;color:#8c5335">4</p>
+            <p style="font-size:12.5px;color:rgba(0,0,0,0.55);margin:8px 0 0">Leads nuevos</p>
+          </div>
+          <div style="background:#141210;padding:24px;border-radius:12px;border-top:3px solid #b26a45;transition:transform 150ms,box-shadow 150ms" style-hover="transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.2)">
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:34px;margin:0;font-weight:500;color:#f1eee8">$18.4k</p>
+            <p style="font-size:12.5px;color:rgba(241,238,232,0.55);margin:8px 0 0">Pendiente de cobro</p>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:56px">
+          <div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px">
+              <h2 style="font-family:'Fraunces',serif;font-weight:500;font-size:20px;margin:0">Proyectos activos</h2>
+              <button onclick="{{ goProjects }}" style="background:none;border:none;font-size:12px;color:rgba(0,0,0,0.45);cursor:pointer;text-decoration:underline;font-family:inherit" style-hover="color:#8c5335">Ver todos</button>
+            </div>
+            <sc-for list="{{ projects }}" as="p" hint-placeholder-count="4">
+              <div style="display:flex;gap:16px;padding:16px 10px;margin:0 -10px;border-bottom:1px solid rgba(0,0,0,0.07);cursor:pointer;border-radius:4px;transition:background 150ms" onclick="{{ p.open }}" style-hover="background:#fff">
+                <div style="{{ p.thumbStyle }};flex-shrink:0"></div>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+                    <span style="font-size:14.5px;font-weight:500">{{ p.name }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:rgba(0,0,0,0.55)">{{ p.progress }}%</span>
+                  </div>
+                  <div style="height:4px;background:rgba(0,0,0,0.08);width:100%">
+                    <div style="height:4px;background:#b26a45;width:{{ p.progressPct }}"></div>
+                  </div>
+                  <p style="font-size:12px;color:rgba(0,0,0,0.45);margin:8px 0 0">{{ p.client }} &middot; {{ p.phase }}</p>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div>
+            <h2 style="font-family:'Fraunces',serif;font-weight:500;font-size:20px;margin:0 0 18px">Pipeline</h2>
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:30px;margin:0 0 14px;font-weight:500">$128,400</p>
+            <div style="display:flex;height:12px;width:100%;margin-bottom:18px;gap:2px">
+              <sc-for list="{{ pipelineStages }}" as="s" hint-placeholder-count="4">
+                <div style="height:12px;background:#b26a45;opacity:{{ s.opacity }};width:{{ s.pct }}"></div>
+              </sc-for>
+            </div>
+            <sc-for list="{{ pipelineStages }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;margin-bottom:8px">
+                <span style="display:flex;align-items:center;gap:8px;color:rgba(0,0,0,0.6)"><span style="width:8px;height:8px;background:#b26a45;opacity:{{ s.opacity }};flex-shrink:0"></span>{{ s.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-weight:500">{{ s.value }}</span>
+              </div>
+            </sc-for>
+
+            <h2 style="font-family:'Fraunces',serif;font-weight:500;font-size:20px;margin:32px 0 14px">Alertas</h2>
+            <div style="display:flex;flex-direction:column;gap:0">
+              <div style="display:flex;gap:10px;align-items:center;font-size:13px;padding:10px 12px;background:#fdf1ee;border-left:2px solid #a4432b;margin-bottom:6px">2 tareas atrasadas</div>
+              <div style="display:flex;gap:10px;align-items:center;font-size:13px;padding:10px 12px;background:#fdf1ee;border-left:2px solid #a4432b;margin-bottom:6px">1 pago vencido</div>
+              <div style="display:flex;gap:10px;align-items:center;font-size:13px;padding:10px 12px;background:#faf2ec;border-left:2px solid #8c5335">3 aprobaciones pendientes</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:48px">
+          <h2 style="font-family:'Fraunces',serif;font-weight:500;font-size:18px;margin:0 0 18px">Actividad reciente</h2>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+              <div style="display:flex;gap:16px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-size:13.5px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:rgba(0,0,0,0.4);width:56px;flex-shrink:0">{{ a.time }}</span>
+                <span>{{ a.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ darkDemo }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#15130f;padding:36px;margin:-4px -4px 0">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;margin-bottom:40px">
+            <div style="background:#1c1a15;padding:22px 24px;border-radius:12px">
+              <p style="font-family:'IBM Plex Mono',monospace;font-size:30px;margin:0;font-weight:500;color:#f1eee8">3</p>
+              <p style="font-size:12.5px;color:rgba(241,238,232,0.5);margin:6px 0 0">Tareas críticas</p>
+            </div>
+            <div style="background:#1c1a15;padding:22px 24px;border-radius:12px">
+              <p style="font-family:'IBM Plex Mono',monospace;font-size:30px;margin:0;font-weight:500;color:#f1eee8">2</p>
+              <p style="font-size:12.5px;color:rgba(241,238,232,0.5);margin:6px 0 0">Reuniones hoy</p>
+            </div>
+            <div style="background:#1c1a15;padding:22px 24px;border-radius:12px">
+              <p style="font-family:'IBM Plex Mono',monospace;font-size:30px;margin:0;font-weight:500;color:#cf8657">4</p>
+              <p style="font-size:12.5px;color:rgba(241,238,232,0.5);margin:6px 0 0">Leads nuevos</p>
+            </div>
+            <div style="background:#1c1a15;padding:22px 24px;border-radius:12px">
+              <p style="font-family:'IBM Plex Mono',monospace;font-size:30px;margin:0;font-weight:500;color:#f1eee8">$18.4k</p>
+              <p style="font-size:12.5px;color:rgba(241,238,232,0.5);margin:6px 0 0">Pendiente de cobro</p>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:56px">
+            <div>
+              <h2 style="font-family:'Fraunces',serif;font-weight:500;font-size:18px;margin:0 0 18px;color:#f1eee8">Proyectos activos</h2>
+              <sc-for list="{{ projects }}" as="p" hint-placeholder-count="4">
+                <div style="padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+                    <span style="font-size:14.5px;font-weight:500;color:#f1eee8">{{ p.name }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:rgba(241,238,232,0.55)">{{ p.progress }}%</span>
+                  </div>
+                  <div style="height:3px;background:rgba(255,255,255,0.1);width:100%">
+                    <div style="height:3px;background:#cf8657;width:{{ p.progressPct }}"></div>
+                  </div>
+                  <p style="font-size:12px;color:rgba(241,238,232,0.45);margin:8px 0 0">{{ p.client }} &middot; {{ p.phase }}</p>
+                </div>
+              </sc-for>
+            </div>
+            <div>
+              <h2 style="font-family:'Fraunces',serif;font-weight:500;font-size:18px;margin:0 0 16px;color:#f1eee8">Pipeline</h2>
+              <p style="font-family:'IBM Plex Mono',monospace;font-size:26px;margin:0 0 16px;font-weight:500;color:#f1eee8">$128,400</p>
+              <sc-for list="{{ pipelineStages }}" as="s" hint-placeholder-count="4">
+                <div style="margin-bottom:10px">
+                  <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
+                    <span style="color:rgba(241,238,232,0.6)">{{ s.name }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;color:#f1eee8">{{ s.value }}</span>
+                  </div>
+                  <div style="height:6px;background:rgba(255,255,255,0.08);width:100%">
+                    <div style="height:6px;background:#cf8657;opacity:{{ s.opacity }};width:{{ s.pct }}"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <!-- ============ CRM ============ -->
+    <sc-if value="{{ screenIs.crm }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+        <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0">CRM</h1>
+        <button onclick="{{ goCrmNew }}" style="background:#000;color:#f1eee8;border:none;border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer;font-family:inherit;transition:background 150ms" style-hover="background:#8c5335">+ Nuevo lead</button>
+      </div>
+      <div style="display:flex;gap:22px;border-bottom:1px solid rgba(0,0,0,0.1);margin-bottom:28px">
+        <button onclick="{{ goCrmLeads }}" style="{{ crmTabStyles.leads }}">Leads</button>
+        <button onclick="{{ goCrmClientes }}" style="{{ crmTabStyles.clientes }}">Clientes</button>
+        <button onclick="{{ goCrmPipeline }}" style="{{ crmTabStyles.pipeline }}">Pipeline</button>
+      </div>
+
+      <sc-if value="{{ crmTabIs.leads }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <input placeholder="Buscar lead..." style="flex:1;min-width:200px;padding:10px 14px;border:1px solid rgba(0,0,0,0.15);border-radius:8px;background:#fff;font-size:13.5px;font-family:inherit"/>
+          <button onclick="{{ setLeadsTable }}" style="{{ leadsViewBtn.table }}">Tabla</button>
+          <button onclick="{{ setLeadsKanban }}" style="{{ leadsViewBtn.kanban }}">Kanban</button>
+        </div>
+
+        <sc-if value="{{ leadsView.table }}" hint-placeholder-val="{{ true }}">
+          <table style="width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;overflow:hidden">
+            <thead>
+              <tr style="text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);border-bottom:1px solid rgba(0,0,0,0.08)">
+                <th style="padding:12px 16px">Lead</th><th style="padding:12px 16px">Proyecto</th><th style="padding:12px 16px">Valor</th>
+                <th style="padding:12px 16px">Fuente</th><th style="padding:12px 16px">Estado</th><th style="padding:12px 16px">Seguimiento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ leads }}" as="l" hint-placeholder-count="8">
+                <tr style="border-bottom:1px solid rgba(0,0,0,0.06);transition:background 150ms" style-hover="background:#f1eee8">
+                  <td style="padding:13px 16px;font-size:13.5px;font-weight:500">{{ l.name }}</td>
+                  <td style="padding:13px 16px;font-size:13px;color:rgba(0,0,0,0.6)">{{ l.project }}</td>
+                  <td style="padding:13px 16px;font-family:'IBM Plex Mono',monospace;font-size:13px">{{ l.valueFmt }}</td>
+                  <td style="padding:13px 16px;font-size:13px;color:rgba(0,0,0,0.55)">{{ l.source }}</td>
+                  <td style="padding:13px 16px"><span style="{{ l.badgeStyle }}">{{ l.status }}</span></td>
+                  <td style="padding:13px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:rgba(0,0,0,0.55)">{{ l.next }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </sc-if>
+
+        <sc-if value="{{ leadsView.kanban }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px">
+            <sc-for list="{{ kanbanColumns }}" as="col" hint-placeholder-count="6">
+              <div style="width:220px;flex-shrink:0">
+                <div style="display:flex;justify-content:space-between;font-size:11.5px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.45);padding:0 4px 10px;border-bottom:2px solid {{ col.color }}">
+                  <span>{{ col.name }}</span><span style="font-family:'IBM Plex Mono',monospace">{{ col.count }}</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+                  <sc-for list="{{ col.leads }}" as="l" hint-placeholder-count="2">
+                    <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;border-left:3px solid {{ col.color }};padding:12px;font-size:12.5px;transition:transform 150ms,box-shadow 150ms;cursor:pointer" style-hover="transform:translateY(-2px);box-shadow:0 8px 16px rgba(0,0,0,0.1)">
+                      <p style="margin:0 0 6px;font-weight:500">{{ l.name }}</p>
+                      <p style="margin:0 0 8px;color:rgba(0,0,0,0.5);font-size:12px">{{ l.project }}</p>
+                      <p style="margin:0;font-family:'IBM Plex Mono',monospace;color:#8c5335;font-weight:500">{{ l.valueFmt }}</p>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ crmTabIs.clientes }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+          <sc-for list="{{ clients }}" as="c" hint-placeholder-count="6">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px;cursor:pointer;transition:transform 150ms,box-shadow 150ms" onclick="{{ goClientDetail }}" style-hover="transform:translateY(-3px);box-shadow:0 10px 22px rgba(0,0,0,0.1)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+                <div style="width:34px;height:34px;border-radius:50%;background:#e4dfd4;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:14px">{{ c.initials }}</div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(0,0,0,0.5)">{{ c.projects }} proy.</span>
+              </div>
+              <p style="margin:0 0 4px;font-weight:500;font-size:14.5px">{{ c.name }}</p>
+              <p style="margin:0;font-size:12.5px;color:rgba(0,0,0,0.5)">{{ c.category }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ crmTabIs.pipeline }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px">
+          <div style="text-align:center;border:1px solid rgba(0,0,0,0.08);border-radius:10px;background:#fff;padding:24px">
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:24px;margin:0;font-weight:500">$12k</p>
+            <p style="font-size:12px;color:rgba(0,0,0,0.5);margin:6px 0 0">Nuevo</p>
+          </div>
+          <div style="text-align:center;border:1px solid rgba(0,0,0,0.08);border-radius:10px;background:#fff;padding:24px">
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:24px;margin:0;font-weight:500">$42k</p>
+            <p style="font-size:12px;color:rgba(0,0,0,0.5);margin:6px 0 0">Propuesta</p>
+          </div>
+          <div style="text-align:center;border:1px solid rgba(0,0,0,0.08);border-radius:10px;background:#fff;padding:24px">
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:24px;margin:0;font-weight:500">$51k</p>
+            <p style="font-size:12px;color:rgba(0,0,0,0.5);margin:6px 0 0">Negociación</p>
+          </div>
+          <div style="text-align:center;border:1px solid #b26a45;border-radius:10px;background:#fff;padding:24px">
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:24px;margin:0;font-weight:500;color:#8c5335">$23k</p>
+            <p style="font-size:12px;color:rgba(0,0,0,0.5);margin:6px 0 0">Ganado</p>
+          </div>
+        </div>
+        <p style="font-size:12.5px;color:rgba(0,0,0,0.45)">Timeline del cliente ganado &mdash; ver ficha completa en Clientes.</p>
+      </sc-if>
+    </sc-if>
+
+    <!-- ============ CLIENT DETAIL ============ -->
+    <sc-if value="{{ screenIs.clientDetail }}" hint-placeholder-val="{{ false }}">
+      <button onclick="{{ goCrmClientes }}" style="background:none;border:none;font-size:12.5px;color:rgba(0,0,0,0.45);cursor:pointer;padding:0;margin-bottom:16px;font-family:inherit">&larr; Clientes</button>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:36px">
+        <div style="width:52px;height:52px;border-radius:50%;background:#e4dfd4;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:20px">FR</div>
+        <div>
+          <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:26px;margin:0">Familia Rodríguez</h1>
+          <p style="margin:4px 0 0;font-size:13px;color:rgba(0,0,0,0.5)">Cliente desde mar. 2025 &middot; Residencial &middot; Casa EG</p>
+        </div>
+      </div>
+
+      <div style="margin-bottom:44px">
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 20px">Journey del cliente</p>
+        <div style="display:flex;align-items:center">
+          <sc-for list="{{ clientJourney }}" as="step" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;flex:1">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:90px">
+                <div style="{{ step.dotStyle }}"></div>
+                <span style="font-size:12px;color:rgba(0,0,0,0.55);text-align:center">{{ step.label }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(0,0,0,0.35)">{{ step.date }}</span>
+              </div>
+              <sc-if value="{{ step.hasLine }}" hint-placeholder-val="{{ true }}">
+                <div style="flex:1;height:1px;background:{{ step.lineColor }};margin-bottom:22px"></div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+        <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:22px">
+          <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4);margin:0 0 12px">Contrato</p>
+          <p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500">$42,000</p>
+          <p style="font-size:12px;color:rgba(0,0,0,0.5);margin:6px 0 0">Firmado 12 mar. 2025</p>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:22px">
+          <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4);margin:0 0 12px">Cobrado</p>
+          <p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500;color:#3a7a56">$28,000</p>
+          <p style="font-size:12px;color:rgba(0,0,0,0.5);margin:6px 0 0">2 pagos de 3</p>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:22px">
+          <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4);margin:0 0 12px">Comunicación</p>
+          <p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500">14</p>
+          <p style="font-size:12px;color:rgba(0,0,0,0.5);margin:6px 0 0">Interacciones registradas</p>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PROJECTS LIST ============ -->
+    <sc-if value="{{ screenIs.projects }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px">
+        <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0">Proyectos</h1>
+        <button style="background:#000;color:#f1eee8;border:none;border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer;font-family:inherit;transition:background 150ms" style-hover="background:#8c5335">+ Nuevo proyecto</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px">
+        <sc-for list="{{ projects }}" as="p" hint-placeholder-count="5">
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;cursor:pointer;transition:transform 150ms,box-shadow 150ms;overflow:hidden" onclick="{{ p.open }}" style-hover="transform:translateY(-4px);box-shadow:0 14px 28px rgba(0,0,0,0.1)">
+            <div style="{{ p.thumbStyleLg }}"></div>
+            <div style="padding:22px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+                <div>
+                  <p style="margin:0 0 6px;font-family:'Fraunces',serif;font-weight:500;font-size:19px">{{ p.name }}</p>
+                  <span style="display:inline-block;font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;background:#f1eee8;color:#8c5335;padding:2px 8px">{{ p.category }}</span>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:500">{{ p.progress }}%</span>
+              </div>
+              <div style="height:4px;background:rgba(0,0,0,0.08);width:100%;margin-bottom:14px">
+                <div style="height:4px;background:#b26a45;width:{{ p.progressPct }}"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;color:rgba(0,0,0,0.55)">
+                <span>{{ p.client }} &middot; {{ p.phase }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace">Entrega {{ p.due }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ============ PROJECT WORKSPACE ============ -->
+    <sc-if value="{{ screenIs.workspace }}" hint-placeholder-val="{{ false }}">
+      <button onclick="{{ goProjects }}" style="background:none;border:none;font-size:12.5px;color:rgba(0,0,0,0.45);cursor:pointer;padding:0;margin-bottom:16px;font-family:inherit">&larr; Proyectos</button>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+        <div>
+          <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0">Casa EG</h1>
+          <p style="margin:6px 0 0;font-size:13.5px;color:rgba(0,0,0,0.5)">Arquitectura residencial &middot; Familia Rodríguez &middot; Salinas, Ecuador</p>
+        </div>
+        <div style="text-align:right">
+          <p style="font-family:'IBM Plex Mono',monospace;font-size:30px;margin:0;font-weight:500">82%</p>
+          <p style="font-size:11px;color:rgba(0,0,0,0.45);margin:2px 0 0;text-transform:uppercase;letter-spacing:0.06em">Completado</p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:22px;border-bottom:1px solid rgba(0,0,0,0.1);margin:24px 0 28px;overflow-x:auto">
+        <button onclick="{{ goWsOverview }}" style="{{ wsTabStyles.overview }}">Overview</button>
+        <button onclick="{{ goWsTasks }}" style="{{ wsTabStyles.tasks }}">Tareas</button>
+        <button onclick="{{ goWsGantt }}" style="{{ wsTabStyles.gantt }}">Cronograma</button>
+        <button onclick="{{ goWsDocs }}" style="{{ wsTabStyles.docs }}">Documentos</button>
+        <button onclick="{{ goWsApprovals }}" style="{{ wsTabStyles.approvals }}">Aprobaciones</button>
+        <button onclick="{{ goWsFinance }}" style="{{ wsTabStyles.finance }}">Finanzas</button>
+        <button onclick="{{ goWsActivity }}" style="{{ wsTabStyles.activity }}">Actividad</button>
+      </div>
+
+      <sc-if value="{{ wsTabIs.overview }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-bottom:40px">
+          <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 20px">Fases del proyecto</p>
+          <div style="display:flex;flex-direction:column;gap:0">
+            <sc-for list="{{ phases }}" as="ph" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,0.06)">
+                <span style="{{ ph.markStyle }}">{{ ph.mark }}</span>
+                <span style="flex:1;font-size:14px;{{ ph.textStyle }}">{{ ph.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(0,0,0,0.4)">{{ ph.date }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px">
+          <div>
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 16px">Próximos hitos</p>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;font-size:13.5px"><span>Entrega planos estructurales</span><span style="font-family:'IBM Plex Mono',monospace;color:rgba(0,0,0,0.5)">28 ago</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13.5px"><span>Aprobación fachada V04</span><span style="font-family:'IBM Plex Mono',monospace;color:#a4432b">vencido</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13.5px"><span>Reunión de obra</span><span style="font-family:'IBM Plex Mono',monospace;color:rgba(0,0,0,0.5)">2 sep</span></div>
+            </div>
+          </div>
+          <div>
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 16px">Documentos recientes</p>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;font-size:13.5px"><span>06_RENDERS &mdash; Fachada V04</span><span style="font-family:'IBM Plex Mono',monospace;color:rgba(0,0,0,0.5)">hoy</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13.5px"><span>04_ESTRUCTURA &mdash; Cimentación</span><span style="font-family:'IBM Plex Mono',monospace;color:rgba(0,0,0,0.5)">ayer</span></div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ wsTabIs.tasks }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+          <button style="background:#000;color:#f1eee8;border:none;border-radius:8px;padding:8px 16px;font-size:12.5px;cursor:pointer;font-family:inherit">+ Nueva tarea</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+          <sc-for list="{{ taskColumns }}" as="col" hint-placeholder-count="4">
+            <div>
+              <p style="font-size:11.5px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.45);margin:0 0 10px">{{ col.name }} &middot; {{ col.count }}</p>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ col.tasks }}" as="t" hint-placeholder-count="2">
+                  <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:12px">
+                    <p style="margin:0 0 8px;font-size:13px;font-weight:500">{{ t.title }}</p>
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                      <span style="{{ t.priorityStyle }}">{{ t.priority }}</span>
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(0,0,0,0.45)">{{ t.date }}</span>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ wsTabIs.gantt }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:24px;overflow-x:auto">
+          <div style="display:grid;grid-template-columns:160px 1fr;gap:0;min-width:760px">
+            <div></div>
+            <div style="display:grid;grid-template-columns:repeat(8,1fr);font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:rgba(0,0,0,0.4);padding-bottom:8px;border-bottom:1px solid rgba(0,0,0,0.1)">
+              <span>May</span><span>Jun</span><span>Jul</span><span>Ago</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dic</span>
+            </div>
+            <sc-for list="{{ ganttRows }}" as="row" hint-placeholder-count="8">
+              <div style="font-size:12.5px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,0.06);display:flex;align-items:center">{{ row.name }}</div>
+              <div style="position:relative;padding:11px 0;border-bottom:1px solid rgba(0,0,0,0.06)">
+                <div style="height:8px;background:{{ row.color }};width:{{ row.width }};margin-left:{{ row.offset }};opacity:{{ row.opacity }}"></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ wsTabIs.docs }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:0">
+          <sc-for list="{{ documents }}" as="d" hint-placeholder-count="10">
+            <div style="display:flex;align-items:center;gap:16px;padding:13px 10px;margin:0 -10px;border-bottom:1px solid rgba(0,0,0,0.06);border-radius:4px;transition:background 150ms" style-hover="background:#fff">
+              <div style="width:32px;height:38px;background:#e4dfd4;flex-shrink:0"></div>
+              <div style="flex:1;min-width:0">
+                <p style="margin:0;font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ d.name }}</p>
+                <p style="margin:2px 0 0;font-size:12px;color:rgba(0,0,0,0.45)">{{ d.author }} &middot; {{ d.date }}</p>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(0,0,0,0.5)">{{ d.version }}</span>
+              <span style="{{ d.badgeStyle }}">{{ d.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:40px">
+          <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 16px">Historial de versiones &mdash; Fachada principal</p>
+          <div style="display:flex;gap:12px">
+            <sc-for list="{{ versions }}" as="v" hint-placeholder-count="4">
+              <div style="{{ v.cardStyle }}">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500">{{ v.label }}</span>
+                <sc-if value="{{ v.approved }}" hint-placeholder-val="{{ false }}">
+                  <span style="display:block;font-size:10.5px;color:#3a7a56;margin-top:4px">APROBADA</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ wsTabIs.approvals }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:560px;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px">
+          <div style="aspect-ratio:16/10;background:repeating-linear-gradient(135deg,#e4dfd4,#e4dfd4 10px,#ecebe4 10px,#ecebe4 20px);display:flex;align-items:center;justify-content:center">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(0,0,0,0.45)">[ render / PDF de fachada principal ]</span>
+          </div>
+          <div style="padding:24px">
+            <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4)">Fachada principal &middot; Versión 04</p>
+            <p style="margin:0 0 18px;font-size:14px;font-style:italic;color:rgba(0,0,0,0.7);font-family:'Fraunces',serif">&ldquo;Hemos incorporado el cambio de revestimiento solicitado en el volumen superior y ajustado la altura del parapeto.&rdquo;</p>
+            <div style="display:flex;gap:10px">
+              <button style="flex:1;background:#000;color:#f1eee8;border:none;border-radius:8px;padding:11px;font-size:13px;cursor:pointer;font-family:inherit">Aprobar</button>
+              <button style="flex:1;background:none;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:11px;font-size:13px;cursor:pointer;font-family:inherit">Solicitar cambios</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ wsTabIs.finance }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+          <div style="border:1px solid rgba(0,0,0,0.08);border-radius:10px;background:#fff;padding:22px">
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4);margin:0 0 10px">Contratado</p>
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500">$42,000</p>
+          </div>
+          <div style="border:1px solid rgba(0,0,0,0.08);border-radius:10px;background:#fff;padding:22px">
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4);margin:0 0 10px">Cobrado</p>
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500;color:#3a7a56">$28,000</p>
+          </div>
+          <div style="border:1px solid rgba(0,0,0,0.08);border-radius:10px;background:#fff;padding:22px">
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4);margin:0 0 10px">Pendiente</p>
+            <p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500;color:#a4432b">$14,000</p>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ wsTabIs.activity }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+            <div style="display:flex;gap:16px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-size:13.5px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:rgba(0,0,0,0.4);width:56px;flex-shrink:0">{{ a.time }}</span>
+              <span>{{ a.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <!-- ============ QUOTES ============ -->
+    <sc-if value="{{ screenIs.quotes }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0 0 24px">Cotizaciones</h1>
+      <div style="display:flex;gap:22px;border-bottom:1px solid rgba(0,0,0,0.1);margin-bottom:28px">
+        <button onclick="{{ goQuoteBuilder }}" style="{{ quoteTabStyles.builder }}">Constructor</button>
+        <button onclick="{{ goQuoteClient }}" style="{{ quoteTabStyles.client }}">Vista del cliente</button>
+      </div>
+
+      <sc-if value="{{ quoteTabIs.builder }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:720px;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:28px">
+          <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+            <thead>
+              <tr style="text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);border-bottom:1px solid rgba(0,0,0,0.1)">
+                <th style="padding:0 0 10px">Servicio</th><th style="padding:0 0 10px">Cant.</th><th style="padding:0 0 10px;text-align:right">Precio</th><th style="padding:0 0 10px;text-align:right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ quoteItems }}" as="it" hint-placeholder-count="4">
+                <tr style="border-bottom:1px solid rgba(0,0,0,0.06)">
+                  <td style="padding:10px 0;font-size:13.5px">{{ it.name }}</td>
+                  <td style="padding:10px 0;font-size:13.5px;font-family:'IBM Plex Mono',monospace">{{ it.qty }}</td>
+                  <td style="padding:10px 0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px">{{ it.price }}</td>
+                  <td style="padding:10px 0;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px">{{ it.subtotal }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;font-size:13.5px">
+            <div style="display:flex;gap:24px;color:rgba(0,0,0,0.6)"><span>Subtotal</span><span style="font-family:'IBM Plex Mono',monospace">$24,500</span></div>
+            <div style="display:flex;gap:24px;color:rgba(0,0,0,0.6)"><span>Descuento</span><span style="font-family:'IBM Plex Mono',monospace">&minus;$500</span></div>
+            <div style="display:flex;gap:24px;color:rgba(0,0,0,0.6)"><span>IVA (15%)</span><span style="font-family:'IBM Plex Mono',monospace">$3,600</span></div>
+            <div style="display:flex;gap:24px;font-size:18px;font-weight:500;margin-top:6px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.1)"><span>Total</span><span style="font-family:'IBM Plex Mono',monospace">$27,600</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ quoteTabIs.client }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:640px;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:48px">
+          <p style="font-family:'Fraunces',serif;font-weight:600;font-size:20px;margin:0 0 4px">Adrián Gutiérrez Arq.</p>
+          <p style="font-size:12px;color:rgba(0,0,0,0.45);margin:0 0 36px">Cotización No. 0042 &middot; 21 ago 2026</p>
+          <p style="font-size:14px;color:rgba(0,0,0,0.7);margin:0 0 28px">Propuesta de honorarios para <strong>Remodelación cocina &mdash; Sra. Peña</strong></p>
+          <div style="border-top:1px solid rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.1);padding:20px 0;margin-bottom:20px">
+            <sc-for list="{{ quoteItems }}" as="it" hint-placeholder-count="4">
+              <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>{{ it.name }}</span><span style="font-family:'IBM Plex Mono',monospace">{{ it.subtotal }}</span></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:500;font-family:'Fraunces',serif"><span>Total</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px">$27,600</span></div>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <!-- ============ CONTRACTS ============ -->
+    <sc-if value="{{ screenIs.contracts }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0 0 28px">Contratos</h1>
+      <table style="width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;overflow:hidden">
+        <thead>
+          <tr style="text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);border-bottom:1px solid rgba(0,0,0,0.08)">
+            <th style="padding:12px 16px">Cliente</th><th style="padding:12px 16px">Proyecto</th><th style="padding:12px 16px">Valor</th><th style="padding:12px 16px">Firmado</th><th style="padding:12px 16px">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ contracts }}" as="c" hint-placeholder-count="5">
+            <tr style="border-bottom:1px solid rgba(0,0,0,0.06)">
+              <td style="padding:13px 16px;font-size:13.5px;font-weight:500">{{ c.client }}</td>
+              <td style="padding:13px 16px;font-size:13px;color:rgba(0,0,0,0.6)">{{ c.project }}</td>
+              <td style="padding:13px 16px;font-family:'IBM Plex Mono',monospace;font-size:13px">{{ c.value }}</td>
+              <td style="padding:13px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:rgba(0,0,0,0.55)">{{ c.date }}</td>
+              <td style="padding:13px 16px"><span style="{{ c.badgeStyle }}">{{ c.status }}</span></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </sc-if>
+
+    <!-- ============ FINANCE ============ -->
+    <sc-if value="{{ screenIs.finance }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0 0 28px">Finanzas</h1>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.08);border-radius:10px;border-radius:12px;overflow:hidden;margin-bottom:44px">
+        <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Contratado</p><p style="font-family:'IBM Plex Mono',monospace;font-size:19px;margin:0;font-weight:500">$128,400</p></div>
+        <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Cobrado</p><p style="font-family:'IBM Plex Mono',monospace;font-size:19px;margin:0;font-weight:500">$84,000</p></div>
+        <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Pendiente</p><p style="font-family:'IBM Plex Mono',monospace;font-size:19px;margin:0;font-weight:500;color:#a4432b">$44,400</p></div>
+        <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Gastos</p><p style="font-family:'IBM Plex Mono',monospace;font-size:19px;margin:0;font-weight:500">$37,800</p></div>
+        <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Utilidad</p><p style="font-family:'IBM Plex Mono',monospace;font-size:19px;margin:0;font-weight:500;color:#3a7a56">$46,200</p></div>
+        <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Margen</p><p style="font-family:'IBM Plex Mono',monospace;font-size:19px;margin:0;font-weight:500">35.9%</p></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:48px;margin-bottom:44px">
+        <div>
+          <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 18px">Flujo de caja &middot; últimos 6 meses</p>
+          <div style="display:flex;align-items:flex-end;gap:14px;height:140px;border-bottom:1px solid rgba(0,0,0,0.1);padding-bottom:2px">
+            <sc-for list="{{ cashflow }}" as="m" hint-placeholder-count="6">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+                <div style="width:100%;background:#b26a45;height:{{ m.height }}"></div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:rgba(0,0,0,0.45)">{{ m.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 18px">Rentabilidad por proyecto</p>
+          <sc-for list="{{ profitability }}" as="p" hint-placeholder-count="5">
+            <div style="margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>{{ p.name }}</span><span style="font-family:'IBM Plex Mono',monospace">{{ p.margin }}</span></div>
+              <div style="height:5px;background:rgba(0,0,0,0.07)"><div style="height:5px;background:#8c5335;width:{{ p.pct }}"></div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ WEBSITE ============ -->
+    <sc-if value="{{ screenIs.website }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+        <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0">Website</h1>
+        <span style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(0,0,0,0.5)">
+          <span style="width:7px;height:7px;border-radius:50%;background:#3a7a56"></span> ONLINE &middot; 99.98% uptime
+        </span>
+      </div>
+      <div style="display:flex;gap:22px;border-bottom:1px solid rgba(0,0,0,0.1);margin:20px 0 28px">
+        <button onclick="{{ goWebsiteAnalytics }}" style="{{ websiteTabStyles.analytics }}">Analytics</button>
+        <button onclick="{{ goWebsiteSeo }}" style="{{ websiteTabStyles.seo }}">SEO</button>
+      </div>
+
+      <sc-if value="{{ websiteTabIs.analytics }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.08);border-radius:10px;border-radius:12px;overflow:hidden;margin-bottom:40px">
+          <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Visitantes</p><p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500">12,842</p></div>
+          <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Sesiones</p><p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500">16,203</p></div>
+          <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Leads</p><p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500;color:#8c5335">147</p></div>
+          <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Conversión</p><p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500">3.8%</p></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px">
+          <div>
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 16px">Tráfico por canal</p>
+            <sc-for list="{{ trafficSources }}" as="t" hint-placeholder-count="4">
+              <div style="margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>{{ t.name }}</span><span style="font-family:'IBM Plex Mono',monospace">{{ t.pct }}</span></div>
+                <div style="height:6px;background:rgba(0,0,0,0.07)"><div style="height:6px;background:#b26a45;width:{{ t.pct }}"></div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div>
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 16px">Páginas más vistas</p>
+            <sc-for list="{{ topPages }}" as="pg" hint-placeholder-count="4">
+              <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,0.06)"><span>{{ pg.name }}</span><span style="font-family:'IBM Plex Mono',monospace;color:rgba(0,0,0,0.5)">{{ pg.views }}</span></div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ websiteTabIs.seo }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.08);border-radius:10px;border-radius:12px;overflow:hidden;margin-bottom:36px">
+          <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Clicks</p><p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500">2,140</p></div>
+          <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Impresiones</p><p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500">61,400</p></div>
+          <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">CTR</p><p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500">3.5%</p></div>
+          <div style="background:#fff;padding:20px 18px"><p style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(0,0,0,0.4);margin:0 0 8px">Posición media</p><p style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0;font-weight:500">6.2</p></div>
+        </div>
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 16px">Keywords principales</p>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ keywords }}" as="k" hint-placeholder-count="5">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06)">
+              <span style="font-size:13.5px">&ldquo;{{ k.term }}&rdquo;</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500">#{{ k.position }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <!-- ============ MARKETING ============ -->
+    <sc-if value="{{ screenIs.marketing }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0 0 8px">Marketing Intelligence</h1>
+      <p style="font-size:13.5px;color:rgba(0,0,0,0.5);margin:0 0 36px">De la fuente al ingreso &mdash; qué canal realmente construye el estudio.</p>
+      <div style="display:flex;flex-direction:column;gap:1px;background:rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.08);border-radius:10px;border-radius:12px;overflow:hidden">
+        <sc-for list="{{ marketingFunnel }}" as="src" hint-placeholder-count="3">
+          <div style="background:#fff;padding:22px 24px;display:grid;grid-template-columns:140px 1fr 1fr 1fr 1fr;align-items:center;gap:12px">
+            <span style="font-family:'Fraunces',serif;font-weight:500;font-size:16px">{{ src.name }}</span>
+            <div><p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500">{{ src.leads }}</p><p style="margin:2px 0 0;font-size:11px;color:rgba(0,0,0,0.45);text-transform:uppercase;letter-spacing:0.05em">Leads</p></div>
+            <div><p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500">{{ src.clients }}</p><p style="margin:2px 0 0;font-size:11px;color:rgba(0,0,0,0.45);text-transform:uppercase;letter-spacing:0.05em">Clientes</p></div>
+            <div><p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500">{{ src.projects }}</p><p style="margin:2px 0 0;font-size:11px;color:rgba(0,0,0,0.45);text-transform:uppercase;letter-spacing:0.05em">Proyectos</p></div>
+            <div><p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;color:#8c5335">{{ src.revenue }}</p><p style="margin:2px 0 0;font-size:11px;color:rgba(0,0,0,0.45);text-transform:uppercase;letter-spacing:0.05em">Ingresos</p></div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ============ CALENDAR ============ -->
+    <sc-if value="{{ screenIs.calendar }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px">
+        <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0">Agenda</h1>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:rgba(0,0,0,0.5)">Agosto 2026</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.08);border-radius:10px;border-radius:12px;overflow:hidden">
+        <sc-for list="{{ calendarDays }}" as="d" hint-placeholder-count="35">
+          <div style="background:#fff;min-height:88px;padding:8px;position:relative">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:rgba(0,0,0,0.4)">{{ d.num }}</span>
+            <sc-if value="{{ d.hasEvent }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ d.eventStyle }}">{{ d.eventLabel }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ============ NOTIFICATIONS ============ -->
+    <sc-if value="{{ screenIs.notifications }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0 0 28px">Notificaciones</h1>
+      <div style="max-width:640px;display:flex;flex-direction:column">
+        <sc-for list="{{ notifications }}" as="n" hint-placeholder-count="6">
+          <div style="display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-bottom:1px solid rgba(0,0,0,0.07)">
+            <span style="{{ n.dotStyle }}"></span>
+            <div style="flex:1">
+              <p style="margin:0;font-size:14px">{{ n.text }}</p>
+              <p style="margin:4px 0 0;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:rgba(0,0,0,0.4)">{{ n.time }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ============ AI ============ -->
+    <sc-if value="{{ screenIs.ai }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:760px">
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:#8c5335;margin:0 0 10px">Archi AI</p>
+        <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:28px;margin:0 0 32px">¿Cómo puedo ayudarte hoy?</h1>
+
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4);margin:0 0 14px">Sugerencias</p>
+        <div style="display:flex;flex-direction:column;gap:1px;background:rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.08);border-radius:10px;border-radius:12px;overflow:hidden;margin-bottom:40px">
+          <sc-for list="{{ aiSuggestions }}" as="s" hint-placeholder-count="4">
+            <div style="background:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:13.5px">{{ s.text }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8c5335">&rarr;</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="border:1px solid rgba(0,0,0,0.08);border-radius:10px;background:#fff;padding:24px">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+            <div style="background:#f1eee8;padding:10px 16px;font-size:13.5px;max-width:70%">¿Qué proyectos están atrasados?</div>
+          </div>
+          <div style="display:flex;justify-content:flex-start;margin-bottom:18px">
+            <div style="background:#000;color:#f1eee8;padding:10px 16px;font-size:13.5px;max-width:75%">Actualmente tienes 2 proyectos con retraso: <strong>Brangus</strong> (fase Anteproyecto, 6 días) y <strong>Casa EG</strong> (aprobación de fachada vencida, 2 días).</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <input placeholder="Pregúntale a Archi AI..." style="flex:1;padding:12px 14px;border:1px solid rgba(0,0,0,0.15);border-radius:8px;font-size:13.5px;font-family:inherit"/>
+            <button style="background:#000;color:#f1eee8;border:none;border-radius:8px;padding:0 20px;font-size:13px;cursor:pointer;font-family:inherit">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ REPORTS ============ -->
+    <sc-if value="{{ screenIs.reports }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0 0 28px">Reportes</h1>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+        <sc-for list="{{ reports }}" as="r" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:24px">
+            <p style="margin:0 0 6px;font-family:'Fraunces',serif;font-weight:500;font-size:17px">{{ r.title }}</p>
+            <p style="margin:0 0 18px;font-size:12.5px;color:rgba(0,0,0,0.5)">{{ r.desc }}</p>
+            <div style="display:flex;gap:8px">
+              <button style="border:1px solid rgba(0,0,0,0.15);border-radius:8px;background:none;padding:7px 14px;font-size:12px;cursor:pointer;font-family:inherit">PDF</button>
+              <button style="border:1px solid rgba(0,0,0,0.15);border-radius:8px;background:none;padding:7px 14px;font-size:12px;cursor:pointer;font-family:inherit">CSV</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ============ SETTINGS ============ -->
+    <sc-if value="{{ screenIs.settings }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0 0 28px">Configuración</h1>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;max-width:900px">
+        <div>
+          <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 16px">Estudio</p>
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:22px;display:flex;flex-direction:column;gap:16px">
+            <div><p style="margin:0 0 5px;font-size:11.5px;color:rgba(0,0,0,0.45)">Nombre</p><p style="margin:0;font-size:14px">Adrián Gutiérrez Arq.</p></div>
+            <div><p style="margin:0 0 5px;font-size:11.5px;color:rgba(0,0,0,0.45)">Color principal</p><div style="display:flex;align-items:center;gap:8px"><span style="width:16px;height:16px;background:#b26a45"></span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px">#B26A45</span></div></div>
+            <div><p style="margin:0 0 5px;font-size:11.5px;color:rgba(0,0,0,0.45)">Dominio</p><p style="margin:0;font-size:14px">adriangutierrezarq.com</p></div>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(0,0,0,0.4);margin:0 0 16px">Equipo</p>
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px">
+            <sc-for list="{{ team }}" as="m" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,0.06)">
+                <div style="width:30px;height:30px;border-radius:50%;background:#e4dfd4;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:12.5px;flex-shrink:0">{{ m.initials }}</div>
+                <div style="flex:1"><p style="margin:0;font-size:13.5px">{{ m.name }}</p></div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:rgba(0,0,0,0.45)">{{ m.role }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </main>
+</div>
+</sc-if>
+
+<!-- ================= CLIENT PORTAL ================= -->
+<sc-if value="{{ isPortalMode }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;background:#f1eee8">
+  <div style="max-width:520px;margin:0 auto;padding:40px 24px 100px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:40px">
+      <p style="font-family:'Fraunces',serif;font-weight:600;font-size:16px;margin:0">Adrián Gutiérrez Arq.</p>
+      <button onclick="{{ setModeAdmin }}" style="background:none;border:none;font-size:12px;color:rgba(0,0,0,0.4);cursor:pointer;font-family:inherit">Salir</button>
+    </div>
+
+    <div style="display:flex;gap:22px;border-bottom:1px solid rgba(0,0,0,0.1);margin-bottom:32px">
+      <button onclick="{{ goPortalDashboard }}" style="{{ portalTabStyles.dashboard }}">Proyecto</button>
+      <button onclick="{{ goPortalApprovals }}" style="{{ portalTabStyles.approvals }}">Aprobaciones</button>
+      <button onclick="{{ goPortalDocs }}" style="{{ portalTabStyles.docs }}">Documentos</button>
+      <button onclick="{{ goPortalPayments }}" style="{{ portalTabStyles.payments }}">Pagos</button>
+    </div>
+
+    <sc-if value="{{ portalTabIs.dashboard }}" hint-placeholder-val="{{ true }}">
+      <p style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:#8c5335;margin:0 0 6px">Tu proyecto</p>
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:26px;margin:0 0 24px">Casa EG</h1>
+
+      <div style="text-align:center;padding:32px 0;border:1px solid rgba(0,0,0,0.08);border-radius:10px;background:#fff;margin-bottom:24px">
+        <p style="font-family:'Fraunces',serif;font-weight:600;font-size:52px;margin:0;letter-spacing:-0.02em">82<span style="font-size:28px">%</span></p>
+        <p style="font-size:12.5px;color:rgba(0,0,0,0.5);margin:6px 0 0">completado</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px;margin-bottom:24px">
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4);margin:0 0 8px">Próximo hito</p>
+        <p style="margin:0;font-size:15px;font-weight:500">Entrega de planos estructurales</p>
+        <p style="margin:4px 0 0;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:rgba(0,0,0,0.5)">26 de agosto</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid #b26a45;border-radius:10px;padding:20px;margin-bottom:24px">
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:#8c5335;margin:0 0 8px">Pendiente de tu aprobación</p>
+        <p style="margin:0 0 14px;font-size:15px;font-weight:500">Fachada principal &mdash; Versión 04</p>
+        <button onclick="{{ goPortalApprovals }}" style="width:100%;background:#000;color:#f1eee8;border:none;border-radius:8px;padding:12px;font-size:13.5px;cursor:pointer;font-family:inherit">Revisar</button>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px;margin-bottom:24px">
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4);margin:0 0 12px">Próxima reunión</p>
+        <p style="margin:0;font-size:15px">Viernes 28 &middot; 10:00 AM</p>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ portalTabIs.approvals }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:24px;margin:0 0 24px">Aprobaciones</h1>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px">
+        <div style="aspect-ratio:16/10;background:repeating-linear-gradient(135deg,#e4dfd4,#e4dfd4 10px,#ecebe4 10px,#ecebe4 20px);display:flex;align-items:center;justify-content:center">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(0,0,0,0.45)">[ render de fachada principal ]</span>
+        </div>
+        <div style="padding:22px">
+          <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:rgba(0,0,0,0.4)">Fachada principal &middot; V04</p>
+          <p style="margin:0 0 18px;font-size:13.5px;font-style:italic;color:rgba(0,0,0,0.7);font-family:'Fraunces',serif">&ldquo;Hemos realizado los cambios solicitados en el revestimiento superior.&rdquo;</p>
+          <div style="display:flex;gap:10px">
+            <button style="flex:1;background:#000;color:#f1eee8;border:none;border-radius:8px;padding:12px;font-size:13.5px;cursor:pointer;font-family:inherit">Aprobar</button>
+            <button style="flex:1;background:none;border:1px solid rgba(0,0,0,0.2);border-radius:8px;padding:12px;font-size:13.5px;cursor:pointer;font-family:inherit">Solicitar cambios</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ portalTabIs.docs }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:24px;margin:0 0 24px">Documentos</h1>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px">
+        <sc-for list="{{ portalDocs }}" as="d" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid rgba(0,0,0,0.06)">
+            <div style="width:26px;height:32px;background:#e4dfd4;flex-shrink:0"></div>
+            <span style="flex:1;font-size:14px">{{ d.name }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8c5335">Descargar</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ portalTabIs.payments }}" hint-placeholder-val="{{ false }}">
+      <h1 style="font-family:'Fraunces',serif;font-weight:500;font-size:24px;margin:0 0 24px">Pagos</h1>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:22px;display:flex;justify-content:space-between;align-items:center">
+          <div><p style="margin:0;font-size:14px">Anticipo + avance de obra</p><p style="margin:4px 0 0;font-size:11.5px;color:rgba(0,0,0,0.45)">Pagado &middot; 2 cuotas</p></div>
+          <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;color:#3a7a56">$28,000</p>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:22px;display:flex;justify-content:space-between;align-items:center">
+          <div><p style="margin:0;font-size:14px">Cuota final</p><p style="margin:4px 0 0;font-size:11.5px;color:rgba(0,0,0,0.45)">Vence 15 sep 2026</p></div>
+          <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;color:#a4432b">$14,000</p>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+<!-- ================= LOGIN ================= -->
+<sc-if value="{{ isLoginMode }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f1eee8">
+  <div style="width:100%;max-width:380px;padding:24px">
+    <p style="font-family:'Fraunces',serif;font-weight:600;font-size:22px;text-align:center;margin:0 0 6px">ARCHI.OS</p>
+    <p style="text-align:center;font-size:13px;color:rgba(0,0,0,0.5);margin:0 0 40px">Adrián Gutiérrez Arq.</p>
+    <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:32px">
+      <p style="margin:0 0 6px;font-size:11.5px;color:rgba(0,0,0,0.5)">Correo</p>
+      <input type="email" placeholder="tu@estudio.com" style="width:100%;padding:11px 14px;border:1px solid rgba(0,0,0,0.15);border-radius:8px;font-size:13.5px;margin-bottom:20px;font-family:inherit"/>
+      <button style="width:100%;background:#000;color:#f1eee8;border:none;border-radius:8px;padding:12px;font-size:13.5px;cursor:pointer;font-family:inherit">Enviar enlace mágico</button>
+      <p style="text-align:center;font-size:11.5px;color:rgba(0,0,0,0.4);margin:16px 0 0">Sin contraseña &mdash; te enviamos un enlace de acceso.</p>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:960},&quot;initialScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dashboard&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;dashboard&quot;,&quot;crm&quot;,&quot;projects&quot;,&quot;workspace&quot;,&quot;finance&quot;,&quot;website&quot;,&quot;ai&quot;,&quot;login&quot;],&quot;section&quot;:&quot;Comportamiento&quot;},&quot;portalPreview&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamiento&quot;},&quot;colorMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;section&quot;:&quot;Comportamiento&quot;}}">
+function money(n){ return '$' + n.toLocaleString('en-US'); }
+
+const LEADS = [
+  { name:"María Fernanda Solís", project:"Ampliación vivienda", value:18500, source:"Google", status:"Propuesta", next:"22 ago" },
+  { name:"Hormipen S.A.", project:"Fachada corporativa", value:68000, source:"Referido", status:"Ganado", next:"—" },
+  { name:"Grupo Brangus", project:"Restaurante Brangus", value:54000, source:"Instagram", status:"Negociación", next:"25 ago" },
+  { name:"Familia Rodríguez", project:"Casa EG", value:42000, source:"Referido", status:"Ganado", next:"—" },
+  { name:"Municipio de Salinas", project:"Renovación urbana", value:210000, source:"Licitación", status:"Propuesta", next:"29 ago" },
+  { name:"Inversiones Tulum", project:"Bistrobar Tulum", value:31000, source:"Instagram", status:"Contactado", next:"24 ago" },
+  { name:"Suite Palmar Hotel", project:"Interiorismo suites", value:26000, source:"Referido", status:"Reunión", next:"27 ago" },
+  { name:"Cocina Urbana — Sra. Peña", project:"Remodelación cocina", value:9800, source:"Google", status:"Nuevo", next:"23 ago" },
+];
+
+const STATUS_COLORS = {
+  Nuevo:"#6e6659", Contactado:"#6e6659", Reunión:"#8c5335", "Visita a sitio":"#8c5335",
+  Propuesta:"#b26a45", Negociación:"#b26a45", Ganado:"#3a7a56", Perdido:"#a4432b",
+};
+
+function badgeStyle(status){
+  const c = STATUS_COLORS[status] || "#6e6659";
+  return `display:inline-block;font-size:11px;padding:4px 10px;background:${c};color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:500;border-radius:20px`;
+}
+
+const PROJECTS = [
+  { name:"Casa EG", client:"Familia Rodríguez", category:"Residencial", progress:82, phase:"Diseño arquitectónico", due:"15 sep" },
+  { name:"Hormipen", client:"Hormipen S.A.", category:"Comercial", progress:64, phase:"Planos", due:"30 ago" },
+  { name:"Brangus", client:"Grupo Brangus", category:"Comercial", progress:41, phase:"Anteproyecto", due:"12 oct" },
+  { name:"Tulum", client:"Inversiones Tulum", category:"Comercial", progress:23, phase:"Conceptualización", due:"5 nov" },
+  { name:"Suite Palmar", client:"Hotel Palmar", category:"Hospitalidad", progress:95, phase:"Entrega", due:"26 ago" },
+];
+
+const PHASE_NAMES = ["Levantamiento","Conceptualización","Anteproyecto","Diseño arquitectónico","Planos","Permisos","Construcción","Entrega"];
+const PHASE_DATES = ["mar 2025","abr 2025","may 2025","ago 2026","—","—","—","—"];
+
+const ACTIVITY = [
+  { time:"09:14", text:"Nuevo lead desde Google — María Fernanda Solís" },
+  { time:"11:02", text:"Cotización aceptada — Hormipen S.A." },
+  { time:"14:30", text:"Cliente aprobó fachada — Suite Palmar V02" },
+  { time:"16:45", text:"Pago recibido — Casa EG, cuota 2 de 3" },
+];
+
+const TASKS = {
+  Backlog: [{ title:"Levantar medidas terreno", priority:"Media", date:"2 sep" }],
+  "Por hacer": [{ title:"Revisar instalaciones eléctricas", priority:"Alta", date:"24 ago" }, { title:"Cotizar acabados baño", priority:"Baja", date:"29 ago" }],
+  "En progreso": [{ title:"Ajustar fachada V04", priority:"Alta", date:"22 ago" }],
+  Revisión: [{ title:"Planos estructurales", priority:"Alta", date:"vencido" }],
+};
+
+const PRIORITY_COLORS = { Alta:"#a4432b", Media:"#8c5335", Baja:"#6e6659" };
+
+const DOCS = [
+  { name:"01_CONTRATO — Casa EG.pdf", author:"Adrián G.", date:"12 mar 2025", version:"v1", status:"Firmado" },
+  { name:"03_ARQUITECTURA — Planta baja.dwg", author:"Adrián G.", date:"2 ago", version:"v3", status:"Vigente" },
+  { name:"06_RENDERS — Fachada principal.jpg", author:"Adrián G.", date:"hoy", version:"v4", status:"Aprobada" },
+  { name:"07_PRESUPUESTO — Detallado.xlsx", author:"Adrián G.", date:"15 jul", version:"v2", status:"Vigente" },
+  { name:"08_PERMISOS — Municipal.pdf", author:"Adrián G.", date:"3 jun", version:"v1", status:"En trámite" },
+];
+
+const DOC_BADGE = { Firmado:"#3a7a56", Vigente:"#6e6659", Aprobada:"#3a7a56", "En trámite":"#8c5335" };
+
+const QUOTE_ITEMS = [
+  { name:"Anteproyecto y diseño arquitectónico", qty:1, price:8500, subtotal:8500 },
+  { name:"Planos estructurales", qty:1, price:6200, subtotal:6200 },
+  { name:"Dirección de obra (mensual)", qty:8, price:900, subtotal:7200 },
+  { name:"Renders fotorrealistas", qty:3, price:867, subtotal:2600 },
+];
+
+const CONTRACTS = [
+  { client:"Familia Rodríguez", project:"Casa EG", value:42000, date:"12 mar 2025", status:"Vigente" },
+  { client:"Hormipen S.A.", project:"Fachada corporativa", value:68000, date:"3 feb 2025", status:"Vigente" },
+  { client:"Grupo Brangus", project:"Restaurante Brangus", value:54000, date:"20 jun 2025", status:"Vigente" },
+  { client:"Hotel Palmar", project:"Interiorismo suites", value:26000, date:"9 ene 2025", status:"Completado" },
+];
+
+const CONTRACT_BADGE = { Vigente:"#8c5335", Completado:"#3a7a56" };
+
+const KEYWORDS = [
+  { term:"arquitectos en Salinas Ecuador", position:2 },
+  { term:"estudio de arquitectura Salinas", position:4 },
+  { term:"diseño de interiores Ecuador", position:7 },
+  { term:"arquitectos Ecuador", position:9 },
+  { term:"remodelación de cocinas Salinas", position:11 },
+];
+
+const NOTIFS = [
+  { text:"Nuevo lead desde Google — María Fernanda Solís", time:"hace 12 min", tone:"#8c5335" },
+  { text:"Cliente aprobó fachada V04 — Suite Palmar", time:"hace 1 h", tone:"#3a7a56" },
+  { text:"Pago vencido — Cuota final, Casa EG", time:"hace 3 h", tone:"#a4432b" },
+  { text:"Tarea crítica vence mañana — Planos estructurales", time:"hoy 09:00", tone:"#a4432b" },
+  { text:"Nueva cotización aceptada — Hormipen S.A.", time:"ayer", tone:"#3a7a56" },
+  { text:"3 aprobaciones pendientes de revisión", time:"ayer", tone:"#8c5335" },
+];
+
+class Component extends DCLogic {
+  state = {
+    mode: this.props.portalPreview ? "portal" : "login" === this.props.initialScreen ? "login" : "admin",
+    screen: (this.props.initialScreen && this.props.initialScreen !== "login") ? this.props.initialScreen : "dashboard",
+    crmTab: "leads",
+    leadsView: "table",
+    wsTab: "overview",
+    quoteTab: "builder",
+    websiteTab: "analytics",
+    portalTab: "dashboard",
+    dark: (this.props.colorMode || "light") === "dark",
+  };
+
+  go(screen){ return () => this.setState({ screen, mode:"admin" }); }
+
+  renderVals(){
+    const s = this.state;
+    const screens = ["dashboard","crm","clientDetail","projects","workspace","quotes","contracts","finance","website","marketing","calendar","notifications","ai","reports","settings"];
+    const screenIs = {};
+    screens.forEach(k => screenIs[k] = s.screen === k);
+
+    const navKeys = ["dashboard","crmLeads","crmClientes","crmPipeline","projects","quotes","contracts","finance","websiteAnalytics","marketing","calendar","notifications","ai","reports","settings"];
+    const navScreenMap = { crmLeads:"crm", crmClientes:"crm", crmPipeline:"crm", websiteAnalytics:"website" };
+    const navSubTab = { crmLeads:["crmTab","leads"], crmClientes:["crmTab","clientes"], crmPipeline:["crmTab","pipeline"], websiteAnalytics:["websiteTab","analytics"] };
+    const navStyles = {};
+    navKeys.forEach(k => {
+      const targetScreen = navScreenMap[k] || k;
+      let active = s.screen === targetScreen;
+      if (navSubTab[k]) {
+        const [field, val] = navSubTab[k];
+        active = active && s[field] === val;
+      }
+      navStyles[k] = `width:100%;display:flex;align-items:center;gap:10px;text-align:left;background:none;border:none;border-radius:8px;border-left:2px solid ${active ? "#b26a45" : "transparent"};padding:8px 12px;margin-bottom:1px;font-size:13.5px;font-family:inherit;cursor:pointer;color:${active ? "#f1eee8" : "rgba(241,238,232,0.62)"};font-weight:${active ? "500" : "400"};background:${active ? "rgba(178,106,69,0.16)" : "transparent"};transition:background 150ms,color 150ms`;
+    });
+
+    const tabStyle = (active) => `background:none;border:none;padding:0 0 12px;margin-bottom:-1px;font-size:13.5px;font-family:inherit;cursor:pointer;border-bottom:2px solid ${active ? "#000" : "transparent"};color:${active ? "#000" : "rgba(0,0,0,0.5)"};font-weight:${active ? "500" : "400"}`;
+
+    const THUMB_HUES = ["#d9a077","#c9c2b3","#b6c9b8","#cbb4a3"];
+    const projects = PROJECTS.map((p, i) => ({
+      ...p, progressPct: p.progress + "%", open: this.go("workspace"),
+      thumbStyle: `width:56px;height:56px;border-radius:10px;background:repeating-linear-gradient(135deg,${THUMB_HUES[i % 4]},${THUMB_HUES[i % 4]} 6px,#e4dfd4 6px,#e4dfd4 12px)`,
+      thumbStyleLg: `width:100%;aspect-ratio:16/10;border-radius:14px 14px 0 0;background:repeating-linear-gradient(135deg,${THUMB_HUES[i % 4]},${THUMB_HUES[i % 4]} 8px,#e4dfd4 8px,#e4dfd4 16px)`,
+    }));
+
+    const kanbanStatuses = ["Nuevo","Contactado","Reunión","Propuesta","Negociación","Ganado"];
+    const kanbanColumns = kanbanStatuses.map(name => {
+      const inCol = LEADS.filter(l => l.status === name);
+      return { name, count: inCol.length, color: STATUS_COLORS[name], leads: inCol.map(l => ({ ...l, valueFmt: money(l.value) })) };
+    });
+
+    const clients = [
+      { name:"Familia Rodríguez", category:"Residencial", initials:"FR", projects:1 },
+      { name:"Hormipen S.A.", category:"Comercial", initials:"HP", projects:1 },
+      { name:"Grupo Brangus", category:"Comercial", initials:"GB", projects:1 },
+      { name:"Hotel Palmar", category:"Hospitalidad", initials:"HP", projects:2 },
+      { name:"Inversiones Tulum", category:"Comercial", initials:"IT", projects:1 },
+      { name:"Municipio de Salinas", category:"Institucional", initials:"MS", projects:1 },
+    ];
+
+    const journeySteps = ["Lead","Reunión","Cotización","Contrato","Proyecto"];
+    const journeyDates = ["feb 2025","feb 2025","mar 2025","mar 2025","en curso"];
+    const clientJourney = journeySteps.map((label, i) => ({
+      label, date: journeyDates[i], hasLine: i < journeySteps.length - 1,
+      lineColor: "#b26a45",
+      dotStyle: `width:14px;height:14px;border-radius:50%;background:#b26a45;border:2px solid #f1eee8;box-shadow:0 0 0 1px #b26a45`,
+    }));
+
+    const phases = PHASE_NAMES.map((name, i) => {
+      const done = i < 3, current = i === 3;
+      return {
+        name, date: PHASE_DATES[i],
+        mark: done ? "✓" : current ? "◉" : "○",
+        markStyle: `font-size:14px;width:18px;color:${done ? "#3a7a56" : current ? "#8c5335" : "rgba(0,0,0,0.3)"}`,
+        textStyle: current ? "font-weight:500" : done ? "color:rgba(0,0,0,0.55)" : "color:rgba(0,0,0,0.4)",
+      };
+    });
+
+    const taskColumns = Object.entries(TASKS).map(([name, tasks]) => ({
+      name, count: tasks.length,
+      tasks: tasks.map(t => ({ ...t, priorityStyle: `font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:${PRIORITY_COLORS[t.priority]}` })),
+    }));
+
+    const ganttRows = [
+      { name:"Levantamiento", color:"#6e6659", width:"8%", offset:"0%", opacity:1 },
+      { name:"Conceptualización", color:"#6e6659", width:"10%", offset:"6%", opacity:1 },
+      { name:"Anteproyecto", color:"#6e6659", width:"12%", offset:"14%", opacity:1 },
+      { name:"Diseño arquitectónico", color:"#b26a45", width:"18%", offset:"24%", opacity:1 },
+      { name:"Planos", color:"#e4dfd4", width:"14%", offset:"40%", opacity:1 },
+      { name:"Permisos", color:"#e4dfd4", width:"12%", offset:"52%", opacity:1 },
+      { name:"Construcción", color:"#e4dfd4", width:"28%", offset:"62%", opacity:1 },
+      { name:"Entrega", color:"#e4dfd4", width:"6%", offset:"88%", opacity:1 },
+    ];
+
+    const documents = DOCS.map(d => ({ ...d, badgeStyle: badgeStyle_doc(d.status) }));
+    function badgeStyle_doc(status){ const c = DOC_BADGE[status] || "#6e6659"; return `display:inline-block;font-size:10.5px;padding:4px 10px;background:${c};color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:500;border-radius:20px`; }
+
+    const versions = ["V01","V02","V03","V04"].map((label, i) => {
+      const approved = i === 3;
+      return { label, approved, cardStyle: `padding:14px 18px;border:1px solid ${approved ? "#3a7a56" : "rgba(0,0,0,0.1)"};border-radius:10px;background:${approved ? "#f1f7f2" : "#fff"};text-align:center` };
+    });
+
+    const quoteItems = QUOTE_ITEMS.map(it => ({ ...it, price: "$" + it.price.toLocaleString(), subtotal: "$" + it.subtotal.toLocaleString() }));
+    const contracts = CONTRACTS.map(c => ({ ...c, value: money(c.value), badgeStyle: `display:inline-block;font-size:11px;padding:4px 10px;background:${CONTRACT_BADGE[c.status]};color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:500;border-radius:20px` }));
+
+    const cashflow = [
+      { label:"Mar", height:"48%" }, { label:"Abr", height:"62%" }, { label:"May", height:"55%" },
+      { label:"Jun", height:"78%" }, { label:"Jul", height:"90%" }, { label:"Ago", height:"70%" },
+    ];
+    const profitability = [
+      { name:"Casa EG", margin:"42%", pct:"42%" }, { name:"Hormipen", margin:"38%", pct:"38%" },
+      { name:"Brangus", margin:"29%", pct:"29%" }, { name:"Suite Palmar", margin:"51%", pct:"51%" },
+      { name:"Tulum", margin:"18%", pct:"18%" },
+    ];
+
+    const trafficSources = [
+      { name:"Google", pct:"46%" }, { name:"Instagram", pct:"31%" }, { name:"Directo", pct:"15%" }, { name:"Referral", pct:"8%" },
+    ];
+    const topPages = [
+      { name:"Inicio", views:"4,210" }, { name:"Proyectos", views:"3,105" }, { name:"Servicios", views:"1,884" }, { name:"Contacto", views:"1,240" },
+    ];
+
+    const marketingFunnel = [
+      { name:"Google", leads:32, clients:8, projects:5, revenue:"$150,000" },
+      { name:"Instagram", leads:41, clients:3, projects:2, revenue:"$42,000" },
+      { name:"Referidos", leads:22, clients:9, projects:7, revenue:"$220,000" },
+    ];
+
+    const calendarDays = Array.from({ length:35 }, (_, i) => {
+      const num = i - 5;
+      const events = { 21:"Reunión Brangus", 24:"Visita obra", 26:"Entrega planos", 28:"Reunión cliente" };
+      const hasEvent = num > 0 && num <= 31 && !!events[num];
+      return {
+        num: num > 0 && num <= 31 ? num : "", hasEvent,
+        eventLabel: events[num] || "",
+        eventStyle: "position:absolute;bottom:8px;left:8px;right:8px;background:#f1eee8;border-left:2px solid #b26a45;padding:3px 6px;font-size:10.5px;color:rgba(0,0,0,0.7)",
+      };
+    });
+
+    const notifications = NOTIFS.map(n => ({ ...n, dotStyle: `width:8px;height:8px;border-radius:50%;background:${n.tone};margin-top:5px;flex-shrink:0` }));
+
+    const aiSuggestions = [
+      { text:"Revisar 3 tareas atrasadas" }, { text:"Contactar 2 leads sin seguimiento" },
+      { text:"Revisar pago vencido — Casa EG" }, { text:"Revisar aprobación pendiente — Fachada V04" },
+    ];
+
+    const reports = [
+      { title:"Reporte comercial", desc:"Leads, pipeline y conversión por fuente y responsable." },
+      { title:"Reporte financiero", desc:"Ingresos, gastos, cobros y rentabilidad por proyecto." },
+      { title:"Reporte de proyectos", desc:"Avance, fases y retrasos de todos los proyectos activos." },
+      { title:"Reporte de marketing", desc:"Rendimiento de canales y retorno por fuente de adquisición." },
+    ];
+
+    const team = [
+      { initials:"AG", name:"Adrián Gutiérrez", role:"org_admin" },
+      { initials:"CM", name:"Camila Moreira", role:"editor" },
+      { initials:"JP", name:"Juan Pablo Rosales", role:"visor" },
+    ];
+
+    const portalDocs = [
+      { name:"Contrato firmado.pdf" }, { name:"Planos arquitectónicos V3.pdf" }, { name:"Render fachada V04.jpg" },
+    ];
+
+    const pillBase = "border:1px solid rgba(241,238,232,0.25);background:none;color:rgba(241,238,232,0.6);padding:5px 12px;font-size:11px;font-family:'IBM Plex Mono',monospace;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;border-radius:20px";
+    const pillActive = "border:1px solid #b26a45;background:#b26a45;color:#000;padding:5px 12px;font-size:11px;font-family:'IBM Plex Mono',monospace;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;border-radius:20px";
+
+    return {
+      isAdminMode: s.mode === "admin", isPortalMode: s.mode === "portal", isLoginMode: s.mode === "login",
+      pillAdmin: s.mode === "admin" ? pillActive : pillBase,
+      pillPortal: s.mode === "portal" ? pillActive : pillBase,
+      pillLogin: s.mode === "login" ? pillActive : pillBase,
+      setModeAdmin: () => this.setState({ mode:"admin" }),
+      setModePortal: () => this.setState({ mode:"portal" }),
+      setModeLogin: () => this.setState({ mode:"login" }),
+
+      screenIs, navStyles,
+      goDashboard: this.go("dashboard"),
+      goCrmLeads: () => this.setState({ screen:"crm", mode:"admin", crmTab:"leads" }),
+      goCrmClientes: () => this.setState({ screen:"crm", mode:"admin", crmTab:"clientes" }),
+      goCrmPipeline: () => this.setState({ screen:"crm", mode:"admin", crmTab:"pipeline" }),
+      goCrmNew: this.go("crm"),
+      goClientDetail: this.go("clientDetail"),
+      goProjects: this.go("projects"),
+      goQuoteBuilder: () => this.setState({ screen:"quotes", mode:"admin", quoteTab:"builder" }),
+      goQuoteClient: () => this.setState({ screen:"quotes", mode:"admin", quoteTab:"client" }),
+      goContracts: this.go("contracts"),
+      goFinance: this.go("finance"),
+      goWebsiteAnalytics: () => this.setState({ screen:"website", mode:"admin", websiteTab:"analytics" }),
+      goWebsiteSeo: () => this.setState({ screen:"website", mode:"admin", websiteTab:"seo" }),
+      goMarketing: this.go("marketing"),
+      goCalendar: this.go("calendar"),
+      goNotifications: this.go("notifications"),
+      goAi: this.go("ai"),
+      goReports: this.go("reports"),
+      goSettings: this.go("settings"),
+      hasUnread: true,
+
+      crmTabIs: { leads: s.crmTab === "leads", clientes: s.crmTab === "clientes", pipeline: s.crmTab === "pipeline" },
+      crmTabStyles: { leads: tabStyle(s.crmTab === "leads"), clientes: tabStyle(s.crmTab === "clientes"), pipeline: tabStyle(s.crmTab === "pipeline") },
+      leadsView: { table: s.leadsView === "table", kanban: s.leadsView === "kanban" },
+      leadsViewBtn: {
+        table: `border:1px solid ${s.leadsView === "table" ? "#000" : "rgba(0,0,0,0.15)"};background:${s.leadsView === "table" ? "#000" : "none"};color:${s.leadsView === "table" ? "#f1eee8" : "#000"};padding:9px 16px;font-size:12.5px;cursor:pointer;font-family:inherit`,
+        kanban: `border:1px solid ${s.leadsView === "kanban" ? "#000" : "rgba(0,0,0,0.15)"};background:${s.leadsView === "kanban" ? "#000" : "none"};color:${s.leadsView === "kanban" ? "#f1eee8" : "#000"};padding:9px 16px;font-size:12.5px;cursor:pointer;font-family:inherit`,
+      },
+      setLeadsTable: () => this.setState({ leadsView:"table" }),
+      setLeadsKanban: () => this.setState({ leadsView:"kanban" }),
+      leads: LEADS.map(l => ({ ...l, valueFmt: money(l.value), badgeStyle: badgeStyle(l.status) })),
+      kanbanColumns,
+      clients,
+      clientJourney,
+
+      projects,
+
+      wsTabIs: { overview: s.wsTab === "overview", tasks: s.wsTab === "tasks", gantt: s.wsTab === "gantt", docs: s.wsTab === "docs", approvals: s.wsTab === "approvals", finance: s.wsTab === "finance", activity: s.wsTab === "activity" },
+      wsTabStyles: {
+        overview: tabStyle(s.wsTab === "overview"), tasks: tabStyle(s.wsTab === "tasks"), gantt: tabStyle(s.wsTab === "gantt"),
+        docs: tabStyle(s.wsTab === "docs"), approvals: tabStyle(s.wsTab === "approvals"), finance: tabStyle(s.wsTab === "finance"), activity: tabStyle(s.wsTab === "activity"),
+      },
+      goWsOverview: () => this.setState({ wsTab:"overview" }), goWsTasks: () => this.setState({ wsTab:"tasks" }),
+      goWsGantt: () => this.setState({ wsTab:"gantt" }), goWsDocs: () => this.setState({ wsTab:"docs" }),
+      goWsApprovals: () => this.setState({ wsTab:"approvals" }), goWsFinance: () => this.setState({ wsTab:"finance" }),
+      goWsActivity: () => this.setState({ wsTab:"activity" }),
+      phases, taskColumns, ganttRows, documents, versions,
+
+      quoteTabIs: { builder: s.quoteTab === "builder", client: s.quoteTab === "client" },
+      quoteTabStyles: { builder: tabStyle(s.quoteTab === "builder"), client: tabStyle(s.quoteTab === "client") },
+      quoteItems, contracts,
+
+      cashflow, profitability,
+
+      websiteTabIs: { analytics: s.websiteTab === "analytics", seo: s.websiteTab === "seo" },
+      websiteTabStyles: { analytics: tabStyle(s.websiteTab === "analytics"), seo: tabStyle(s.websiteTab === "seo") },
+      trafficSources, topPages, keywords: KEYWORDS,
+
+      marketingFunnel, calendarDays, notifications, aiSuggestions, reports, team,
+
+      pipelineStages: [
+        { name:"Nuevo", value:"$12k", pct:"9%", opacity:0.5 },
+        { name:"Propuesta", value:"$42k", pct:"33%", opacity:0.65 },
+        { name:"Negociación", value:"$51k", pct:"40%", opacity:0.8 },
+        { name:"Ganado", value:"$23k", pct:"18%", opacity:1 },
+      ],
+      activity: ACTIVITY,
+
+      lightDemo: !s.dark, darkDemo: s.dark,
+      demoLightBtn: `border:1px solid ${!s.dark ? "#000" : "rgba(0,0,0,0.15)"};background:${!s.dark ? "#000" : "none"};color:${!s.dark ? "#f1eee8" : "#000"};padding:7px 14px;font-size:12px;cursor:pointer;font-family:inherit`,
+      demoDarkBtn: `border:1px solid ${s.dark ? "#000" : "rgba(0,0,0,0.15)"};background:${s.dark ? "#000" : "none"};color:${s.dark ? "#f1eee8" : "#000"};padding:7px 14px;font-size:12px;cursor:pointer;font-family:inherit`,
+      setLight: () => this.setState({ dark:false }), setDark: () => this.setState({ dark:true }),
+
+      portalTabIs: { dashboard: s.portalTab === "dashboard", approvals: s.portalTab === "approvals", docs: s.portalTab === "docs", payments: s.portalTab === "payments" },
+      portalTabStyles: {
+        dashboard: tabStyle(s.portalTab === "dashboard"), approvals: tabStyle(s.portalTab === "approvals"),
+        docs: tabStyle(s.portalTab === "docs"), payments: tabStyle(s.portalTab === "payments"),
+      },
+      goPortalDashboard: () => this.setState({ portalTab:"dashboard" }), goPortalApprovals: () => this.setState({ portalTab:"approvals" }),
+      goPortalDocs: () => this.setState({ portalTab:"docs" }), goPortalPayments: () => this.setState({ portalTab:"payments" }),
+      portalDocs,
+    };
+  }
+}
+</script>
+</body>
+</html>

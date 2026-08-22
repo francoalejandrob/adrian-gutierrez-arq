@@ -5,10 +5,10 @@
 // had everywhere) and the same disabled treatment, instead of each form
 // re-typing (and slowly drifting from) the same class string.
 
-export const labelClass = "text-xs uppercase tracking-wide text-carbon/60";
+export const labelClass = "text-[11.5px] text-carbon/50";
 
 export const inputClass =
-  "border border-carbon/20 bg-white px-3 py-2 text-sm text-carbon outline-none transition-colors " +
+  "rounded-lg border border-carbon/15 bg-white px-3.5 py-2.5 text-[13.5px] text-carbon outline-none transition-colors " +
   "duration-150 placeholder:text-carbon/30 focus:border-carbon focus:ring-2 focus:ring-naranja/25 " +
   "disabled:cursor-not-allowed disabled:bg-hueso/60 disabled:text-carbon/40";
 

@@ -8,6 +8,11 @@
   --color-naranja-oscuro: #8c5335;
   --color-arena: #e4dfd4;
   --color-piedra: #6e6659;
+  /* Warm near-black for dark surfaces (dashboard sidebar). Distinct from
+     --color-carbon (#000000, pure black — used as the site's ink/text
+     color everywhere) so giving a surface this tone doesn't collide with
+     that existing meaning. */
+  --color-noche: #141210;
 }
 
 @theme inline {
@@ -17,6 +22,7 @@
   --color-naranja-oscuro: var(--color-naranja-oscuro);
   --color-arena: var(--color-arena);
   --color-piedra: var(--color-piedra);
+  --color-noche: var(--color-noche);
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-plex-sans);
   --font-mono: var(--font-plex-mono);

@@ -1,4 +1,5 @@
-import { ArrowRightCircle } from "lucide-react";
+import { ArrowLeft, ArrowRightCircle } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import LeadForm from "@/components/dashboard/lead-form";
 import StatusSelect from "@/components/dashboard/status-select";
@@ -35,10 +36,17 @@ export default async function LeadDetailPage(
 
   return (
     <div className="max-w-3xl">
+      <Link
+        href="/dashboard/crm?tab=leads"
+        className="mb-4 inline-flex items-center gap-1.5 text-[12.5px] text-carbon/45 transition-colors duration-150 hover:text-carbon"
+      >
+        <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
+        CRM
+      </Link>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl text-carbon">{lead.name}</h1>
-          <p className="text-sm text-carbon/60">{lead.email}</p>
+          <h1 className="font-display text-[26px] font-medium text-carbon">{lead.name}</h1>
+          <p className="mt-1 text-sm text-carbon/55">{lead.email}</p>
         </div>
         {lead.status !== "ganado" && (
           <form action={boundConvert}>

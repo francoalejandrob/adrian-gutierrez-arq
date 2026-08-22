@@ -4,21 +4,21 @@ export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap transition-all " +
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-lg transition-all " +
   "duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100 " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-naranja/40 focus-visible:ring-offset-1";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-carbon text-white hover:opacity-90",
-  secondary: "border border-carbon text-carbon hover:bg-carbon hover:text-white",
+  primary: "bg-carbon text-hueso hover:bg-naranja-oscuro",
+  secondary: "border border-carbon/20 text-carbon hover:border-carbon hover:bg-hueso",
   ghost: "text-carbon/60 hover:text-carbon",
   danger: "text-carbon/40 hover:text-red-600",
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: "px-3 py-1.5 text-xs uppercase tracking-wide",
-  md: "px-4 py-2 text-sm font-medium",
-  lg: "px-5 py-2.5 text-sm font-medium",
+  sm: "px-3.5 py-1.5 text-xs font-medium",
+  md: "px-4 py-2 text-[13px] font-medium",
+  lg: "px-5 py-2.5 text-[13.5px] font-medium",
 };
 
 // Class-string builder so the exact same look can be applied to a <Link>

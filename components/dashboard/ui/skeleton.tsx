@@ -6,7 +6,7 @@ export function StatGridSkeleton({ count = 4 }: { count?: number }) {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="border border-carbon/10 bg-white p-5">
+        <div key={i} className="rounded-[10px] border border-carbon/[0.08] bg-white p-5">
           <SkeletonBlock className="h-7 w-16" />
           <SkeletonBlock className="mt-3 h-3 w-24" />
         </div>
@@ -17,7 +17,7 @@ export function StatGridSkeleton({ count = 4 }: { count?: number }) {
 
 export function TableSkeleton({ rows = 6, cols = 4 }: { rows?: number; cols?: number }) {
   return (
-    <div className="overflow-x-auto border border-carbon/10 bg-white">
+    <div className="overflow-x-auto rounded-[10px] border border-carbon/[0.08] bg-white">
       <div className="border-b border-carbon/10 px-4 py-3">
         <SkeletonBlock className="h-3 w-40" />
       </div>

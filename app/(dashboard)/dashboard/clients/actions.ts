@@ -30,8 +30,8 @@ export async function createClientRecord(formData: FormData) {
   });
   if (error) throw new Error(error.message);
 
-  revalidatePath("/dashboard/clients");
-  redirect("/dashboard/clients");
+  revalidatePath("/dashboard/crm");
+  redirect("/dashboard/crm?tab=clientes");
 }
 
 export async function updateClientRecord(id: string, formData: FormData) {
@@ -45,7 +45,7 @@ export async function updateClientRecord(id: string, formData: FormData) {
   if (error) throw new Error(error.message);
 
   revalidatePath(`/dashboard/clients/${id}`);
-  revalidatePath("/dashboard/clients");
+  revalidatePath("/dashboard/crm");
 }
 
 export async function addClientNote(id: string, formData: FormData) {

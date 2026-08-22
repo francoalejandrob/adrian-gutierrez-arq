@@ -52,7 +52,7 @@ export default function LoginForm({ next = "/dashboard" }: { next?: string }) {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
         <label htmlFor="email" className={labelClass}>
-          Email
+          Correo
         </label>
         <input
           id="email"
@@ -60,6 +60,7 @@ export default function LoginForm({ next = "/dashboard" }: { next?: string }) {
           type="email"
           required
           autoComplete="email"
+          placeholder="tu@estudio.com"
           className={inputClass}
         />
       </div>
@@ -70,10 +71,14 @@ export default function LoginForm({ next = "/dashboard" }: { next?: string }) {
         </p>
       )}
 
-      <Button type="submit" disabled={status === "loading"} className="w-full">
+      <Button type="submit" disabled={status === "loading"} size="lg" className="w-full">
         {status !== "loading" && <Send size={15} strokeWidth={1.75} aria-hidden="true" />}
-        {status === "loading" ? "Enviando…" : "Enviar enlace de acceso"}
+        {status === "loading" ? "Enviando…" : "Enviar enlace mágico"}
       </Button>
+
+      <p className="text-center text-[11.5px] text-carbon/40">
+        Sin contraseña — te enviamos un enlace de acceso.
+      </p>
     </form>
   );
 }

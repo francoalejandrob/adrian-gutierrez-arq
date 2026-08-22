@@ -10,8 +10,8 @@ export default function PageHeader({
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 className="font-display text-2xl text-carbon">{title}</h1>
-        {description && <p className="mt-1 text-sm text-carbon/60">{description}</p>}
+        <h1 className="font-display text-[30px] font-medium text-carbon">{title}</h1>
+        {description && <p className="mt-1.5 text-[13.5px] text-carbon/55">{description}</p>}
       </div>
       {action}
     </div>
