@@ -42,13 +42,13 @@ export default async function LoginPage() {
         </div>
         <div className="flex gap-11">
           <Stat value={String(projectCount ?? 0).padStart(2, "0")} label="Proyectos" />
-          <Stat value={`$${currency.format(contracted)}`} label="Contratado" />
+          <Stat value={`$${currency.format(contracted)}`} label="Contratado" tone="positive" />
           <Stat value={String(clientCount ?? 0)} label="Clientes" />
         </div>
       </div>
 
       <div className="flex items-center justify-center p-16">
-        <div className="w-full max-w-[352px]">
+        <div className="w-full max-w-[352px] border border-corte bg-superficie p-9 shadow-[6px_6px_0_0_var(--color-acento)]">
           <p className="mb-7 font-dp-mono text-[9.5px] uppercase tracking-[0.16em] text-concreto">Acceso al estudio</p>
           <LoginForm />
         </div>
@@ -57,10 +57,10 @@ export default async function LoginPage() {
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+function Stat({ value, label, tone }: { value: string; label: string; tone?: "positive" }) {
   return (
     <div>
-      <p className="font-dp-mono text-2xl text-tinta">{value}</p>
+      <p className={`font-dp-mono text-2xl ${tone === "positive" ? "text-verde" : "text-tinta"}`}>{value}</p>
       <p className="mt-2.5 font-dp-mono text-[9.5px] uppercase tracking-[0.14em] text-grafito">{label}</p>
     </div>
   );

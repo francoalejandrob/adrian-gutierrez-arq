@@ -21,6 +21,12 @@
   --color-grafito: #45443f;
   --color-tinta: #0f0f0e;
   --color-acento: #a8382a;
+  /* Segundo color del sistema — no está en el mockup original, se agregó
+     porque el sistema de un solo acento leía "plano" en la práctica.
+     Verde desaturado (no el verde-éxito genérico de SaaS) para "resuelto"
+     en StatusLabel/StatusMark y para la etapa "ganado" del pipeline —
+     el único otro lugar donde el color transmite información real. */
+  --color-verde: #3f6b52;
 }
 
 @theme inline {
@@ -42,6 +48,7 @@
   --color-grafito: var(--color-grafito);
   --color-tinta: var(--color-tinta);
   --color-acento: var(--color-acento);
+  --color-verde: var(--color-verde);
   --font-dp-serif: var(--font-instrument-serif);
   --font-dp-sans: var(--font-archivo);
   --font-dp-mono: var(--font-jetbrains-mono);

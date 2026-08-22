@@ -12,7 +12,8 @@ const PALETTE = [
   { name: "Concreto", hex: "#8A867C", role: "Metadatos" },
   { name: "Grafito", hex: "#45443F", role: "Texto secundario" },
   { name: "Tinta", hex: "#0F0F0E", role: "Texto y acción" },
-  { name: "Acento", hex: "#A8382A", role: "Tinta de revisión — único acento" },
+  { name: "Acento", hex: "#A8382A", role: "Tinta de revisión — atención" },
+  { name: "Verde", hex: "#3F6B52", role: "Resuelto / positivo — segundo color del sistema" },
 ];
 
 const TYPE_SPECIMENS = [
@@ -60,9 +61,10 @@ export default function DesignSystemPage() {
 
         <Section title="03 · Disciplina de estado">
           <p className="mb-6 max-w-[60ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
-            Una sola gramática en todo el producto: relleno = resuelto, hueco = pendiente, rombo rojo = requiere
-            atención. Sin semáforos de color — los estados nombrados son texto con color/peso (nunca una pastilla con
-            fondo), y las marcas geométricas se usan aparte para líneas de tiempo, versiones y prioridades.
+            Una sola gramática en todo el producto: relleno verde = resuelto, hueco = pendiente, rombo rojo =
+            requiere atención. Los estados nombrados siguen siendo texto con color/peso — nunca una pastilla con
+            fondo — y las marcas geométricas se usan aparte para líneas de tiempo, versiones y prioridades. Verde y
+            acento son los dos únicos colores con significado; todo lo demás en la interfaz es tinta/grafito/concreto.
           </p>
           <div className="flex flex-wrap gap-x-10 gap-y-5">
             <div className="flex items-center gap-3">
@@ -107,7 +109,12 @@ export default function DesignSystemPage() {
         </Section>
 
         <Section title="05 · Componentes">
-          <div className="flex flex-wrap items-center gap-4">
+          <p className="mb-6 max-w-[60ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
+            Los botones primario y secundario llevan una sombra sólida sin desenfoque, apilada detrás del botón —
+            lee como una tarjeta superpuesta, no como una sombra de SaaS genérica. Al presionar, el botón viaja hacia
+            su propia sombra.
+          </p>
+          <div className="flex flex-wrap items-center gap-6">
             <Button variant="primary">Primario</Button>
             <Button variant="secondary">Secundario</Button>
             <Button variant="tertiary">Terciario</Button>

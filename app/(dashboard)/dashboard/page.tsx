@@ -114,7 +114,11 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-2 border-b border-corte lg:grid-cols-4">
         {instruments.map((item, i) => (
-          <div key={item.label} className={`p-8 ${i > 0 ? "border-l border-filete" : ""}`}>
+          <div
+            key={item.label}
+            className={`relative p-8 ${i > 0 ? "border-l border-filete" : ""} ${item.attention ? "bg-acento/[0.05]" : ""}`}
+          >
+            {item.attention && <span className="absolute left-0 top-0 h-full w-[3px] bg-acento" />}
             <p className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</p>
             <p className={`mt-4 font-dp-mono text-[30px] leading-none ${item.attention ? "text-acento" : "text-tinta"}`}>
               {item.value}
@@ -181,10 +185,10 @@ export default async function DashboardPage() {
               {pipeline.map((stage) => (
                 <div
                   key={stage.status}
-                  className="h-[3px] bg-tinta"
+                  className={stage.status === "ganado" ? "h-[3px] bg-verde" : "h-[3px] bg-tinta"}
                   style={{
                     width: pipelineTotal > 0 ? `${(stage.value / pipelineTotal) * 100}%` : `${100 / pipeline.length}%`,
-                    opacity: 0.35 + (0.65 * stage.value) / maxStageValue,
+                    opacity: stage.status === "ganado" ? 1 : 0.35 + (0.65 * stage.value) / maxStageValue,
                   }}
                 />
               ))}
@@ -193,7 +197,9 @@ export default async function DashboardPage() {
               {pipeline.map((stage) => (
                 <div key={stage.status} className="flex items-center justify-between font-dp-sans text-[12.5px]">
                   <span className="text-grafito">{stage.label}</span>
-                  <span className="font-dp-mono text-tinta">{currency.format(stage.value)}</span>
+                  <span className={`font-dp-mono ${stage.status === "ganado" ? "text-verde" : "text-tinta"}`}>
+                    {currency.format(stage.value)}
+                  </span>
                 </div>
               ))}
             </div>

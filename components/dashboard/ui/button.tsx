@@ -5,11 +5,26 @@ export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
   "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-dp-mono font-medium " +
-  "uppercase tracking-[0.12em] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50";
+  "uppercase tracking-[0.12em] transition-[transform,box-shadow,background-color,border-color,color] duration-150 " +
+  "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50";
 
+// Hard offset shadows (no blur, tinted to the accent) instead of a soft
+// SaaS drop-shadow — reads as a stacked/layered card in the same
+// technical-drafting language as the zero-radius system, and gives every
+// primary/secondary button real depth + a second color on the surface.
+// Press physics: the button travels toward its own shadow on :active, so
+// it reads as a physical, pushable object rather than a flat rectangle.
 const variants: Record<ButtonVariant, string> = {
-  primary: "border border-tinta bg-tinta text-papel hover:border-acento hover:bg-acento",
-  secondary: "border border-corte bg-transparent text-tinta hover:border-tinta",
+  primary:
+    "border border-tinta bg-tinta text-papel shadow-[3px_3px_0_0_var(--color-acento)] " +
+    "hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--color-acento)] " +
+    "active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_0_var(--color-acento)] " +
+    "disabled:shadow-[3px_3px_0_0_var(--color-corte)]",
+  secondary:
+    "border border-corte bg-superficie text-tinta shadow-[2px_2px_0_0_var(--color-tinta)] " +
+    "hover:border-tinta hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_var(--color-tinta)] " +
+    "active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--color-tinta)] " +
+    "disabled:shadow-[2px_2px_0_0_var(--color-corte)]",
   tertiary: "border-none bg-transparent p-0 text-concreto hover:text-tinta",
   danger: "border-none bg-transparent p-0 text-concreto hover:text-acento",
 };

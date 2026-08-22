@@ -10,7 +10,7 @@ export default function StatusMark({ tone = "pending", className = "" }: { tone?
     return <span className={`inline-block h-[9px] w-[9px] rotate-45 bg-acento ${className}`} />;
   }
   if (tone === "resolved") {
-    return <span className={`inline-block h-[9px] w-[9px] bg-tinta ${className}`} />;
+    return <span className={`inline-block h-[9px] w-[9px] bg-verde ${className}`} />;
   }
   if (tone === "historic") {
     return <span className={`inline-block h-[9px] w-[9px] bg-corte ${className}`} />;

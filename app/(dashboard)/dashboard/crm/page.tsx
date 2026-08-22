@@ -228,13 +228,18 @@ async function PipelineTab({ supabase }: { supabase: Supa }) {
       <div className="flex flex-col">
         {pipeline.map((stage) => (
           <div key={stage.status} className="grid grid-cols-[140px_1fr_140px_60px] items-center gap-5 border-b border-filete py-4 last:border-0">
-            <span className={`font-dp-mono text-[10.5px] uppercase tracking-[0.1em] ${stage.status === "ganado" ? "text-tinta font-medium" : "text-grafito"}`}>
+            <span className={`font-dp-mono text-[10.5px] uppercase tracking-[0.1em] ${stage.status === "ganado" ? "text-verde font-medium" : "text-grafito"}`}>
               {stage.label}
             </span>
             <div className="h-[3px] bg-filete">
-              <div className="h-[3px] bg-tinta" style={{ width: `${(stage.value / maxValue) * 100}%` }} />
+              <div
+                className={stage.status === "ganado" ? "h-[3px] bg-verde" : "h-[3px] bg-tinta"}
+                style={{ width: `${(stage.value / maxValue) * 100}%` }}
+              />
             </div>
-            <span className="text-right font-dp-mono text-[13px] text-tinta">{currency.format(stage.value)}</span>
+            <span className={`text-right font-dp-mono text-[13px] ${stage.status === "ganado" ? "text-verde" : "text-tinta"}`}>
+              {currency.format(stage.value)}
+            </span>
             <span className="text-right font-dp-mono text-[11px] text-concreto">{stage.count}</span>
           </div>
         ))}

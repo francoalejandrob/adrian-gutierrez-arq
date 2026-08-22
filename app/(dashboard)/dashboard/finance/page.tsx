@@ -77,11 +77,11 @@ export default async function FinancePage() {
 
       <div className="grid grid-cols-2 border-b border-corte sm:grid-cols-3 lg:grid-cols-6">
         <SummaryStat label="Contratado" value={currency.format(contracted)} />
-        <SummaryStat label="Cobrado" value={currency.format(collected)} />
+        <SummaryStat label="Cobrado" value={currency.format(collected)} tone="positive" />
         <SummaryStat label="Pendiente" value={currency.format(pending)} tone="attention" />
         <SummaryStat label="Gastos" value={currency.format(spent)} />
-        <SummaryStat label="Utilidad" value={currency.format(profit)} />
-        <SummaryStat label="Margen" value={`${marginPct.toFixed(1)}%`} last />
+        <SummaryStat label="Utilidad" value={currency.format(profit)} tone="positive" />
+        <SummaryStat label="Margen" value={`${marginPct.toFixed(1)}%`} tone="positive" last />
       </div>
 
       <div className="grid grid-cols-1 gap-12 px-12 py-10 lg:grid-cols-[1.3fr_1fr]">
@@ -89,7 +89,7 @@ export default async function FinancePage() {
           <div className="flex h-[140px] items-end gap-3.5 border-b border-filete pb-0.5">
             {cashflow.map((m) => (
               <div key={m.label} className="flex h-full flex-1 flex-col items-center justify-end gap-1.5">
-                <div className="w-full bg-tinta" style={{ height: `${(m.total / maxCashflow) * 100}%` }} />
+                <div className="w-full bg-verde" style={{ height: `${(m.total / maxCashflow) * 100}%` }} />
                 <span className="font-dp-mono text-[10.5px] text-concreto">{m.label}</span>
               </div>
             ))}
@@ -101,10 +101,13 @@ export default async function FinancePage() {
               <div key={p.name}>
                 <div className="mb-1.5 flex justify-between font-dp-sans text-[12.5px]">
                   <span className="text-grafito">{p.name}</span>
-                  <span className="font-dp-mono text-tinta">{p.pct.toFixed(0)}%</span>
+                  <span className={`font-dp-mono ${p.pct >= 0 ? "text-verde" : "text-acento"}`}>{p.pct.toFixed(0)}%</span>
                 </div>
                 <div className="h-[3px] bg-filete">
-                  <div className="h-[3px] bg-tinta" style={{ width: `${Math.max(0, Math.min(100, p.pct))}%` }} />
+                  <div
+                    className={p.pct >= 0 ? "h-[3px] bg-verde" : "h-[3px] bg-acento"}
+                    style={{ width: `${Math.max(0, Math.min(100, Math.abs(p.pct)))}%` }}
+                  />
                 </div>
               </div>
             ))}
@@ -160,13 +163,14 @@ function SummaryStat({
 }: {
   label: string;
   value: string;
-  tone?: "attention";
+  tone?: "attention" | "positive";
   last?: boolean;
 }) {
+  const toneClass = tone === "attention" ? "text-acento" : tone === "positive" ? "text-verde" : "text-tinta";
   return (
     <div className={`p-6 ${last ? "" : "border-r border-filete"}`}>
       <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">{label}</p>
-      <p className={`mt-2.5 font-dp-mono text-lg ${tone === "attention" ? "text-acento" : "text-tinta"}`}>{value}</p>
+      <p className={`mt-2.5 font-dp-mono text-lg ${toneClass}`}>{value}</p>
     </div>
   );
 }
