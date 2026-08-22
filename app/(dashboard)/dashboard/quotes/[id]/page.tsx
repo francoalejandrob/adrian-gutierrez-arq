@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Printer } from "lucide-react";
+import { ArrowLeft, Printer } from "lucide-react";
 import { notFound } from "next/navigation";
 import StatusSelect from "@/components/dashboard/status-select";
 import { buttonClass } from "@/components/dashboard/ui/button";
@@ -38,14 +38,21 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
 
   return (
     <div className="max-w-3xl">
+      <Link
+        href="/dashboard/quotes"
+        className="mb-4 inline-flex items-center gap-1.5 text-[12.5px] text-carbon/45 transition-colors duration-150 hover:text-carbon"
+      >
+        <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
+        Cotizaciones
+      </Link>
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs uppercase tracking-wide text-carbon/50">
-            <Link href={`/dashboard/projects/${quote.project_id}`} className="transition-colors hover:text-naranja">
+            <Link href={`/dashboard/projects/${quote.project_id}?tab=finance`} className="transition-colors hover:text-naranja-oscuro">
               {quote.projects?.clients?.name} — {quote.projects?.name}
             </Link>
           </p>
-          <h1 className="font-display text-2xl text-carbon">
+          <h1 className="font-display text-[26px] font-medium text-carbon">
             Cotización del {new Date(quote.issue_date).toLocaleDateString("es-EC")}
           </h1>
         </div>
@@ -88,7 +95,7 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
                 <td className="py-2.5 text-right font-mono">{currency.format(item.quantity * item.unit_price)}</td>
                 <td className="py-2.5 text-right">
                   <form action={deleteQuoteItem.bind(null, id, item.id)}>
-                    <SubmitButton variant="danger" size="sm" className="normal-case tracking-normal">
+                    <SubmitButton variant="danger" size="sm">
                       Eliminar
                     </SubmitButton>
                   </form>

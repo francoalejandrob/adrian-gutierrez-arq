@@ -3,10 +3,10 @@ import { FolderKanban, Plus } from "lucide-react";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
-import ProgressBar from "@/components/dashboard/ui/progress-bar";
-import StatusBadge from "@/components/dashboard/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
-import { PROJECT_STATUS_LABELS, PROJECT_STATUS_TONE, PROJECT_STATUSES, type ProjectStatus } from "@/lib/supabase/types";
+import { PROJECT_STATUS_LABELS, PROJECT_STATUSES } from "@/lib/supabase/types";
+
+const THUMB_HUES = ["#d9a077", "#c9c2b3", "#b6c9b8", "#cbb4a3"];
 
 export default async function ProjectsPage(
   props: PageProps<"/dashboard/projects">,
@@ -52,54 +52,52 @@ export default async function ProjectsPage(
         ))}
       </div>
 
-      <div className="mt-6 overflow-x-auto border border-carbon/10 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-carbon/10 text-xs uppercase tracking-wide text-carbon/50">
-              <th className="px-4 py-3">Proyecto</th>
-              <th className="px-4 py-3">Cliente</th>
-              <th className="px-4 py-3">Estado</th>
-              <th className="px-4 py-3">Progreso</th>
-              <th className="px-4 py-3">Entrega estimada</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(projects ?? []).map((project) => (
-              <tr
+      {(projects ?? []).length > 0 ? (
+        <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
+          {(projects ?? []).map((project, i) => {
+            const hue = THUMB_HUES[i % THUMB_HUES.length];
+            return (
+              <Link
                 key={project.id}
-                className="border-b border-carbon/5 transition-colors duration-100 last:border-0 hover:bg-hueso/60"
+                href={`/dashboard/projects/${project.id}`}
+                className="overflow-hidden rounded-[14px] border border-carbon/[0.08] bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(0,0,0,0.1)]"
               >
-                <td className="px-4 py-3">
-                  <Link
-                    href={`/dashboard/projects/${project.id}`}
-                    className="font-medium text-carbon hover:text-naranja hover:underline"
-                  >
-                    {project.name}
-                  </Link>
-                </td>
-                <td className="px-4 py-3 text-carbon/70">{project.clients?.name ?? "—"}</td>
-                <td className="px-4 py-3">
-                  <StatusBadge
-                    label={PROJECT_STATUS_LABELS[project.status as ProjectStatus]}
-                    tone={PROJECT_STATUS_TONE[project.status as ProjectStatus]}
-                  />
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <ProgressBar value={project.progress} className="w-16" />
-                    <span className="font-mono text-xs text-carbon/60">{project.progress}%</span>
+                <div
+                  className="aspect-video w-full"
+                  style={{
+                    backgroundImage: `repeating-linear-gradient(135deg, ${hue}, ${hue} 8px, #e4dfd4 8px, #e4dfd4 16px)`,
+                  }}
+                />
+                <div className="p-[22px]">
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="mb-1.5 font-display text-[19px] font-medium text-carbon">{project.name}</p>
+                      {project.category && (
+                        <span className="inline-block bg-hueso px-2 py-0.5 text-[10.5px] uppercase tracking-wide text-naranja-oscuro">
+                          {project.category}
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-mono text-2xl font-medium text-carbon">{project.progress}%</span>
                   </div>
-                </td>
-                <td className="px-4 py-3 font-mono text-xs text-carbon/50">
-                  {project.estimated_end_date
-                    ? new Date(project.estimated_end_date).toLocaleDateString("es-EC")
-                    : "—"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {(projects ?? []).length === 0 && (
+                  <div className="mb-3.5 h-1 w-full bg-carbon/[0.08]">
+                    <div className="h-1 bg-naranja" style={{ width: `${project.progress}%` }} />
+                  </div>
+                  <div className="flex justify-between text-[12.5px] text-carbon/55">
+                    <span>{project.clients?.name ?? "—"}</span>
+                    <span className="font-mono">
+                      {project.estimated_end_date
+                        ? `Entrega ${new Date(project.estimated_end_date).toLocaleDateString("es-EC")}`
+                        : "Sin fecha de entrega"}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="mt-6 rounded-[10px] border border-carbon/[0.08] bg-white">
           <EmptyState
             icon={FolderKanban}
             title="Todavía no hay proyectos"
@@ -110,8 +108,8 @@ export default async function ProjectsPage(
               </Link>
             }
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -128,7 +126,7 @@ function FilterPill({
   return (
     <Link
       href={href}
-      className={`px-3 py-1.5 text-xs uppercase tracking-wide transition-colors duration-150 ${
+      className={`rounded-full px-3 py-1.5 text-xs transition-colors duration-150 ${
         active
           ? "bg-carbon text-white"
           : "border border-carbon/20 text-carbon/60 hover:border-carbon hover:text-carbon"

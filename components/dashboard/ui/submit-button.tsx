@@ -1,5 +1,6 @@
 "use client";
 
+import type { ButtonHTMLAttributes } from "react";
 import { useFormStatus } from "react-dom";
 import Button, { type ButtonSize, type ButtonVariant } from "./button";
 
@@ -7,24 +8,28 @@ import Button, { type ButtonSize, type ButtonVariant } from "./button";
 // pending state (disabled + label swap) instead of staying clickable
 // while the mutation is in flight — the previous version left every
 // submit button in its normal state during the request, inviting double
-// submits with no feedback that anything was happening.
+// submits with no feedback that anything was happening. Extra button
+// props (name/value) pass through so two SubmitButtons in the same form
+// can each submit a different value — the standard HTML pattern already
+// used for the portal's Aprobar/Solicitar cambios pair.
 export default function SubmitButton({
   children,
   pendingLabel,
   variant = "primary",
   size = "md",
   className = "",
+  ...rest
 }: {
   children: React.ReactNode;
   pendingLabel?: React.ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   className?: string;
-}) {
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "children" | "className">) {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" variant={variant} size={size} disabled={pending} className={className}>
+    <Button type="submit" variant={variant} size={size} disabled={pending} className={className} {...rest}>
       {pending && (
         <svg
           className="h-3.5 w-3.5 animate-spin"

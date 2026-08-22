@@ -232,3 +232,36 @@ export async function getSignedDownloadUrl(storagePath: string) {
   if (error) throw new Error(error.message);
   return data.signedUrl;
 }
+
+// Approvals ----------------------------------------------------------------
+
+const versionResponseSchema = z.enum(["aprobado", "cambios_solicitados"]);
+
+// Lets the studio record an approval/change-request from the dashboard —
+// e.g. a client approved verbally or by email instead of through the
+// portal. This doesn't grant any new access: organization_members
+// already had write permission on document_versions via the original
+// org-scoped RLS policy (the portal's own respondToDocumentVersion just
+// layers an *additional* policy for portal users on top of that).
+export async function updateDocumentVersionStatus(projectId: string, versionId: string, formData: FormData) {
+  const status = versionResponseSchema.parse(formData.get("status"));
+  const comment = String(formData.get("comment") ?? "").trim() || null;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { error } = await supabase
+    .from("document_versions")
+    .update({
+      status,
+      comment,
+      approved_at: status === "aprobado" ? new Date().toISOString() : null,
+      approved_by: user?.id,
+    })
+    .eq("id", versionId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+}
