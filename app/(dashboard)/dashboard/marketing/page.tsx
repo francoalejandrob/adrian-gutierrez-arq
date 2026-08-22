@@ -30,11 +30,15 @@ export default async function MarketingPage() {
     <div>
       <PageHeader eyebrow="Inteligencia · De la visita al ingreso, calculado con datos propios" title="Marketing intelligence" />
 
-      <div className="grid grid-cols-5 border-y border-corte">
+      <div className="dp-card mx-12 mt-8 grid grid-cols-5">
         {stages.map((stage, i) => (
           <div key={stage.label} className={`p-8 ${i > 0 ? "border-l border-filete" : ""}`}>
             <p className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</p>
-            <p className="mt-4 font-dp-mono text-2xl leading-none text-tinta">{stage.value ?? "—"}</p>
+            <p
+              className={`mt-4 font-dp-mono text-2xl leading-none ${stage.label === "Ingresos" ? "text-verde" : "text-tinta"}`}
+            >
+              {stage.value ?? "—"}
+            </p>
             <p className="mt-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-grafito">{stage.label}</p>
           </div>
         ))}

@@ -12,7 +12,7 @@ export default function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-4 py-16 text-center">
+    <div className="dp-card mx-12 my-8 flex flex-col items-center gap-4 py-16 text-center">
       <StatusMark tone="pending" className="h-3 w-3" />
       <div>
         <p className="font-dp-sans text-[13.5px] text-grafito">{title}</p>

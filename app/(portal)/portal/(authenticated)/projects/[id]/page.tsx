@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import DownloadButton from "@/components/dashboard/download-button";
+import Section from "@/components/dashboard/ui/section";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { inputClass } from "@/components/dashboard/ui/styles";
 import { createClient } from "@/lib/supabase/server";
@@ -70,7 +71,7 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
         <h1 className="font-dp-serif text-[38px] leading-none tracking-[-0.015em] text-tinta">{project.name}</h1>
       </div>
 
-      <div className="grid grid-cols-[auto_1fr] gap-10 border-y border-corte py-7">
+      <div className="dp-card grid grid-cols-[auto_1fr] gap-10 p-8">
         <div>
           <p className="font-dp-mono text-[44px] leading-none text-tinta">
             {project.progress}
@@ -90,8 +91,8 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-        <div>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="dp-card p-7">
           <p className="mb-2 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Próximo hito</p>
           {nextMilestone ? (
             <>
@@ -104,7 +105,7 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
             <p className="font-dp-sans text-[13px] text-concreto">Sin hitos próximos.</p>
           )}
         </div>
-        <div>
+        <div className="dp-card p-7">
           <p className="mb-2 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Próxima reunión</p>
           {nextEvent ? (
             <p className="font-dp-sans text-[14px] text-tinta">
@@ -122,7 +123,7 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
           <p className="mb-5 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-acento">Pendiente de tu aprobación</p>
           <div className="flex flex-col gap-8">
             {pendingApprovals.map(({ doc, version }) => (
-              <div key={version.id} className="border border-filete">
+              <div key={version.id} className="overflow-hidden rounded-2xl border border-filete">
                 <div className="dp-grain-strong flex aspect-[16/10] items-center justify-center">
                   <span className="font-dp-mono text-xs text-grafito">[ {doc.name} — v{version.version} ]</span>
                 </div>
@@ -148,8 +149,7 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
         </div>
       )}
 
-      <div className="border-t border-filete pt-10">
-        <p className="mb-5 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Documentos</p>
+      <Section title="Documentos">
         <div>
           {(documents ?? []).map((doc) => {
             const latest = [...doc.document_versions].sort((a, b) => b.version - a.version)[0];
@@ -168,10 +168,9 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
           })}
           {(documents ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin documentos compartidos todavía.</p>}
         </div>
-      </div>
+      </Section>
 
-      <div className="border-t border-filete pt-10">
-        <p className="mb-5 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Pagos</p>
+      <Section title="Pagos">
         <div className="flex flex-col">
           {(payments ?? []).map((payment) => (
             <div key={payment.id} className="flex items-center justify-between gap-4 border-b border-filete py-4 last:border-0">
@@ -191,7 +190,7 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
         </div>
 
         {pendingQuote && (
-          <div className="mt-8 border border-filete p-7">
+          <div className="mt-8 rounded-2xl border border-filete p-7">
             <p className="mb-3.5 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">Cotización pendiente</p>
             {(() => {
               const items = [...pendingQuote.quote_items].sort((a, b) => a.position - b.position);
@@ -212,10 +211,9 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
             })()}
           </div>
         )}
-      </div>
+      </Section>
 
-      <div className="border-t border-filete pt-10">
-        <p className="mb-5 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Mensajes</p>
+      <Section title="Mensajes">
         <form action={boundAddMessage} className="flex gap-2.5">
           <input name="body" placeholder="Escribe un mensaje…" className={`flex-1 ${inputClass}`} />
           <SubmitButton variant="secondary" pendingLabel="Enviando…">
@@ -231,7 +229,7 @@ export default async function PortalProjectPage(props: PageProps<"/portal/projec
           ))}
           {(activity ?? []).length === 0 && <li className="py-2 font-dp-sans text-sm text-concreto">Sin mensajes todavía.</li>}
         </ul>
-      </div>
+      </Section>
     </div>
   );
 }

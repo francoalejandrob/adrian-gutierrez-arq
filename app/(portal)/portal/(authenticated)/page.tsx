@@ -17,12 +17,12 @@ export default async function PortalHomePage() {
   return (
     <div>
       <h1 className="font-dp-serif text-3xl text-tinta">Tus proyectos</h1>
-      <div className="mt-7 flex flex-col">
+      <div className="mt-7 flex flex-col gap-3">
         {(projects ?? []).map((project) => (
           <Link
             key={project.id}
             href={`/portal/projects/${project.id}`}
-            className="flex items-center justify-between border-b border-filete py-4 last:border-0"
+            className="dp-card flex items-center justify-between p-6 transition-transform duration-150 hover:-translate-y-px"
           >
             <span className="font-dp-sans text-[14px] text-tinta">{project.name}</span>
             <span className="font-dp-mono text-[11px] text-concreto">

@@ -56,7 +56,7 @@ export default function AiChat() {
 
   if (notConfigured) {
     return (
-      <div className="border border-dashed border-corte p-5 font-dp-sans text-[13px] text-grafito">
+      <div className="rounded-2xl border border-dashed border-corte p-5 font-dp-sans text-[13px] text-grafito">
         <p>{notConfigured}</p>
         <p className="mt-2.5 font-dp-mono text-[10.5px] text-concreto">
           Ver INTEGRATION_SETUP.md en el repositorio para los pasos de configuración.
@@ -67,7 +67,7 @@ export default function AiChat() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="border border-filete p-7">
+      <div className="rounded-2xl border border-filete p-7">
         {(messages.length > 0 || loading) && (
           <div ref={scrollRef} className="mb-5 flex max-h-[420px] flex-col gap-3.5 overflow-y-auto">
             {messages.map((message, i) => (

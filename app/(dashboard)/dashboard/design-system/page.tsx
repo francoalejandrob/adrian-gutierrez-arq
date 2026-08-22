@@ -50,7 +50,7 @@ export default function DesignSystemPage() {
           <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
             {PALETTE.map((color) => (
               <div key={color.name}>
-                <div className="h-16 w-full border border-filete" style={{ backgroundColor: color.hex }} />
+                <div className="h-16 w-full rounded-xl border border-filete" style={{ backgroundColor: color.hex }} />
                 <p className="mt-2.5 font-dp-sans text-[13px] text-tinta">{color.name}</p>
                 <p className="font-dp-mono text-[11px] text-concreto">{color.hex}</p>
                 <p className="mt-0.5 font-dp-sans text-[11.5px] text-concreto">{color.role}</p>
@@ -102,9 +102,10 @@ export default function DesignSystemPage() {
 
         <Section title="04 · Retícula y espaciado">
           <p className="max-w-[60ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
-            12 columnas, márgenes de lámina de 48px, medianil de 22px. Separadores de 1px (filete o corte) en lugar
-            de sombras o tarjetas — la jerarquía se construye con tipografía y espacio, no con cajas. Radio 0px por
-            defecto en todo el sistema: la esquina viva es parte de la identidad.
+            12 columnas, márgenes de lámina de 48px, medianil de 22px. Cada bloque de contenido es una tarjeta
+            delimitada — borde fino, esquina de 16px, sombra suave (clase compartida <span className="font-dp-mono text-[12px]">.dp-card</span>) —
+            en vez de solo separadores de 1px; los separadores siguen usándose dentro de una tarjeta, para las filas
+            de una lista o tabla.
           </p>
         </Section>
 

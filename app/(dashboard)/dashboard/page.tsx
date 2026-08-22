@@ -112,12 +112,9 @@ export default async function DashboardPage() {
     <div>
       <PageHeader eyebrow={`${greeting()}${firstName ? `, ${firstName}` : ""}`} title="Esto es lo importante hoy." />
 
-      <div className="grid grid-cols-2 border-b border-corte lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 px-12 pt-8 lg:grid-cols-4">
         {instruments.map((item, i) => (
-          <div
-            key={item.label}
-            className={`relative p-8 ${i > 0 ? "border-l border-filete" : ""} ${item.attention ? "bg-acento/[0.05]" : ""}`}
-          >
+          <div key={item.label} className={`dp-card relative p-7 ${item.attention ? "border-acento/30" : ""}`}>
             {item.attention && <span className="absolute left-0 top-0 h-full w-[3px] bg-acento" />}
             <p className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</p>
             <p className={`mt-4 font-dp-mono text-[30px] leading-none ${item.attention ? "text-acento" : "text-tinta"}`}>

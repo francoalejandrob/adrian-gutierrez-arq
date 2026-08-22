@@ -63,7 +63,7 @@ export default function CommandPalette() {
         type="button"
         onClick={openPalette}
         title="Buscar o navegar"
-        className="flex h-[29px] shrink-0 cursor-pointer items-center justify-center border border-filete px-2.5 font-dp-mono text-[10.5px] uppercase tracking-[0.1em] text-concreto transition-colors duration-150 hover:border-tinta hover:text-tinta"
+        className="flex h-[29px] shrink-0 cursor-pointer items-center justify-center rounded-md border border-filete px-2.5 font-dp-mono text-[10.5px] uppercase tracking-[0.1em] text-concreto transition-colors duration-150 hover:border-tinta hover:text-tinta"
       >
         ⌘K
       </button>
@@ -75,7 +75,7 @@ export default function CommandPalette() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="dp-scope w-[592px] max-w-[92vw] border border-tinta bg-superficie shadow-[0_30px_70px_rgba(15,15,14,0.22)]"
+            className="dp-scope w-[592px] max-w-[92vw] overflow-hidden rounded-2xl border border-tinta bg-superficie shadow-[0_30px_70px_rgba(15,15,14,0.22)]"
           >
             <div className="flex items-center gap-3 border-b border-filete px-5 py-[17px]">
               <span className="font-dp-mono text-[13px] text-acento">&gt;</span>

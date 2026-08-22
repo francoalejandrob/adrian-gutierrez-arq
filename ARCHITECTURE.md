@@ -317,6 +317,42 @@ en el dashboard y el portal (el sitio público sigue sin tocarse).
   (tarea más atrasada, mayor pendiente de cobro) — no hay insights de
   IA inventados sin un LLM real detrás.
 
+## 6f. Dos ajustes post-lanzamiento sobre §6e (profundidad, color, tarjetas)
+
+Con §6e ya en producción, el usuario dio feedback directo dos veces: "se
+ve muy plano" (faltaba color, botones sin profundidad) y luego, viendo
+capturas reales del dashboard, "quiero que todos los recursos... se vean
+delimitados por un recuadro con puntas redondeadas". Ambos ajustes viven
+sobre el mismo sistema de tokens de §6e (no lo reemplazan) y están
+documentados como fuente de verdad en `/dashboard/design-system`, no acá
+en prosa:
+
+- **Segundo color (`--color-verde`)**: el mockup original solo definía
+  un acento (rojo, para "atención"). "Resuelto" pasó de tinta lisa a
+  verde en `StatusLabel`/`StatusMark`, y verde se aplica donde es
+  semánticamente correcto (etapa "ganado" del pipeline, cifras
+  cobradas/margen) — no como decoración suelta.
+- **`Button` con sombra sólida apilada** (`components/dashboard/ui/button.tsx`):
+  offset hard-shadow tintada (acento en primario, tinta en secundario)
+  con física de presión (el botón viaja hacia su sombra en `:active`) —
+  reemplaza el estado sin sombra de §6e.
+  Esto por sí solo no bastó — el feedback siguiente pidió tarjetas
+  visibles, no solo botones con relieve.
+- **Radio 0px revertido a tarjetas redondeadas**: `.dp-card` (definida en
+  `app/globals.css`, dentro de `@layer components` — importante:
+  *dentro* del layer, no como CSS suelto, porque CSS fuera de los layers
+  de Tailwind gana por encima de cualquier utilidad aunque venga antes en
+  el HTML, lo que habría vuelto un no-op cualquier override puntual tipo
+  `border-acento/30`) — borde + esquina de 16px + sombra suave. El
+  componente compartido `Section` ahora renderiza como `.dp-card`, así
+  que este cambio se propaga solo a la mayoría de los bloques de
+  contenido del dashboard/portal; las franjas de KPIs/resumen que no
+  usaban `Section` (home, finanzas, marketing, website, ficha de
+  cliente, workspace de proyecto) se migraron a mano a la misma clase.
+  Los botones (`rounded-lg`) y los paneles ya delimitados (login, ⌘K,
+  tarjetas de aprobación) también se redondearon para que todo el
+  sistema comparta una sola esquina.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

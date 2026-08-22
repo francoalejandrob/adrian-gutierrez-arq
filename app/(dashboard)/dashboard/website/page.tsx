@@ -46,7 +46,7 @@ export default async function WebsitePage(props: PageProps<"/dashboard/website">
         <div className="px-12 py-10">
           {traffic.configured ? (
             <>
-              <div className="mb-10 grid grid-cols-2 border-y border-corte">
+              <div className="dp-card mb-10 grid grid-cols-2">
                 <div className="border-r border-filete p-7">
                   <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">Usuarios activos</p>
                   <p className="mt-2.5 font-dp-mono text-2xl text-tinta">{traffic.data.totals.activeUsers.toLocaleString("es-EC")}</p>
@@ -161,7 +161,7 @@ async function safeCall<T extends { configured: boolean }>(
 
 function NotConfigured({ reason }: { reason: string }) {
   return (
-    <div className="flex flex-col items-center gap-3 border border-dashed border-corte px-4 py-14 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-corte px-4 py-14 text-center">
       <StatusMark tone="pending" className="h-3 w-3" />
       <div>
         <p className="font-dp-sans text-[13px] text-grafito">{reason}</p>

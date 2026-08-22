@@ -79,24 +79,26 @@ export default async function ClientDetailPage(
     <div>
       <PageHeaderWithBack client={client} />
 
-      <Section title="Recorrido del cliente" className="px-12 py-8">
-        <div className="flex items-start">
-          {journey.map((step, i) => (
-            <div key={step.label} className="flex flex-1 items-start">
-              <div className="flex min-w-[90px] flex-col items-center gap-2.5">
-                <StatusMark tone={step.date ? "resolved" : "pending"} />
-                <span className={`text-center font-dp-sans text-[12px] ${step.date ? "text-tinta" : "text-concreto"}`}>{step.label}</span>
-                <span className="font-dp-mono text-[10px] text-concreto">
-                  {step.date ? new Date(step.date).toLocaleDateString("es-EC", { month: "short", year: "numeric" }) : "pendiente"}
-                </span>
+      <div className="px-12 pt-8">
+        <Section title="Recorrido del cliente">
+          <div className="flex items-start">
+            {journey.map((step, i) => (
+              <div key={step.label} className="flex flex-1 items-start">
+                <div className="flex min-w-[90px] flex-col items-center gap-2.5">
+                  <StatusMark tone={step.date ? "resolved" : "pending"} />
+                  <span className={`text-center font-dp-sans text-[12px] ${step.date ? "text-tinta" : "text-concreto"}`}>{step.label}</span>
+                  <span className="font-dp-mono text-[10px] text-concreto">
+                    {step.date ? new Date(step.date).toLocaleDateString("es-EC", { month: "short", year: "numeric" }) : "pendiente"}
+                  </span>
+                </div>
+                {i < journey.length - 1 && <div className="mt-[4.5px] h-px flex-1 bg-filete" />}
               </div>
-              {i < journey.length - 1 && <div className="mt-[4.5px] h-px flex-1 bg-filete" />}
-            </div>
-          ))}
-        </div>
-      </Section>
+            ))}
+          </div>
+        </Section>
+      </div>
 
-      <div className="grid grid-cols-3 border-y border-corte">
+      <div className="mx-12 mt-8 grid grid-cols-3 dp-card">
         <StatCell label="Contrato" value={currency.format(contractedTotal)} hint={firstSignedAt ? `Firmado ${new Date(firstSignedAt).toLocaleDateString("es-EC")}` : "Sin contratos firmados"} />
         <StatCell label="Cobrado" value={currency.format(collectedTotal)} hint={`${(payments ?? []).filter((p) => p.status === "pagada").length} pago(s)`} />
         <StatCell label="Comunicación" value={String(communicationCount)} hint="Interacciones registradas" last />

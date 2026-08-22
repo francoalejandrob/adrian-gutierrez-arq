@@ -418,7 +418,7 @@ export default async function ProjectDetailPage(
       {tab === "approvals" && (
         <div className="flex flex-col gap-8 px-12 py-10">
           {pendingApprovals.map(({ doc, version }) => (
-            <div key={version.id} className="max-w-lg border border-filete">
+            <div key={version.id} className="max-w-lg overflow-hidden rounded-2xl border border-filete">
               <div className="dp-grain-strong flex aspect-[16/10] items-center justify-center">
                 <span className="font-dp-mono text-xs text-grafito">[ {doc.name} — v{version.version} ]</span>
               </div>
@@ -446,7 +446,7 @@ export default async function ProjectDetailPage(
 
       {tab === "finance" && (
         <div className="flex flex-col gap-10 px-12 py-10">
-          <div className="grid grid-cols-5 border-y border-corte">
+          <div className="dp-card grid grid-cols-5">
             <SummaryStat label="Contratado" value={currency.format(contracted)} />
             <SummaryStat label="Cobrado" value={currency.format(collected)} tone="positive" />
             <SummaryStat label="Pendiente" value={currency.format(pending)} />

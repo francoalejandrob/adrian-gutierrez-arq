@@ -4,7 +4,7 @@ export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-dp-mono font-medium " +
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-lg font-dp-mono font-medium " +
   "uppercase tracking-[0.12em] transition-[transform,box-shadow,background-color,border-color,color] duration-150 " +
   "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50";
 

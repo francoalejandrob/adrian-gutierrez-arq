@@ -75,7 +75,7 @@ export default async function FinancePage() {
     <div>
       <PageHeader eyebrow="Inteligencia · Resumen de todos los proyectos" title="Finanzas" />
 
-      <div className="grid grid-cols-2 border-b border-corte sm:grid-cols-3 lg:grid-cols-6">
+      <div className="dp-card mx-12 mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
         <SummaryStat label="Contratado" value={currency.format(contracted)} />
         <SummaryStat label="Cobrado" value={currency.format(collected)} tone="positive" />
         <SummaryStat label="Pendiente" value={currency.format(pending)} tone="attention" />
