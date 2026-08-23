@@ -30,10 +30,11 @@ export default async function LoginPage() {
   const contracted = (contracts ?? []).reduce((sum, c) => sum + c.value, 0);
 
   return (
-    <main className={`dp-scope ${dpFontVars} grid min-h-dvh grid-cols-1 font-dp-sans text-tinta md:grid-cols-2`}>
-      <div className="dp-grain-strong relative hidden overflow-hidden border-r border-corte md:flex">
-        <LoginVideoBackground />
-        <div className="relative z-10 flex flex-1 flex-col justify-between p-16">
+    <main className={`dp-scope ${dpFontVars} dp-grain-strong relative min-h-dvh overflow-hidden font-dp-sans text-tinta`}>
+      <LoginVideoBackground />
+
+      <div className="relative z-10 grid min-h-dvh grid-cols-1 md:grid-cols-2">
+        <div className="hidden flex-col justify-between p-16 md:flex">
           <p className="font-dp-mono text-[10px] uppercase tracking-[0.18em] text-grafito">ARCHI.OS &nbsp;·&nbsp; v2.0</p>
           <div>
             <h1 className="mb-6 max-w-[18ch] font-dp-serif text-[52px] leading-none tracking-[-0.025em] text-tinta">
@@ -49,12 +50,12 @@ export default async function LoginPage() {
             <Stat value={String(clientCount ?? 0)} label="Clientes" />
           </div>
         </div>
-      </div>
 
-      <div className="flex items-center justify-center p-16">
-        <div className="w-full max-w-[352px] rounded-2xl border border-corte bg-superficie p-9 shadow-[6px_6px_0_0_var(--color-acento)]">
-          <p className="mb-7 font-dp-mono text-[9.5px] uppercase tracking-[0.16em] text-concreto">Acceso al estudio</p>
-          <LoginForm />
+        <div className="flex items-center justify-center p-16">
+          <div className="w-full max-w-[352px] rounded-2xl border border-corte bg-superficie p-9 shadow-[6px_6px_0_0_var(--color-acento)]">
+            <p className="mb-7 font-dp-mono text-[9.5px] uppercase tracking-[0.16em] text-concreto">Acceso al estudio</p>
+            <LoginForm />
+          </div>
         </div>
       </div>
     </main>
