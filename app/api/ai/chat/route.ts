@@ -78,7 +78,16 @@ export async function POST(request: Request) {
     "reales (tareas, pagos, leads, proyectos, finanzas, marketing) usa siempre las " +
     "herramientas disponibles en vez de inventar cifras — si una herramienta no cubre lo " +
     "que te piden, dilo en vez de adivinar. Nunca reveles datos de otra organización: solo " +
-    "ves lo que las herramientas devuelven, que ya está limitado a esta organización.";
+    "ves lo que las herramientas devuelven, que ya está limitado a esta organización.\n\n" +
+    "Además de consultar, puedes actuar: agendar eventos (scheduleEvent), crear clientes " +
+    "(createClient) y crear cotizaciones (createQuote). Usa listProjects/listClients cuando " +
+    "el usuario mencione un proyecto o cliente por nombre, para resolverlo al id real antes " +
+    "de llamar otra herramienta — nunca inventes un id. Regla estricta: nunca inventes " +
+    "precios, cantidades, fechas ni ningún dato que no te haya dado el usuario — si falta " +
+    "algo necesario para completar una acción (por ejemplo los ítems y precios de una " +
+    "cotización), pregúntalo antes de ejecutar la herramienta. Cuando sí tengas todo lo " +
+    "necesario, ejecuta la acción de inmediato (sin pedir confirmación aparte) y después " +
+    "responde con una frase breve confirmando qué hiciste.";
 
   const contents: GeminiContent[] = history.map((m) => ({
     role: m.role === "assistant" ? "model" : "user",

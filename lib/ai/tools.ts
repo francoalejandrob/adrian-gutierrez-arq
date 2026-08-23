@@ -1,4 +1,6 @@
+import { z } from "zod";
 import type { createClient } from "@/lib/supabase/server";
+import { getCurrentOrganizationId } from "@/lib/supabase/org";
 
 // Real data-query functions, not stubs — this is the "backend" a
 // tool-calling LLM invokes (section 34-35 of the master prompt). Every
@@ -144,6 +146,158 @@ export async function getMarketingPerformance(supabase: SupabaseClient) {
     .map((row) => ({ ...row, contracted: currency.format(row.contracted) }));
 }
 
+// Herramientas de lectura auxiliares: la IA no puede adivinar UUIDs,
+// así que necesita poder resolver "el proyecto de la casa Rodríguez" o
+// "el cliente Pérez" a un id real antes de agendar/cotizar/crear algo
+// ligado a un proyecto o cliente existente.
+export async function listProjects(supabase: SupabaseClient) {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("id, name, status, clients(name)")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map((project) => ({
+    id: project.id,
+    name: project.name,
+    status: project.status,
+    client: project.clients?.name ?? null,
+  }));
+}
+
+export async function listClients(supabase: SupabaseClient) {
+  const { data, error } = await supabase
+    .from("clients")
+    .select("id, name, company")
+    .order("name")
+    .limit(50);
+  if (error) throw new Error(error.message);
+
+  return data ?? [];
+}
+
+// Herramientas de escritura (Fase 7, extensión de acciones). Mismo
+// patrón de organización que las Server Actions equivalentes
+// (app/(dashboard)/dashboard/clients/actions.ts, .../calendar/actions.ts,
+// .../projects/[id]/finance-actions.ts): resuelven organizationId vía
+// getCurrentOrganizationId con el cliente de Supabase de la sesión (no
+// un cliente admin) y dejan que RLS sea el límite real de organización.
+// Cada una valida su entrada con Zod — nunca confían en que el modelo
+// mandó datos completos o del tipo correcto.
+
+const clientToolSchema = z.object({
+  name: z.string().trim().min(1, "El nombre es obligatorio."),
+  email: z.string().trim().email("Email inválido").optional().or(z.literal("")),
+  phone: z.string().trim().optional(),
+  company: z.string().trim().optional(),
+  address: z.string().trim().optional(),
+  notes: z.string().trim().optional(),
+});
+
+export async function createClientTool(supabase: SupabaseClient, args: Record<string, unknown>) {
+  const parsed = clientToolSchema.safeParse(args);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos inválidos.");
+
+  const organizationId = await getCurrentOrganizationId(supabase);
+  if (!organizationId) throw new Error("Sin organización asociada.");
+
+  const { data, error } = await supabase
+    .from("clients")
+    .insert({ organization_id: organizationId, ...parsed.data })
+    .select("id, name")
+    .single();
+  if (error) throw new Error(error.message);
+
+  return { created: true, client: data };
+}
+
+const eventToolSchema = z.object({
+  title: z.string().trim().min(1, "El título es obligatorio."),
+  date: z.string().trim().min(1, "La fecha es obligatoria (YYYY-MM-DD)."),
+  time: z.string().trim().optional(),
+  projectId: z.string().trim().optional(),
+  notes: z.string().trim().optional(),
+});
+
+export async function scheduleEventTool(supabase: SupabaseClient, args: Record<string, unknown>) {
+  const parsed = eventToolSchema.safeParse(args);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos inválidos.");
+
+  const organizationId = await getCurrentOrganizationId(supabase);
+  if (!organizationId) throw new Error("Sin organización asociada.");
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const startsAt = new Date(`${parsed.data.date}T${parsed.data.time || "09:00"}:00`).toISOString();
+
+  const { data, error } = await supabase
+    .from("calendar_events")
+    .insert({
+      organization_id: organizationId,
+      project_id: parsed.data.projectId || null,
+      title: parsed.data.title,
+      starts_at: startsAt,
+      notes: parsed.data.notes || null,
+      created_by: user?.id,
+    })
+    .select("id, title, starts_at")
+    .single();
+  if (error) throw new Error(error.message);
+
+  return { created: true, event: data };
+}
+
+const quoteToolSchema = z.object({
+  projectId: z.string().trim().min(1, "Falta el proyecto de la cotización."),
+  items: z
+    .array(
+      z.object({
+        description: z.string().trim().min(1, "Cada ítem necesita una descripción."),
+        quantity: z.number().positive("La cantidad debe ser mayor a 0."),
+        unit_price: z.number().nonnegative("El precio unitario no puede ser negativo."),
+      }),
+    )
+    .min(1, "La cotización necesita al menos un ítem con precio real."),
+  validUntil: z.string().trim().optional(),
+  notes: z.string().trim().optional(),
+});
+
+export async function createQuoteTool(supabase: SupabaseClient, args: Record<string, unknown>) {
+  const parsed = quoteToolSchema.safeParse(args);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos inválidos.");
+
+  const organizationId = await getCurrentOrganizationId(supabase);
+  if (!organizationId) throw new Error("Sin organización asociada.");
+
+  const { data: quote, error } = await supabase
+    .from("quotes")
+    .insert({
+      organization_id: organizationId,
+      project_id: parsed.data.projectId,
+      valid_until: parsed.data.validUntil || null,
+      notes: parsed.data.notes || null,
+    })
+    .select("id")
+    .single();
+  if (error) throw new Error(error.message);
+
+  const { error: itemsError } = await supabase.from("quote_items").insert(
+    parsed.data.items.map((item, position) => ({
+      quote_id: quote.id,
+      description: item.description,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      position,
+    })),
+  );
+  if (itemsError) throw new Error(itemsError.message);
+
+  return { created: true, quoteId: quote.id };
+}
+
 // JSON-schema tool definitions (function-calling). Kept next to the
 // implementations so the two never drift apart. Written once in this
 // neutral, lowercase-JSON-Schema shape and converted below to whatever
@@ -203,13 +357,106 @@ export const AI_TOOLS = [
       parameters: { type: "object", properties: {}, required: [] },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "listProjects",
+      description:
+        "Lista los proyectos de la organización (id, nombre, estado, cliente). Úsala para encontrar el projectId real antes de agendar un evento ligado a un proyecto o crear una cotización.",
+      parameters: { type: "object", properties: {}, required: [] },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "listClients",
+      description:
+        "Lista los clientes de la organización (id, nombre, empresa). Úsala para verificar si un cliente ya existe antes de crear uno nuevo.",
+      parameters: { type: "object", properties: {}, required: [] },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "createClient",
+      description:
+        "Crea un cliente nuevo. Solo el nombre es obligatorio — nunca inventes email, teléfono, empresa o dirección: pídelos si el usuario no los dio.",
+      parameters: {
+        type: "object",
+        properties: {
+          name: { type: "string", description: "Nombre del cliente" },
+          email: { type: "string", description: "Email (opcional)" },
+          phone: { type: "string", description: "Teléfono (opcional)" },
+          company: { type: "string", description: "Empresa (opcional)" },
+          address: { type: "string", description: "Dirección (opcional)" },
+          notes: { type: "string", description: "Notas (opcional)" },
+        },
+        required: ["name"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "scheduleEvent",
+      description:
+        "Agenda un evento en el calendario. Puede ser suelto (sin proyecto) o ligado a un proyecto existente — usa listProjects para resolver el projectId si el usuario menciona un proyecto por nombre.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "Título del evento" },
+          date: { type: "string", description: "Fecha en formato YYYY-MM-DD" },
+          time: { type: "string", description: "Hora en formato HH:MM, 24h (opcional, default 09:00)" },
+          projectId: { type: "string", description: "UUID del proyecto al que pertenece (opcional)" },
+          notes: { type: "string", description: "Notas (opcional)" },
+        },
+        required: ["title", "date"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "createQuote",
+      description:
+        "Crea una cotización para un proyecto existente, con sus ítems (descripción, cantidad, precio unitario). Requiere un projectId real (usa listProjects). Nunca inventes precios ni ítems: si el usuario no te dio montos concretos, pregúntalos antes de llamar esta herramienta.",
+      parameters: {
+        type: "object",
+        properties: {
+          projectId: { type: "string", description: "UUID del proyecto (usa listProjects para encontrarlo)" },
+          items: {
+            type: "array",
+            description: "Ítems de la cotización, con valores reales dados por el usuario",
+            items: {
+              type: "object",
+              properties: {
+                description: { type: "string", description: "Descripción del ítem" },
+                quantity: { type: "number", description: "Cantidad" },
+                unit_price: { type: "number", description: "Precio unitario" },
+              },
+              required: ["description", "quantity", "unit_price"],
+            },
+          },
+          validUntil: { type: "string", description: "Fecha de validez, formato YYYY-MM-DD (opcional)" },
+          notes: { type: "string", description: "Notas (opcional)" },
+        },
+        required: ["projectId", "items"],
+      },
+    },
+  },
 ];
 
 // Gemini's function-calling `parameters` schema uses uppercase type
 // names (OBJECT/STRING/…) instead of JSON Schema's lowercase — this
 // converts AI_TOOLS once rather than maintaining a second, parallel
 // list of tool definitions that could drift out of sync.
-type ParamSchema = { type: string; description?: string; properties?: Record<string, ParamSchema>; required?: string[] };
+type ParamSchema = {
+  type: string;
+  description?: string;
+  properties?: Record<string, ParamSchema>;
+  required?: string[];
+  items?: ParamSchema;
+};
 
 function toGeminiSchema(schema: ParamSchema): Record<string, unknown> {
   if (schema.type === "object") {
@@ -223,6 +470,13 @@ function toGeminiSchema(schema: ParamSchema): Record<string, unknown> {
       ...(schema.required?.length ? { required: schema.required } : {}),
     };
   }
+  if (schema.type === "array") {
+    return {
+      type: "ARRAY",
+      items: toGeminiSchema(schema.items as ParamSchema),
+      ...(schema.description ? { description: schema.description } : {}),
+    };
+  }
   return {
     type: schema.type.toUpperCase(),
     ...(schema.description ? { description: schema.description } : {}),
@@ -234,7 +488,7 @@ export const GEMINI_TOOLS = [
     functionDeclarations: AI_TOOLS.map((tool) => ({
       name: tool.function.name,
       description: tool.function.description,
-      parameters: toGeminiSchema(tool.function.parameters as ParamSchema),
+      parameters: toGeminiSchema(tool.function.parameters as unknown as ParamSchema),
     })),
   },
 ];
@@ -253,6 +507,16 @@ export async function runTool(supabase: SupabaseClient, name: string, args: Reco
       return getRevenue(supabase);
     case "getMarketingPerformance":
       return getMarketingPerformance(supabase);
+    case "listProjects":
+      return listProjects(supabase);
+    case "listClients":
+      return listClients(supabase);
+    case "createClient":
+      return createClientTool(supabase, args);
+    case "scheduleEvent":
+      return scheduleEventTool(supabase, args);
+    case "createQuote":
+      return createQuoteTool(supabase, args);
     default:
       throw new Error(`Herramienta desconocida: ${name}`);
   }
