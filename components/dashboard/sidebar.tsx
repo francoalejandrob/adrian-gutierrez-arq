@@ -22,7 +22,7 @@ export default async function Sidebar() {
   const displayName = member?.profiles?.full_name || member?.profiles?.email || "Usuario";
 
   return (
-    <aside className="dp-grain sticky top-[53px] h-[calc(100vh-53px)] w-[225px] shrink-0 overflow-y-auto border-r border-filete py-[22px] pb-6">
+    <aside className="dp-grain h-full w-[225px] shrink-0 overflow-y-auto border-r border-filete py-[22px] pb-6">
       <SidebarNav />
       <RecentProjects />
 

@@ -20,15 +20,22 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
     .is("read_at", null);
 
   return (
-    <div className={`dp-scope ${dpFontVars} min-h-dvh bg-papel font-dp-sans text-tinta print:block`}>
-      <div className="print:hidden">
+    <div className={`dp-scope ${dpFontVars} flex h-dvh flex-col overflow-hidden bg-papel font-dp-sans text-tinta print:block print:h-auto`}>
+      <div className="shrink-0 print:hidden">
         <SheetHeader dateLabel={dateLabel} unreadCount={unreadCount ?? 0} />
       </div>
-      <div className="flex items-start">
+      {/* Shell de altura fija: sidebar y main tienen cada uno su propio
+          overflow-y-auto, así que scrollear uno nunca mueve al otro —
+          antes dependía de que `sticky` se comportara bien sobre un
+          documento que scrolleaba entero, y en la práctica no siempre
+          lo hacía. */}
+      <div className="flex min-h-0 flex-1 items-stretch print:block print:h-auto">
         <div className="print:hidden">
           <Sidebar />
         </div>
-        <main className="min-w-0 flex-1 print:p-0">{children}</main>
+        <main className="h-full min-w-0 flex-1 overflow-y-auto print:h-auto print:overflow-visible print:p-0">
+          {children}
+        </main>
       </div>
       <div className="print:hidden">
         <FloatingAssistant />

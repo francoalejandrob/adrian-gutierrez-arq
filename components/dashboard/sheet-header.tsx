@@ -18,7 +18,7 @@ export default function SheetHeader({
   const pathname = usePathname();
 
   return (
-    <div className="dp-grain sticky top-0 z-40 flex h-[53px] items-stretch border-b border-corte">
+    <div className="dp-grain relative z-40 flex h-[53px] shrink-0 items-stretch border-b border-corte">
       <div className="flex w-[225px] shrink-0 items-center gap-2.5 border-r border-filete px-5">
         <span className="relative h-[15px] w-[15px] shrink-0 border-[1.5px] border-tinta">
           <span className="absolute inset-[3px] block bg-tinta" />
