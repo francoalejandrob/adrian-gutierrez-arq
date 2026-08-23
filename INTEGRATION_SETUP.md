@@ -12,33 +12,37 @@ credenciales reales (regla del master prompt, sección 53).
 | **Resend** | Ya configurado desde el sitio público (`RESEND_API_KEY` en Vercel). Se reutiliza tal cual, sin cambios. |
 | **Vercel** | Ya autenticado en esta máquina (`vercel whoami` → `francoalejandrob`), mismo proyecto `adrian-gutierrez-arq`. |
 | **GitHub** | Ya autenticado (`gh`, cuenta `francoalejandrob`), mismo repo. |
+| **Gemini API** (Fase 7 — Archi AI) | Key real generada en Google AI Studio y probada de punta a punta contra la API real (auth, modelo, ciclo completo de function-calling) antes de configurarla — ver detalle abajo. |
 
 ## Necesitan que tú hagas algo primero
 
-### Gemini API (Fase 7 — Archi AI)
-El código ya está escrito y listo para activarse
-(`lib/ai/tools.ts`, `app/api/ai/chat/route.ts`, `/dashboard/ai`) — el
+(vacío por ahora — todo lo que faltaba está resuelto)
+
+## Detalle: Gemini API (Fase 7 — Archi AI)
+`lib/ai/tools.ts`, `app/api/ai/chat/route.ts`, `/dashboard/ai` — el
 wiring de tool-calling llama directo a `generateContent` de la
 Generative Language API de Google (fetch directo, sin SDK, mismo
 criterio que las demás integraciones de Google — GA4/Search Console).
-**No probado de punta a punta**: no tengo una key real contra la cual
-probarlo, así que no lo reporto como "listo y probado". El campo más
-propenso a necesitar un ajuste una vez que corra contra la API real es
-el `role` que Gemini espera en el turno que devuelve el resultado de una
-herramienta (`functionResponse`) — está implementado como `"function"`
-según la guía de function-calling de Google, pero algunas versiones de
-la API esperan `"user"` ahí; si Archi AI responde con un error después
-de intentar usar una herramienta, ese es el primer lugar a revisar
-(`app/api/ai/chat/route.ts`, el `contents.push({ role: "function", ... })`).
 
-Elegida sobre Vertex AI/OpenAI porque no requiere proyecto de Google
-Cloud ni facturación — la key se genera gratis en un par de minutos.
+**Probado de punta a punta contra la API real** (no solo documentado)
+con una key real de Google AI Studio, lo que corrigió dos cosas que la
+documentación pública no dejaba claras:
+- El modelo default tuvo que cambiar de `gemini-2.5-flash` (ya no
+  disponible para keys nuevas) a `gemini-3.6-flash`.
+- El turno que devuelve el resultado de una herramienta
+  (`functionResponse`) tiene que tener `role: "user"` — la API rechaza
+  `role: "function"` explícitamente (`Role 'function' is not
+  supported`), a pesar de que así lo mostraba la guía de function-calling
+  consultada.
 
-1. Entrar a [ai.google.dev](https://ai.google.dev) (Google AI Studio) con
-   una cuenta de Google y generar una API key ("Get API key").
-2. Agregar en Vercel: `GEMINI_API_KEY` (nunca en el chat — igual que con
-   el token de Instagram). Opcional: `GEMINI_MODEL` si querés un modelo
-   distinto al default (`gemini-2.5-flash`).
+No verificado todavía: una corrida real a través de `/dashboard/ai` en
+el navegador (con sesión autenticada) — solo el contrato crudo de
+`generateContent` vía requests directos. Si algo falla ahí, revisar
+primero `app/api/ai/chat/route.ts`.
+
+La API key vive en `GEMINI_API_KEY` (Vercel + `.env.local`, nunca en el
+chat). Se generó gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+— sin proyecto de Google Cloud ni facturación.
 
 ### Google Analytics 4 + Search Console (Fase 5)
 El código ya está escrito y listo para activarse

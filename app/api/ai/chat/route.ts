@@ -6,17 +6,21 @@ import { createClient } from "@/lib/supabase/server";
 // API `generateContent`, plain fetch — same choice as the other Google
 // integrations in lib/integrations/, no SDK dependency). Section 53 of
 // the master prompt: without GEMINI_API_KEY this returns an honest "not
-// configured" response instead of simulating a reply. With a key, the
-// request/response shape follows the documented function-calling
-// contract, but this has **not been exercised end-to-end** (no real key
-// to test against) — disclosed in INTEGRATION_SETUP.md and ROADMAP.md
-// rather than reported as done. The one field most likely to need a
-// tweak once tested for real: the `role` Gemini expects on the turn
-// that carries a `functionResponse` part (used here as `"function"`,
-// per the documented function-calling guide — some API versions accept
-// `"user"` instead).
+// configured" response instead of simulating a reply.
+//
+// Verified end-to-end against the real API (not just documented — a
+// live key surfaced two things the docs didn't make obvious):
+// - `gemini-2.5-flash` is gone for new API keys; the model must be
+//   `gemini-3.6-flash` (or newer) as of whenever a key was last tested.
+// - The turn carrying a `functionResponse` part must have role `"user"`,
+//   not `"function"` — the API rejects `"function"` outright
+//   (`Role 'function' is not supported`).
+// Not yet exercised through this actual route/UI in a real browser
+// session (only the raw generateContent contract, via direct requests
+// with a temporary tool schema) — if something's still off, this is the
+// first place to check.
 
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 const MAX_TOOL_ROUNDS = 4;
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -26,7 +30,7 @@ type GeminiPart =
   | { functionCall: { name: string; args?: Record<string, unknown> } }
   | { functionResponse: { name: string; response: unknown } };
 
-type GeminiContent = { role: "user" | "model" | "function"; parts: GeminiPart[] };
+type GeminiContent = { role: "user" | "model"; parts: GeminiPart[] };
 
 function hasFunctionCall(part: GeminiPart): part is { functionCall: { name: string; args?: Record<string, unknown> } } {
   return "functionCall" in part;
@@ -140,7 +144,7 @@ export async function POST(request: Request) {
         }
         responseParts.push({ functionResponse: { name: call.functionCall.name, response: { result } } });
       }
-      contents.push({ role: "function", parts: responseParts });
+      contents.push({ role: "user", parts: responseParts });
     }
 
     return NextResponse.json({

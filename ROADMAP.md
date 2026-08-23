@@ -207,12 +207,16 @@ al estudio o al cliente (Fase 6).
       acá, no un cambio de arquitectura.
 - [x] `/dashboard/ai`: interfaz de chat
 
+Contrato de la API probado de punta a punta contra Gemini real (no solo
+documentado) — corrigió el modelo default (`gemini-2.5-flash` ya no
+existe para keys nuevas → `gemini-3.6-flash`) y el `role` del turno de
+`functionResponse` (`"function"` es rechazado por la API; es `"user"`).
+`GEMINI_API_KEY` ya está configurada en Vercel. Ver `INTEGRATION_SETUP.md`.
+
 **No incluido en Fase 7**:
-- Probado de punta a punta — no hay `GEMINI_API_KEY` real todavía. El
-  request/response sigue el contrato documentado de la API, pero podría
-  necesitar un ajuste menor la primera vez que corra contra la API real
-  (ver la nota sobre el `role` de `functionResponse` en
-  `INTEGRATION_SETUP.md`).
+- Una corrida real a través de `/dashboard/ai` en el navegador con
+  sesión autenticada — lo probado fue el contrato crudo de
+  `generateContent` vía requests directos, no la ruta de la app completa.
 - Streaming de la respuesta — con la interfaz esperando una sola
   respuesta corta por pregunta, el costo de implementar y probar SSE sin
   poder verificarlo end-to-end no se justificaba en esta fase.
