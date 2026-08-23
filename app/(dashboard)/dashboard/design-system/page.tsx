@@ -25,10 +25,13 @@ const PALETTE = [
   { name: "Realce", hex: "#201F24", role: "Fondo de hover / activo" },
 ];
 
+// Una sola tipografía (Rethink Sans) en todo el sistema — la distinción
+// de rol que antes daban 3 typefaces distintos ahora la da el
+// peso/tamaño/tracking de cada uso, no la fuente en sí.
 const TYPE_SPECIMENS = [
-  { label: "Instrument Serif", sample: "El estudio como sistema.", className: "font-dp-serif text-4xl" },
-  { label: "Archivo", sample: "Comercial, producción, documentación y finanzas.", className: "font-dp-sans text-base" },
-  { label: "JetBrains Mono", sample: "01 · CIFRAS · ETIQUETAS · METADATOS", className: "font-dp-mono text-sm uppercase tracking-[0.1em]" },
+  { label: "Rethink Sans · Extrabold, títulos", sample: "El estudio como sistema.", className: "font-dp-serif text-4xl font-extrabold" },
+  { label: "Rethink Sans · Regular, texto", sample: "Comercial, producción, documentación y finanzas.", className: "font-dp-sans text-base" },
+  { label: "Rethink Sans · Medium, etiquetas", sample: "01 · CIFRAS · ETIQUETAS · METADATOS", className: "font-dp-mono text-sm font-medium uppercase tracking-[0.1em]" },
 ];
 
 const BREAKPOINTS = [

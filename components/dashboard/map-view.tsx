@@ -62,7 +62,7 @@ export default function MapView({ pins, apiKey }: { pins: MapPinData[]; apiKey: 
       });
       marker.addListener("click", () => {
         infoWindow.setContent(
-          `<div style="font-family:Archivo,sans-serif;font-size:13px;line-height:1.5;">` +
+          `<div style="font-family:'Rethink Sans',sans-serif;font-size:13px;line-height:1.5;">` +
             `<strong>${escapeHtml(pin.name)}</strong><br/>` +
             `<a href="${pin.href}" style="color:#47607a;">Ver ficha →</a></div>`,
         );

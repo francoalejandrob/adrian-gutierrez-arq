@@ -72,9 +72,16 @@
   --color-ambar: var(--color-ambar);
   --color-azul: var(--color-azul);
   --color-realce: var(--color-realce);
-  --font-dp-serif: var(--font-instrument-serif);
-  --font-dp-sans: var(--font-archivo);
-  --font-dp-mono: var(--font-jetbrains-mono);
+  /* Toda la tipografía del dashboard/portal es Rethink Sans — los 3
+     alias apuntaban antes a 3 tipografías distintas (Instrument
+     Serif/Archivo/JetBrains Mono); ahora los tres resuelven a la misma
+     fuente (lib/dp-fonts.ts), así que ninguno de los ~410 usos de
+     font-dp-serif/dp-sans/dp-mono en el resto del código necesitó
+     cambiar — la distinción de rol (título/cuerpo/etiqueta) sigue
+     viniendo del tamaño/peso/tracking que cada uso ya tenía. */
+  --font-dp-serif: var(--font-rethink-sans);
+  --font-dp-sans: var(--font-rethink-sans);
+  --font-dp-mono: var(--font-rethink-sans);
 
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
