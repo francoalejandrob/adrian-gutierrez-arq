@@ -213,19 +213,58 @@ existe para keys nuevas → `gemini-3.6-flash`) y el `role` del turno de
 `functionResponse` (`"function"` es rechazado por la API; es `"user"`).
 `GEMINI_API_KEY` ya está configurada en Vercel. Ver `INTEGRATION_SETUP.md`.
 
-**No incluido en Fase 7**:
+**No incluido en Fase 7** (el pendiente de acciones de escritura se
+cerró después — ver "Asistente flotante + acciones de escritura + mapa"
+abajo):
 - Una corrida real a través de `/dashboard/ai` en el navegador con
   sesión autenticada — lo probado fue el contrato crudo de
   `generateContent` vía requests directos, no la ruta de la app completa.
 - Streaming de la respuesta — con la interfaz esperando una sola
   respuesta corta por pregunta, el costo de implementar y probar SSE sin
   poder verificarlo end-to-end no se justificaba en esta fase.
-- Borradores de email o creación de tareas por lenguaje natural (acciones
-  de escritura, no solo lectura) — el master prompt las menciona como
-  casos de uso, pero una IA que *escribe* en la base de datos es una
-  superficie de riesgo distinta (¿qué pasa si inventa una tarea, o
-  entiende mal a quién facturar?) que merece su propio diseño explícito
-  en vez de sumarse de paso a la primera versión de lectura.
+
+## Asistente flotante + acciones de escritura + mapa (extensión de Fase 7) ✅
+
+Pedido explícito del usuario: acceso a Archi AI desde cualquier pantalla
+(no solo `/dashboard/ai`), y que la IA pueda *actuar* — cerrando el
+pendiente que Fase 7 había dejado abierto a propósito ("merece su propio
+diseño explícito"). Se sumó también dirección en clientes y un mapa de
+clientes/proyectos (Google Maps), pedidos en el mismo mensaje.
+
+- [x] **Widget flotante global** — `components/dashboard/floating-assistant.tsx`,
+      montado en `app/(dashboard)/dashboard/layout.tsx`. Reusa `AiChat`
+      (`app/(dashboard)/dashboard/ai/chat.tsx`) tal cual, sin refactor —
+      ya era un client component autocontenido sin props. Se oculta en
+      `/dashboard/ai` para no duplicar la conversación.
+- [x] **Herramientas de escritura** en `lib/ai/tools.ts`: `createClient`,
+      `scheduleEvent`, `createQuote` (con ítems reales, nunca inventados),
+      más `listProjects`/`listClients` de lectura para que la IA resuelva
+      nombres a ids reales antes de actuar. Decisión de diseño confirmada
+      con el usuario: **ejecuta apenas tiene todo el dato real necesario y
+      reporta qué hizo** (no pide confirmación aparte) — la garantía de
+      seguridad es la regla anti-invención ya vigente en todo el proyecto:
+      si falta un precio, fecha o a qué proyecto pertenece algo, pregunta
+      en vez de adivinar. Mismo patrón de organización/RLS que las Server
+      Actions equivalentes (`getCurrentOrganizationId`, sin cliente admin).
+- [x] **Dirección en clientes** — columna `clients.address` (migración
+      `0011`), campo en `client-form.tsx`, ficha de cliente.
+- [x] **Mapa** (`/dashboard/map`) — columnas `latitude`/`longitude` en
+      `clients` y `projects` (migración `0012`), geocodificadas server-side
+      vía `lib/integrations/google-geocoding.ts` (nunca bloquea el guardado
+      si falla; nunca inventa coordenadas). `components/dashboard/map-view.tsx`
+      carga la Maps JavaScript API con `next/script` (primer uso en el
+      proyecto) y pinta un pin por cliente/proyecto geocodificado, con
+      `InfoWindow` y link a su ficha. Degrada a un estado vacío claro sin
+      `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` configurada.
+
+**No incluido en esta extensión**:
+- Confirmación previa a las acciones de escritura de la IA — el usuario
+  eligió explícitamente ejecutar-y-reportar en vez de proponer-y-esperar.
+- Verificación en navegador (widget flotante, mapa) — mismo límite de
+  siempre en esta sesión: se verificó con build tipado + lint, no con una
+  sesión real en el navegador.
+- Streaming de respuesta del chat — sigue fuera de alcance por el mismo
+  motivo que en Fase 7.
 
 ## Fase 8 — SaaS ⬜
 

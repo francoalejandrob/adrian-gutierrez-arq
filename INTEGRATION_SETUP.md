@@ -16,7 +16,9 @@ credenciales reales (regla del master prompt, sección 53).
 
 ## Necesitan que tú hagas algo primero
 
-(vacío por ahora — todo lo que faltaba está resuelto)
+| Integración | Qué falta |
+|---|---|
+| **Google Maps** (mapa de clientes/proyectos, `/dashboard/map`) | Ver detalle abajo — a diferencia de todo lo demás en esta tabla, necesita un proyecto de Google Cloud con **facturación habilitada**. |
 
 ## Detalle: Gemini API (Fase 7 — Archi AI)
 `lib/ai/tools.ts`, `app/api/ai/chat/route.ts`, `/dashboard/ai` — el
@@ -43,6 +45,36 @@ primero `app/api/ai/chat/route.ts`.
 La API key vive en `GEMINI_API_KEY` (Vercel + `.env.local`, nunca en el
 chat). Se generó gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
 — sin proyecto de Google Cloud ni facturación.
+
+### Google Maps (mapa de clientes/proyectos, `/dashboard/map`)
+`lib/integrations/google-geocoding.ts`, `components/dashboard/map-view.tsx`,
+`/dashboard/map` — código escrito y listo para activarse, **no probado
+de punta a punta** (sin key real todavía). Necesita **dos** keys
+distintas de un mismo proyecto de Google Cloud, y ese proyecto necesita
+**facturación habilitada** (Google exige tarjeta para Maps/Geocoding,
+a diferencia de Gemini) — aunque el uso normal de un estudio queda
+dentro de la cuota gratuita mensual de Google.
+
+1. En [Google Cloud Console](https://console.cloud.google.com/): crear
+   o reutilizar un proyecto, habilitar facturación, y habilitar dos
+   APIs: **Maps JavaScript API** y **Geocoding API**.
+2. Crear dos API keys (Credenciales → Crear credenciales → Clave de API):
+   - Una para el navegador: restringirla por **referrer HTTP** al
+     dominio de producción (y a `localhost` si querés probar local), y
+     limitarla a "Maps JavaScript API" solamente.
+   - Otra para el servidor (geocoding): **sin restricción de referrer**
+     (las llamadas de geocodificación son servidor-a-servidor, no
+     tienen referrer — restringirla por referrer las bloquearía por
+     completo). Si Google Cloud lo permite en tu región, restringirla
+     por IP en vez de dejarla abierta; si no, limitarla al menos a
+     "Geocoding API" solamente.
+3. Agregar en Vercel (nunca en el chat) y en tu `.env.local`:
+   - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` — la key restringida por referrer.
+   - `GOOGLE_MAPS_SERVER_API_KEY` — la key de geocoding.
+
+Mientras no estén configuradas, `/dashboard/map` muestra un estado
+vacío explícito en vez de simular un mapa — nada se rompe, solo no hay
+mapa que mostrar.
 
 ### Google Analytics 4 + Search Console (Fase 5)
 El código ya está escrito y listo para activarse

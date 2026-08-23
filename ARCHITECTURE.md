@@ -436,6 +436,75 @@ tres puntos en las tablas — la referencia los usa para acciones en lote
 que no existen como feature en esta app; agregarlos habría sido UI
 decorativa sin función real.
 
+## 6h. Asistente flotante + acciones de escritura + mapa de clientes/proyectos
+
+Pedido del usuario en un solo mensaje, después de confirmar que Archi AI
+(§7 del ROADMAP, ver `ROADMAP.md`) ya funcionaba: acceso a la IA desde
+cualquier pantalla, que la IA pueda agendar/crear clientes/cotizar (no
+solo consultar), dirección en la ficha de cliente, y un mapa con pines de
+clientes y proyectos (Google Maps, elegido explícitamente sobre otros
+proveedores).
+
+**Widget flotante** — `components/dashboard/floating-assistant.tsx`
+("use client"), montado como hermano de `<main>` en
+`app/(dashboard)/dashboard/layout.tsx`, envuelto en `print:hidden` igual
+que `Sidebar`/`SheetHeader`. Reusa `AiChat`
+(`app/(dashboard)/dashboard/ai/chat.tsx`) importado directamente entre
+segmentos de rutas (Next.js lo permite sin problema) — `AiChat` ya era un
+client component sin props que gestiona su propio estado y llama a
+`/api/ai/chat`, así que no hizo falta ningún refactor para reutilizarlo
+dentro de un panel emergente. Usa `usePathname()` para no renderizarse en
+`/dashboard/ai` (evita el chat duplicado en su propia página).
+
+**Herramientas de escritura** — `lib/ai/tools.ts` suma
+`listProjects`/`listClients` (lectura, para que la IA resuelva un nombre
+mencionado en el chat a un `id` real — nunca inventa UUIDs) y
+`createClient`/`scheduleEvent`/`createQuote` (escritura). Mismo patrón de
+organización que toda Server Action del proyecto:
+`getCurrentOrganizationId(supabase)` con el cliente de sesión del usuario
+que pregunta, nunca un cliente admin — RLS sigue siendo el único límite
+real. `createQuote` exige un array de ítems con `description`/`quantity`/
+`unit_price` reales; el `systemInstruction` en `app/api/ai/chat/route.ts`
+instruye explícitamente a la IA a nunca inventar precios/fechas/ids y a
+preguntar si falta algo. Decisión de producto confirmada con el usuario
+(no asumida): la IA **ejecuta apenas tiene todo el dato real necesario y
+reporta qué hizo**, sin pedir confirmación previa — la garantía de que
+esto sea seguro es la regla anti-invención, no una capa extra de UI.
+`toGeminiSchema` (mismo converter de §Fase 7) se extendió con un caso
+`"array"` para el schema de `items` de `createQuote`.
+
+**Dirección en clientes** — columna `clients.address` (migración
+`supabase/migrations/0011_client_address.sql`), mismo tipo/criterio que
+`projects.location` (texto libre, sin estructura). Se agregó a
+`client-form.tsx`, `clients/actions.ts` y la ficha de cliente.
+
+**Mapa** — `app/(dashboard)/dashboard/map/page.tsx` (Server Component) +
+`components/dashboard/map-view.tsx` (client). Columnas `latitude`/
+`longitude` en `clients` y `projects` (migración
+`0012_geo_coordinates.sql`), pobladas server-side por
+`lib/integrations/google-geocoding.ts` (fetch directo a la Geocoding API,
+mismo criterio sin-SDK que el resto de `lib/integrations/`) cada vez que
+se guarda un cliente con `address` o un proyecto con `location` — nunca
+bloquea el guardado si la geocodificación falla o la key no está
+configurada, y nunca inventa coordenadas: simplemente quedan `null` y el
+pin no aparece. `map-view.tsx` es el primer uso de `next/script` en el
+proyecto (no había precedente) para cargar la Maps JavaScript API bajo
+demanda; usa `google.maps.Marker` clásico con icono de círculo coloreado
+por tipo (cliente/proyecto) en vez de `AdvancedMarkerElement`, para no
+depender de un `mapId` adicional. La página degrada a un estado vacío
+(mismo patrón `NotConfigured`/dashed-border que
+`app/(dashboard)/dashboard/website/page.tsx`) cuando falta
+`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` o cuando todavía no hay ningún
+cliente/proyecto geocodificado.
+
+**Dos keys de Google Maps, no una** — `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
+(navegador, pensada para restringirse por referrer HTTP al dominio de
+producción) y `GOOGLE_MAPS_SERVER_API_KEY` (servidor, para geocoding,
+sin restricción de referrer porque las llamadas son servidor-a-servidor
+y esa restricción las bloquearía). Ambas requieren un proyecto de Google
+Cloud con facturación habilitada — a diferencia de la key de Gemini de
+Fase 7 — ver `INTEGRATION_SETUP.md`.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.
