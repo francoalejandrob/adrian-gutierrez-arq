@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/app/dp-view-transition.css";
 import FloatingAssistant from "@/components/dashboard/floating-assistant";
 import SheetHeader from "@/components/dashboard/sheet-header";
 import Sidebar from "@/components/dashboard/sidebar";

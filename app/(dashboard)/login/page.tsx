@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/app/dp-view-transition.css";
 import { redirect } from "next/navigation";
 import LoginForm from "@/components/dashboard/login-form";
 import LoginVideoBackground from "@/components/dashboard/login-video-background";

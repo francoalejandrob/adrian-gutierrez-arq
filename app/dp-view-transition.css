@@ -1,0 +1,18 @@
+/* Transición nativa del navegador entre cargas de página completas
+   (login -> dashboard/portal usa window.location.href, no router.push
+   — es una navegación de documento completo, no un cambio de ruta
+   dentro de una SPA). "Cross-Document View Transitions": el navegador
+   saca una foto de la página vieja, otra de la nueva, y hace un
+   cross-fade entre ambas — sin JS, con soporte real en Chrome 126+ y
+   Safari 18.2+; en navegadores sin soporte (Firefox todavía) no pasa
+   nada, es una mejora progresiva.
+
+   Ambas páginas (origen y destino) tienen que declarar esto para que
+   el navegador arme la transición — por eso se importa en los 5
+   puntos de entrada del área dp-scope (dashboard, portal, ambos
+   logins, update-password), no solo en globals.css: el sitio público
+   es una app lógica aparte y esto no le corresponde (ver
+   ARCHITECTURE.md §1). */
+@view-transition {
+  navigation: auto;
+}

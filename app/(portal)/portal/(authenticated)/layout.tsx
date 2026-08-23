@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/app/dp-view-transition.css";
 import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { dpFontVars } from "@/lib/dp-fonts";

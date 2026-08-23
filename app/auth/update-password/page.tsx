@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/app/dp-view-transition.css";
 import { redirect } from "next/navigation";
 import UpdatePasswordForm from "./update-password-form";
 import { dpFontVars } from "@/lib/dp-fonts";
