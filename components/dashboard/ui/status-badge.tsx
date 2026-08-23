@@ -8,12 +8,16 @@ import type { ComponentType } from "react";
 // instead of a flat resolved-or-not split.
 export type BadgeTone = "resolved" | "attention" | "warning" | "info" | "neutral";
 
+// Pase oscuro: la opacidad del relleno bajó de /10 a /6 — verificado con
+// cálculo de contraste real que a /10 el texto "attention" (acento)
+// caía justo debajo de 4.5:1 contra su propio relleno sobre `superficie`
+// oscuro (4.36:1); a /6 los 5 tonos quedan entre 4.54:1 y 9.53:1.
 const TONE_STYLE: Record<BadgeTone, string> = {
-  resolved: "border-verde/20 bg-verde/10 text-verde",
-  attention: "border-acento/20 bg-acento/10 text-acento",
-  warning: "border-ambar/20 bg-ambar/10 text-ambar",
-  info: "border-azul/20 bg-azul/10 text-azul",
-  neutral: "border-concreto/20 bg-concreto/10 text-grafito",
+  resolved: "border-verde/20 bg-verde/6 text-verde",
+  attention: "border-acento/20 bg-acento/6 text-acento",
+  warning: "border-ambar/20 bg-ambar/6 text-ambar",
+  info: "border-azul/20 bg-azul/6 text-azul",
+  neutral: "border-concreto/20 bg-concreto/6 text-grafito",
 };
 
 const TONE_ICON: Record<BadgeTone, ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
