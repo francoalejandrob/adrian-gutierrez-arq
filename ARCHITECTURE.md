@@ -654,6 +654,62 @@ de desajuste que tenía antes ya no aplica); borrar la cuenta de
 solo borra la fila de `portal_access` — un cliente puede tener acceso
 a otros proyectos vía otras filas).
 
+## 6k. Cinco correcciones sobre el dashboard en producción
+
+El usuario mandó 5 capturas con pedidos concretos después de usar el
+dashboard oscuro en producción: sidebar que se movía al scrollear,
+tabs sin diferenciación visual clara, cambio total de tipografía,
+`/dashboard/settings` de solo lectura, y conectar la página Website con
+el sitio público real.
+
+- **Scroll independiente** — el layout pasó de `min-h-dvh` (scroll de
+  documento completo, sidebar con `position: sticky`) a un app-shell de
+  altura fija: `h-dvh overflow-hidden flex flex-col`, con `Sidebar` y
+  `<main>` como dos regiones `overflow-y-auto` independientes. El
+  análisis estático no encontró ningún bug de CSS — `sticky` debería
+  funcionar en teoría — pero la arquitectura anterior dejaba demasiado
+  margen para que el comportamiento real no coincidiera; el app-shell
+  lo garantiza estructuralmente en vez de depender de la finura de
+  `sticky`. Se preservan los overrides `print:` para que las vistas
+  imprimibles de cotizaciones/reportes sigan funcionando.
+- **Tabs como píldoras** — nuevo `components/dashboard/ui/tabs.tsx`
+  (`TabLink`) reemplaza 4 implementaciones duplicadas a mano del mismo
+  patrón de subrayado (CRM, Website, workspace de proyecto, y un
+  `FilterLink` en `projects/page.tsx` que la investigación inicial no
+  había cubierto) por una píldora con borde redondeado, reusando el
+  token `realce` del pase oscuro para el estado activo.
+- **Tipografía única: Rethink Sans** — `lib/dp-fonts.ts` pasa de 3
+  fuentes (Instrument Serif/Archivo/JetBrains Mono) a una sola. Los 3
+  alias `--font-dp-serif/dp-sans/dp-mono` en `globals.css` apuntan
+  ahora a la misma variable — los ~410 usos de esas clases en ~50
+  archivos no necesitaron tocarse, la indirección ya existía. Dos
+  excepciones reales corregidas a mano: el `font-family` hardcodeado
+  del `InfoWindow` de Google Maps (`map-view.tsx`, vive fuera del árbol
+  de React) y las etiquetas de `/dashboard/design-system`. Consecuencia
+  esperada: Rethink Sans no es monoespaciada, así que las cifras que
+  usaban JetBrains Mono pierden la alineación tabular de dígitos —
+  inherente a "toda la tipografía a una sola fuente", no un bug.
+- **Settings editable** — migración `0013_editable_settings.sql`:
+  columna `avatar_url` en `profiles`, políticas RLS de `UPDATE` nuevas
+  en `profiles` (propia fila) y `organizations` (solo `org_admin`) —
+  ninguna de las dos tenía política de escritura antes, solo lectura.
+  Bucket de Storage nuevo `avatars` (público, a diferencia del bucket
+  privado `documents` con URLs firmadas de 60s — una foto de perfil
+  necesita una URL estable para un `<img>` persistente). Nuevo
+  `settings/actions.ts` (`updateOrganization`, `updateProfile`).
+  Verificado en vivo con un round-trip real sobre la fila de
+  `organizations` (revertido de inmediato): un `UPDATE` anónimo
+  devuelve 0 filas incluso contra el id real (RLS, no "no existe"); el
+  org_admin real sí puede escribir. **"Moneda" y "Acento" quedan como
+  literales de solo lectura** — no tienen columna ni efecto en ningún
+  otro lugar del sistema hoy; agregarles edición sería UI decorativa
+  sin función real.
+- **Website conectado al sitio público** — confirmado con el usuario:
+  por ahora solo un link real ("Ver sitio →") a
+  `https://adrian-gutierrez-arq.vercel.app/` en el header de la página,
+  sin arrancar la configuración de GA4/Search Console todavía (sigue
+  documentada como pendiente en `INTEGRATION_SETUP.md`).
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

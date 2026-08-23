@@ -1,7 +1,14 @@
+import { ArrowUpRight } from "lucide-react";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import Section from "@/components/dashboard/ui/section";
 import StatusMark from "@/components/dashboard/ui/status-mark";
 import { TabLink } from "@/components/dashboard/ui/tabs";
+
+// URL real del sitio público del estudio — mismo repo, deploy separado
+// en Vercel. No hay todavía GA4/Search Console configurado (pendiente,
+// requiere pasos del usuario en Google Cloud Console — ver
+// INTEGRATION_SETUP.md); esto es solo el link real al sitio en sí.
+const PUBLIC_SITE_URL = "https://adrian-gutierrez-arq.vercel.app/";
 import { computeMarketingFunnel } from "@/lib/marketing";
 import { getTrafficSummary } from "@/lib/integrations/google-analytics";
 import { getSearchPerformance } from "@/lib/integrations/google-search-console";
@@ -34,7 +41,21 @@ export default async function WebsitePage(props: PageProps<"/dashboard/website">
 
   return (
     <div>
-      <PageHeader eyebrow="Inteligencia · Tráfico y posicionamiento del sitio público" title="Observatorio digital" />
+      <PageHeader
+        eyebrow="Inteligencia · Tráfico y posicionamiento del sitio público"
+        title="Observatorio digital"
+        action={
+          <a
+            href={PUBLIC_SITE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 font-dp-mono text-[10px] uppercase tracking-[0.12em] text-concreto hover:text-tinta"
+          >
+            Ver sitio
+            <ArrowUpRight size={13} strokeWidth={1.75} aria-hidden="true" />
+          </a>
+        }
+      />
 
       <div className="flex gap-3 border-b border-corte px-12 pb-4">
         <TabLink href="/dashboard/website?tab=analytics" label="Tráfico" active={tab === "analytics"} />

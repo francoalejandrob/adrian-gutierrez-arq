@@ -439,3 +439,27 @@ detalle técnico completo.
 dashboard (sigue siendo un allowlist de 2 emails hardcodeado); migrar
 `portal_access` a una FK directa a `auth.users` en vez de coincidencia
 por email.
+
+## 5 correcciones sobre el dashboard en producción ✅
+
+El usuario mandó 5 capturas con pedidos concretos tras usar el
+dashboard oscuro en producción. Ver `ARCHITECTURE.md` §6k para el
+detalle técnico completo.
+
+- **Scroll independiente**: el sidebar se movía junto con el
+  contenido al scrollear — el layout pasó a un app-shell de altura
+  fija con dos regiones de scroll genuinamente separadas.
+- **Tabs como píldoras redondeadas** en todo el sistema (CRM, Website,
+  workspace de proyecto, filtros de estado) — nuevo componente
+  compartido `TabLink`, reemplaza 4 implementaciones duplicadas.
+- **Tipografía única: Rethink Sans** en todo el dashboard/portal —
+  reemplaza el sistema de 3 tipografías (Instrument Serif/Archivo/
+  JetBrains Mono).
+- **`/dashboard/settings` editable**: nombre del estudio (solo
+  `org_admin`), nombre y foto de perfil propios (bucket público nuevo
+  `avatars`). "Moneda"/"Acento" quedan de solo lectura a propósito —
+  no tienen efecto real en el resto del sistema hoy.
+- **Website conectado al sitio público**: link real a
+  `https://adrian-gutierrez-arq.vercel.app/` — confirmado con el
+  usuario que la configuración de GA4/Search Console queda pendiente
+  para más adelante.
