@@ -57,7 +57,7 @@ export default async function WebsitePage(props: PageProps<"/dashboard/website">
         }
       />
 
-      <div className="flex gap-3 border-b border-corte px-12 pb-4">
+      <div className="flex gap-2 border-b border-corte px-12 pb-5">
         <TabLink href="/dashboard/website?tab=analytics" label="Tráfico" active={tab === "analytics"} />
         <TabLink href="/dashboard/website?tab=seo" label="Posicionamiento" active={tab === "seo"} />
         <TabLink href="/dashboard/website?tab=fuentes" label="Fuentes" active={tab === "fuentes"} />

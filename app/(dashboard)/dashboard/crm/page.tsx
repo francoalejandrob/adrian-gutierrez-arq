@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Briefcase, Target } from "lucide-react";
+import { Briefcase, Target, TrendingUp, Users } from "lucide-react";
 import Avatar from "@/components/dashboard/ui/avatar";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import EmptyState from "@/components/dashboard/ui/empty-state";
@@ -49,10 +49,10 @@ export default async function CrmPage(props: PageProps<"/dashboard/crm">) {
         }
       />
 
-      <div className="flex gap-3 border-b border-corte px-12 pb-4">
-        <TabLink href="/dashboard/crm?tab=leads" label="Leads" active={tab === "leads"} />
-        <TabLink href="/dashboard/crm?tab=clientes" label="Clientes" active={tab === "clientes"} />
-        <TabLink href="/dashboard/crm?tab=pipeline" label="Pipeline" active={tab === "pipeline"} />
+      <div className="flex gap-2 border-b border-corte px-12 pb-5">
+        <TabLink href="/dashboard/crm?tab=leads" label="Leads" icon={Users} active={tab === "leads"} />
+        <TabLink href="/dashboard/crm?tab=clientes" label="Clientes" icon={Users} active={tab === "clientes"} />
+        <TabLink href="/dashboard/crm?tab=pipeline" label="Pipeline" icon={TrendingUp} active={tab === "pipeline"} />
       </div>
 
       {tab === "leads" && <LeadsTab supabase={supabase} statusFilter={statusFilter} view={view} />}
