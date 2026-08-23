@@ -19,7 +19,7 @@ const numberOrZero = z
 
 // Quotes ------------------------------------------------------------------
 
-export async function createQuote(projectId: string, formData: FormData) {
+async function insertQuote(projectId: string, formData: FormData) {
   const validUntil = dateOrNull.parse(formData.get("valid_until") ?? undefined);
   const notes = String(formData.get("notes") ?? "").trim() || null;
 
@@ -34,8 +34,26 @@ export async function createQuote(projectId: string, formData: FormData) {
     .single();
   if (error) throw new Error(error.message);
 
+  return quote.id;
+}
+
+export async function createQuote(projectId: string, formData: FormData) {
+  const quoteId = await insertQuote(projectId, formData);
   revalidatePath(`/dashboard/projects/${projectId}`);
-  redirect(`/dashboard/quotes/${quote.id}`);
+  redirect(`/dashboard/quotes/${quoteId}`);
+}
+
+// Para crear una cotización desde /dashboard/quotes (sin estar ya
+// parado en la ficha de un proyecto) — el proyecto viene del propio
+// formulario (un <select>) en vez de estar pre-atado con .bind().
+export async function createQuoteForProject(formData: FormData) {
+  const projectId = String(formData.get("project_id") ?? "").trim();
+  if (!projectId) throw new Error("Selecciona un proyecto");
+
+  const quoteId = await insertQuote(projectId, formData);
+  revalidatePath(`/dashboard/projects/${projectId}`);
+  revalidatePath("/dashboard/quotes");
+  redirect(`/dashboard/quotes/${quoteId}`);
 }
 
 const quoteItemSchema = z.object({
