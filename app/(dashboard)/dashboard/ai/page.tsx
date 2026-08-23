@@ -1,5 +1,5 @@
 import { Sparkles } from "lucide-react";
-import { getLeadsToContact, getOverdueTasks, getPendingPayments } from "@/lib/ai/tools";
+import { getAttentionSignals } from "@/lib/attention";
 import { createClient } from "@/lib/supabase/server";
 import AiChat from "./chat";
 
@@ -7,14 +7,8 @@ const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "
 
 export default async function AiPage() {
   const supabase = await createClient();
-  const [overdueTasks, leadsToContact, pendingPayments, { count: pendingApprovals }, { data: rawPayments }] =
-    await Promise.all([
-      getOverdueTasks(supabase),
-      getLeadsToContact(supabase),
-      getPendingPayments(supabase),
-      supabase.from("document_versions").select("*", { count: "exact", head: true }).eq("status", "enviado"),
-      supabase.from("payments").select("amount, status, projects(name, clients(name))").in("status", ["pendiente", "vencida"]),
-    ]);
+  const attention = await getAttentionSignals(supabase);
+  const { overdueTasks, leadsToContact, pendingPayments, pendingApprovals } = attention;
 
   const suggestions = [
     overdueTasks.length > 0 && {
@@ -29,8 +23,8 @@ export default async function AiPage() {
       label: `Revisar ${pendingPayments.length} pago${pendingPayments.length === 1 ? "" : "s"} pendiente${pendingPayments.length === 1 ? "" : "s"}`,
       href: "/dashboard/finance",
     },
-    (pendingApprovals ?? 0) > 0 && {
-      label: `Revisar ${pendingApprovals} aprobación${pendingApprovals === 1 ? "" : "es"} pendiente${pendingApprovals === 1 ? "" : "s"}`,
+    pendingApprovals.length > 0 && {
+      label: `Revisar ${pendingApprovals.length} aprobación${pendingApprovals.length === 1 ? "" : "es"} pendiente${pendingApprovals.length === 1 ? "" : "s"}`,
       href: "/dashboard/projects",
     },
   ].filter((s): s is { label: string; href: string } => Boolean(s));
@@ -39,12 +33,12 @@ export default async function AiPage() {
   const mostOverdueTask = overdueTasks[0]
     ? {
         title: overdueTasks[0].title,
-        project: overdueTasks[0].project,
+        project: overdueTasks[0].projectName,
         days: Math.floor((new Date(today).getTime() - new Date(overdueTasks[0].due_date!).getTime()) / 86400000),
       }
     : null;
 
-  const topPendingPayment = (rawPayments ?? []).sort((a, b) => b.amount - a.amount)[0] ?? null;
+  const topPendingPayment = [...pendingPayments].sort((a, b) => b.amount - a.amount)[0] ?? null;
 
   const signals = [
     mostOverdueTask && {
@@ -55,7 +49,7 @@ export default async function AiPage() {
     topPendingPayment && {
       label: "Mayor pendiente de cobro",
       value: currency.format(topPendingPayment.amount),
-      detail: `${topPendingPayment.projects?.clients?.name ?? "—"} — ${topPendingPayment.projects?.name ?? "—"}`,
+      detail: `${topPendingPayment.clientName ?? "—"} — ${topPendingPayment.projectName ?? "—"}`,
     },
   ].filter((s): s is { label: string; value: string; detail: string } => Boolean(s));
 

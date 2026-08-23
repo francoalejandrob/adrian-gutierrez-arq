@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AlertTriangle, Calendar, CircleDollarSign, FileSignature, FolderKanban, UserPlus, Users, Wallet } from "lucide-react";
+import { getAttentionSignals } from "@/lib/attention";
 import { computePipeline } from "@/lib/pipeline";
 import { createClient } from "@/lib/supabase/server";
 import { getTrafficSummary } from "@/lib/integrations/google-analytics";
@@ -52,20 +53,12 @@ function trend(rows: { date: string }[]) {
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const today = new Date().toISOString().slice(0, 10);
-
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
 
   const [
     { data: userRes },
-    { data: overdueTasks },
+    attention,
     { count: newLeadsCount },
     { data: payments },
-    { count: pendingApprovalsCount },
-    { data: todayEvents },
     { data: activeProjects },
     { count: activeProjectsCount },
     { data: allLeads },
@@ -77,21 +70,9 @@ export default async function DashboardPage() {
     traffic,
   ] = await Promise.all([
     supabase.auth.getUser(),
-    supabase
-      .from("tasks")
-      .select("id, title, due_date, projects(name)")
-      .lt("due_date", today)
-      .neq("status", "completed")
-      .order("due_date"),
+    getAttentionSignals(supabase),
     supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "nuevo"),
     supabase.from("payments").select("amount, status, paid_date"),
-    supabase.from("document_versions").select("*", { count: "exact", head: true }).eq("status", "enviado"),
-    supabase
-      .from("calendar_events")
-      .select("id, title, starts_at")
-      .gte("starts_at", todayStart.toISOString())
-      .lte("starts_at", todayEnd.toISOString())
-      .order("starts_at"),
     supabase
       .from("projects")
       .select("id, name, progress, clients(name)")
@@ -116,13 +97,12 @@ export default async function DashboardPage() {
     : { data: null };
   const firstName = (profile?.full_name || profile?.email || "").split(" ")[0] || "";
 
-  const overdueCount = overdueTasks?.length ?? 0;
+  const overdueCount = attention.overdueTasks.length;
   const pendingCollection = (payments ?? [])
     .filter((p) => p.status === "pendiente" || p.status === "vencida")
     .reduce((sum, p) => sum + p.amount, 0);
   const paidPayments = (payments ?? []).filter((p) => p.status === "pagada" && p.paid_date);
   const collected = paidPayments.reduce((sum, p) => sum + p.amount, 0);
-  const overduePaymentsCount = (payments ?? []).filter((p) => p.status === "vencida").length;
   const contracted = (contracts ?? []).reduce((sum, c) => sum + c.value, 0);
 
   const projectIds = (activeProjects ?? []).map((p) => p.id);
@@ -152,7 +132,7 @@ export default async function DashboardPage() {
 
   const instruments = [
     { label: "Tareas críticas", value: String(overdueCount), attention: overdueCount > 0, icon: AlertTriangle, trend: undefined },
-    { label: "Reuniones hoy", value: String((todayEvents ?? []).length), attention: false, icon: Calendar, trend: undefined },
+    { label: "Reuniones hoy", value: String(attention.todayMeetings.length), attention: false, icon: Calendar, trend: undefined },
     { label: "Leads nuevos", value: String(newLeadsCount ?? 0), attention: false, icon: UserPlus, trend: leadsTrend },
     { label: "Por cobrar", value: currency.format(pendingCollection), attention: pendingCollection > 0, icon: Wallet, trend: undefined },
   ];
@@ -164,15 +144,47 @@ export default async function DashboardPage() {
     { label: "Proyectos activos", value: String(activeProjectsCount ?? 0), icon: FolderKanban },
   ];
 
-  const attentionRows = [
-    overdueCount > 0 ? `${overdueCount} tarea${overdueCount === 1 ? "" : "s"} atrasada${overdueCount === 1 ? "" : "s"}` : null,
-    overduePaymentsCount > 0
-      ? `${overduePaymentsCount} pago${overduePaymentsCount === 1 ? "" : "s"} vencido${overduePaymentsCount === 1 ? "" : "s"}`
-      : null,
-    (pendingApprovalsCount ?? 0) > 0
-      ? `${pendingApprovalsCount} aprobación${pendingApprovalsCount === 1 ? "" : "es"} pendiente${pendingApprovalsCount === 1 ? "" : "s"}`
-      : null,
-  ].filter((row): row is string => row !== null);
+  // Bandeja unificada de atención — cada fila es un item real y
+  // clickeable (antes era solo texto plano con conteos). Se capa a 3
+  // por categoría para que el panel no crezca sin límite; el "+N más"
+  // manda a la sección correspondiente.
+  const attentionGroups = [
+    {
+      key: "tasks",
+      items: attention.overdueTasks.map((t) => ({ id: t.id, label: t.title, detail: t.projectName ?? "Sin proyecto", href: t.href })),
+      moreHref: "/dashboard/projects",
+      moreLabel: "tarea(s) atrasada(s) más",
+    },
+    {
+      key: "payments",
+      items: attention.pendingPayments.map((p) => ({
+        id: p.id,
+        label: currency.format(p.amount),
+        detail: `${p.clientName ?? "Sin cliente"}${p.status === "vencida" ? " · vencido" : " · pendiente"}`,
+        href: p.href,
+      })),
+      moreHref: "/dashboard/finance",
+      moreLabel: "pago(s) más",
+    },
+    {
+      key: "leads",
+      items: attention.leadsToContact.map((l) => ({ id: l.id, label: l.name, detail: "Sin seguimiento", href: l.href })),
+      moreHref: "/dashboard/crm?tab=leads",
+      moreLabel: "lead(s) más",
+    },
+    {
+      key: "approvals",
+      items: attention.pendingApprovals.map((a) => ({
+        id: a.documentId,
+        label: a.documentName,
+        detail: a.projectName ?? "Sin proyecto",
+        href: a.href,
+      })),
+      moreHref: "/dashboard/projects",
+      moreLabel: "aprobación(es) más",
+    },
+  ].map((group) => ({ ...group, shown: group.items.slice(0, 3), extra: Math.max(0, group.items.length - 3) }));
+  const attentionItemCount = attentionGroups.reduce((sum, g) => sum + g.items.length, 0);
 
   // Leads por fuente — misma agrupación que el embudo de marketing
   // (utm_source si existe, si no el source manual), capada a 5 rebanadas.
@@ -306,26 +318,50 @@ export default async function DashboardPage() {
         <div className="flex flex-col gap-10">
           <Section title="Hoy">
             <div className="flex flex-col">
-              {(todayEvents ?? []).map((event) => (
-                <div key={event.id} className="flex items-baseline gap-4 border-b border-filete py-2.5 last:border-0">
+              {attention.todayMeetings.map((event) => (
+                <Link
+                  key={event.id}
+                  href={event.href}
+                  className="flex items-baseline gap-4 border-b border-filete py-2.5 last:border-0 hover:text-acento"
+                >
                   <span className="w-12 shrink-0 font-dp-mono text-[11px] text-concreto">
                     {new Date(event.starts_at).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })}
                   </span>
                   <span className="truncate font-dp-sans text-[13px] text-tinta">{event.title}</span>
-                </div>
+                </Link>
               ))}
-              {(todayEvents ?? []).length === 0 && <p className="font-dp-sans text-[13px] text-concreto">Sin reuniones hoy.</p>}
+              {attention.todayMeetings.length === 0 && <p className="font-dp-sans text-[13px] text-concreto">Sin reuniones hoy.</p>}
             </div>
           </Section>
 
           <Section title="Atención">
-            <div className="flex flex-col gap-2.5">
-              {attentionRows.map((row) => (
-                <p key={row} className="border-l-2 border-acento pl-3 font-dp-sans text-[13px] text-tinta">
-                  {row}
-                </p>
-              ))}
-              {attentionRows.length === 0 && <p className="font-dp-sans text-[13px] text-concreto">Sin pendientes por ahora.</p>}
+            <div className="flex flex-col gap-4">
+              {attentionGroups.map(
+                (group) =>
+                  group.items.length > 0 && (
+                    <div key={group.key} className="flex flex-col">
+                      {group.shown.map((item) => (
+                        <Link
+                          key={item.id}
+                          href={item.href}
+                          className="flex items-center justify-between gap-4 border-l-2 border-acento py-1.5 pl-3 font-dp-sans text-[13px] text-tinta hover:text-acento"
+                        >
+                          <span className="truncate">{item.label}</span>
+                          <span className="shrink-0 font-dp-mono text-[10.5px] text-concreto">{item.detail}</span>
+                        </Link>
+                      ))}
+                      {group.extra > 0 && (
+                        <Link
+                          href={group.moreHref}
+                          className="pl-3 pt-1 font-dp-mono text-[10.5px] uppercase tracking-[0.1em] text-concreto hover:text-tinta"
+                        >
+                          +{group.extra} {group.moreLabel} →
+                        </Link>
+                      )}
+                    </div>
+                  ),
+              )}
+              {attentionItemCount === 0 && <p className="font-dp-sans text-[13px] text-concreto">Sin pendientes por ahora.</p>}
             </div>
           </Section>
         </div>

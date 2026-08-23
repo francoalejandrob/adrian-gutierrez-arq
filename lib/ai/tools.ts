@@ -1,5 +1,7 @@
 import { z } from "zod";
+import { getAttentionSignals } from "@/lib/attention";
 import { geocodeAddress } from "@/lib/integrations/google-geocoding";
+import { applyPhaseTemplate } from "@/lib/phase-templates";
 import type { createClient } from "@/lib/supabase/server";
 import { getCurrentOrganizationId } from "@/lib/supabase/org";
 import {
@@ -27,52 +29,43 @@ type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
 const currency = new Intl.NumberFormat("es-EC", { style: "currency", currency: "USD" });
 
+// Wrappers delgados sobre lib/attention.ts — antes cada una reimplementaba
+// su propia consulta, con definiciones que terminaron divergiendo de lo
+// que mostraba el resto del dashboard (ver lib/attention.ts). Mantienen
+// su forma de respuesta anterior para no romper el contrato de la tool.
 export async function getOverdueTasks(supabase: SupabaseClient) {
-  const today = new Date().toISOString().slice(0, 10);
-  const { data, error } = await supabase
-    .from("tasks")
-    .select("title, due_date, status, projects(name)")
-    .lt("due_date", today)
-    .neq("status", "completed")
-    .order("due_date");
-  if (error) throw new Error(error.message);
-
-  return (data ?? []).map((task) => ({
-    title: task.title,
-    due_date: task.due_date,
-    status: task.status,
-    project: task.projects?.name ?? null,
+  const { overdueTasks } = await getAttentionSignals(supabase);
+  return overdueTasks.map((t) => ({
+    title: t.title,
+    due_date: t.due_date,
+    status: t.status,
+    project: t.projectName,
   }));
 }
 
 export async function getPendingPayments(supabase: SupabaseClient) {
-  const { data, error } = await supabase
-    .from("payments")
-    .select("id, amount, due_date, status, projects(name, clients(name))")
-    .in("status", ["pendiente", "vencida"])
-    .order("due_date");
-  if (error) throw new Error(error.message);
-
-  return (data ?? []).map((payment) => ({
-    id: payment.id,
-    amount: currency.format(payment.amount),
-    due_date: payment.due_date,
-    status: payment.status,
-    project: payment.projects?.name ?? null,
-    client: payment.projects?.clients?.name ?? null,
+  const { pendingPayments } = await getAttentionSignals(supabase);
+  return pendingPayments.map((p) => ({
+    id: p.id,
+    amount: currency.format(p.amount),
+    due_date: p.due_date,
+    status: p.status,
+    project: p.projectName,
+    client: p.clientName,
   }));
 }
 
 export async function getLeadsToContact(supabase: SupabaseClient) {
-  const { data, error } = await supabase
-    .from("leads")
-    .select("id, name, email, phone, status, source, created_at")
-    .in("status", ["nuevo", "contactado"])
-    .order("created_at", { ascending: false })
-    .limit(20);
-  if (error) throw new Error(error.message);
-
-  return data ?? [];
+  const { leadsToContact } = await getAttentionSignals(supabase);
+  return leadsToContact.map((l) => ({
+    id: l.id,
+    name: l.name,
+    email: l.email,
+    phone: l.phone,
+    status: l.status,
+    source: l.source,
+    created_at: l.created_at,
+  }));
 }
 
 export async function getProjectSummary(supabase: SupabaseClient, projectId: string) {
@@ -472,6 +465,18 @@ export async function updateQuoteStatusTool(supabase: SupabaseClient, args: Reco
     .single();
   if (error) throw new Error(error.message);
 
+  // Misma automatización que la UI del dashboard (finance-actions.ts):
+  // aceptar una cotización aplica la plantilla de fases del proyecto y,
+  // si estaba en planificación, lo pasa a diseño. Antes esto solo
+  // pasaba si se aceptaba desde el formulario, nunca desde el chat.
+  if (parsed.data.status === "accepted") {
+    await applyPhaseTemplate(supabase, quote.project_id);
+    const { data: project } = await supabase.from("projects").select("status").eq("id", quote.project_id).maybeSingle();
+    if (project?.status === "planning") {
+      await supabase.from("projects").update({ status: "design" }).eq("id", quote.project_id);
+    }
+  }
+
   return { updated: true, quote };
 }
 
@@ -658,6 +663,21 @@ export async function createPhaseTool(supabase: SupabaseClient, args: Record<str
   if (error) throw new Error(error.message);
 
   return { created: true, phase: { ...data, projectId } };
+}
+
+const applyPhaseTemplateSchema = z.object({
+  projectId: z.string().trim().min(1, "Falta el proyecto."),
+});
+
+export async function applyPhaseTemplateTool(supabase: SupabaseClient, args: Record<string, unknown>) {
+  const parsed = applyPhaseTemplateSchema.safeParse(args);
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Datos inválidos.");
+
+  const result = await applyPhaseTemplate(supabase, parsed.data.projectId);
+  if (!result.applied) {
+    return { applied: false, message: "El proyecto ya tiene fases — la plantilla no sobrescribe fases existentes." };
+  }
+  return { applied: true, projectId: parsed.data.projectId, phases: result.phases };
 }
 
 const updatePhaseStatusSchema = z.object({
@@ -1327,6 +1347,19 @@ export const AI_TOOLS = [
   {
     type: "function" as const,
     function: {
+      name: "applyPhaseTemplate",
+      description:
+        "Crea automáticamente las fases estándar de un proyecto según su categoría (Residencial, Comercial, Institucional, Hospitalidad, Remodelación). No hace nada si el proyecto ya tiene fases — nunca sobrescribe.",
+      parameters: {
+        type: "object",
+        properties: { projectId: { type: "string", description: "UUID del proyecto (usa listProjects)" } },
+        required: ["projectId"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
       name: "updatePhaseStatus",
       description: "Cambia el estado de una fase (pendiente, en_progreso, completada). Usa listPhases para resolver el phaseId.",
       parameters: {
@@ -1614,6 +1647,8 @@ export async function runTool(supabase: SupabaseClient, name: string, args: Reco
       return updateProjectStatusTool(supabase, args);
     case "createPhase":
       return createPhaseTool(supabase, args);
+    case "applyPhaseTemplate":
+      return applyPhaseTemplateTool(supabase, args);
     case "updatePhaseStatus":
       return updatePhaseStatusTool(supabase, args);
     case "deletePhase":
@@ -1706,6 +1741,11 @@ export function describeToolResult(name: string, result: unknown): { label: stri
     case "createPhase": {
       const p = r.phase as { id: string; name: string; projectId: string };
       return { label: `Fase creada: ${p.name}`, href: `/dashboard/projects/${p.projectId}` };
+    }
+    case "applyPhaseTemplate": {
+      if (!r.applied) return null;
+      const phases = r.phases as string[];
+      return { label: `Plantilla aplicada: ${phases.length} fases creadas`, href: `/dashboard/projects/${r.projectId}` };
     }
     case "updatePhaseStatus": {
       const p = r.phase as { name: string; projectId: string; status: string };

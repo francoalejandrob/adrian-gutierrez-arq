@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentOrganizationId } from "@/lib/supabase/org";
+import { applyPhaseTemplate } from "@/lib/phase-templates";
 import {
   DOC_CATEGORIES,
   PHASE_STATUSES,
@@ -72,6 +73,16 @@ export async function deletePhase(projectId: string, phaseId: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("phases").delete().eq("id", phaseId);
   if (error) throw new Error(error.message);
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+}
+
+// Para proyectos que nunca pasaron por una cotización aceptada (el
+// único disparador automático hoy) — botón manual en la pestaña
+// Overview, visible solo cuando el proyecto no tiene fases todavía.
+export async function applyPhaseTemplateAction(projectId: string) {
+  const supabase = await createClient();
+  await applyPhaseTemplate(supabase, projectId);
 
   revalidatePath(`/dashboard/projects/${projectId}`);
 }

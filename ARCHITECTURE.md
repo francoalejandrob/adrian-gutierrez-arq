@@ -836,6 +836,61 @@ fue exitosa). Datos de prueba de esta verificación (un proyecto, una
 tarea y dos eventos) se crearon y se borraron de producción al
 terminar.
 
+## 6n. Hoja de ruta "resolver todo para un arquitecto" — Etapa 1
+
+El usuario pidió una lista amplia de mejoras (recordatorios
+automáticos, Archi AI flotante, plantillas de proyecto, bandeja
+unificada de atención, preview de documentos, búsqueda global) más
+integrar Google Drive, con la intención explícita de que el sistema
+resuelva todas las necesidades de un arquitecto. Se acordó: Drive con
+alcance "carpetas organizadas conectadas" (no reemplaza el sistema de
+documentos/aprobación actual) en una etapa aparte, y empezar por lo
+rápido y sin integraciones nuevas. Esta etapa cubre 3 de los 6 puntos.
+
+- **Plantillas de proyecto por categoría** — nuevo
+  `lib/phase-templates.ts` (`PHASE_TEMPLATES`, `applyPhaseTemplate`):
+  antes `runAcceptedQuoteAutomation` (`finance-actions.ts`) creaba
+  siempre las mismas 5 fases genéricas sin importar la categoría del
+  proyecto. Ahora varían por categoría (`Residencial`, `Comercial`,
+  `Institucional`, `Hospitalidad`, `Remodelación`, con un fallback
+  genérico), con una única función compartida que nunca sobrescribe
+  fases existentes. Tres puntos de entrada: automático al aceptar una
+  cotización (UI y, ahora también, el tool de IA — antes
+  `updateQuoteStatusTool` no disparaba esta automatización, un gap
+  real encontrado en la investigación), y manual vía un botón "Aplicar
+  plantilla de fases" en la pestaña Overview de un proyecto sin fases.
+  Verificado en vivo: un proyecto categoría Comercial recibió
+  "Estudio de factibilidad, Diseño, Documentación técnica, Permisos,
+  Construcción, Entrega" — la plantilla correcta, no la genérica.
+- **Bandeja unificada de atención** — nuevo `lib/attention.ts`
+  (`getAttentionSignals`), única fuente de verdad que reemplaza
+  consultas duplicadas e inconsistentes que existían en 5 archivos.
+  Corrige un bug real: "aprobaciones pendientes" tenía dos
+  definiciones que no coincidían — el home y Archi AI contaban filas
+  crudas de `document_versions.status='enviado'` sin deduplicar,
+  mientras que la pestaña Aprobaciones de un proyecto usaba la lógica
+  correcta (última versión por documento, cualquier estado que no sea
+  `aprobado`); ahora todos usan la misma. El panel "Atención" del
+  dashboard home pasó de texto plano con conteos a una lista real de
+  items clickeables con link directo (tarea → pestaña Tareas del
+  proyecto, pago → Finanzas, lead → su ficha, aprobación → pestaña
+  Aprobaciones), capada a 3 por categoría con "+N más". La tabla
+  `notifications` (eventos del portal de cliente) se deja aparte a
+  propósito — es un concepto distinto ("algo pasó" vs. "algo requiere
+  tu acción ahora").
+- **Búsqueda global real** — nuevo `app/api/search/route.ts` (mismo
+  patrón de auth de sesión que `api/ai/chat/route.ts`), busca con
+  `ilike` sobre leads/clientes/proyectos/documentos scoped por RLS.
+  `components/dashboard/command-palette.tsx` (⌘K) gana un grupo
+  "Resultados" con fetch debounced (300ms) — antes el palette solo
+  navegaba a rutas fijas, nunca buscaba contenido real. Verificado en
+  vivo: buscar "franco" devuelve el lead y el cliente reales con sus
+  datos de contacto/empresa.
+
+Quedan para etapas siguientes (documentado en `ROADMAP.md`):
+recordatorios automáticos por email, Archi AI como asistente flotante
+global, preview de documentos inline, y Google Drive.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

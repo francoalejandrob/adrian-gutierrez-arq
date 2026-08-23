@@ -38,6 +38,7 @@ import {
 } from "@/lib/supabase/types";
 import { addProjectNote, updateProject, updateProjectStatus } from "../actions";
 import {
+  applyPhaseTemplateAction,
   createPhase,
   createTask,
   deletePhase,
@@ -153,6 +154,7 @@ export default async function ProjectDetailPage(
   const boundUpdate = updateProject.bind(null, id);
   const boundAddNote = addProjectNote.bind(null, id);
   const boundCreatePhase = createPhase.bind(null, id);
+  const boundApplyPhaseTemplate = applyPhaseTemplateAction.bind(null, id);
   const boundCreateTask = createTask.bind(null, id);
   const boundUpload = uploadDocumentVersion.bind(null, id);
   const boundInvitePortal = invitePortalAccess.bind(null, id, project.client_id);
@@ -245,7 +247,16 @@ export default async function ProjectDetailPage(
               {(phases ?? []).map((phase, i) => (
                 <PhaseRow key={phase.id} phase={phase} isCurrent={isCurrentPhase(phases ?? [], i)} />
               ))}
-              {(phases ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin fases todavía.</p>}
+              {(phases ?? []).length === 0 && (
+                <div className="flex flex-col items-start gap-3">
+                  <p className="font-dp-sans text-sm text-concreto">Sin fases todavía.</p>
+                  <form action={boundApplyPhaseTemplate}>
+                    <SubmitButton variant="secondary" size="sm" pendingLabel="Aplicando…">
+                      Aplicar plantilla de fases
+                    </SubmitButton>
+                  </form>
+                </div>
+              )}
             </div>
           </Section>
 

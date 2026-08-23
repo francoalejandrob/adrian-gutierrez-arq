@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentOrganizationId } from "@/lib/supabase/org";
+import { applyPhaseTemplate } from "@/lib/phase-templates";
 import { EXPENSE_CATEGORIES, PAYMENT_STATUSES, QUOTE_STATUSES } from "@/lib/supabase/types";
 
 const dateOrNull = z
@@ -15,16 +16,6 @@ const numberOrZero = z
   .string()
   .optional()
   .transform((v) => (v ? Number(v) : 0));
-
-// The five-phase template used when a quote is accepted and the project
-// has no phases yet (master prompt §13's own example list).
-const DEFAULT_PHASE_TEMPLATE = [
-  "Conceptualización",
-  "Diseño",
-  "Documentación",
-  "Construcción",
-  "Entrega",
-];
 
 // Quotes ------------------------------------------------------------------
 
@@ -118,31 +109,18 @@ export async function updateQuoteStatus(projectId: string, quoteId: string, form
   revalidatePath(`/dashboard/projects/${projectId}`);
 }
 
-async function runAcceptedQuoteAutomation(
+// Exportada para que lib/ai/tools.ts (updateQuoteStatusTool) dispare
+// exactamente la misma automatización cuando la cotización se acepta
+// desde el chat de Archi AI en vez de desde esta UI — antes solo pasaba
+// acá, así que aceptar una cotización por chat no creaba las fases.
+export async function runAcceptedQuoteAutomation(
   supabase: Awaited<ReturnType<typeof createClient>>,
   projectId: string,
 ) {
-  const { count } = await supabase
-    .from("phases")
-    .select("*", { count: "exact", head: true })
-    .eq("project_id", projectId);
-  if ((count ?? 0) > 0) return;
-
-  const { data: project } = await supabase
-    .from("projects")
-    .select("organization_id, status")
-    .eq("id", projectId)
-    .single();
+  const { data: project } = await supabase.from("projects").select("status").eq("id", projectId).maybeSingle();
   if (!project) return;
 
-  await supabase.from("phases").insert(
-    DEFAULT_PHASE_TEMPLATE.map((name, i) => ({
-      organization_id: project.organization_id,
-      project_id: projectId,
-      name,
-      position: i,
-    })),
-  );
+  await applyPhaseTemplate(supabase, projectId);
 
   if (project.status === "planning") {
     await supabase.from("projects").update({ status: "design" }).eq("id", projectId);

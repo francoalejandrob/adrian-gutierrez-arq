@@ -6,6 +6,14 @@ import { useRouter } from "next/navigation";
 import { CMD_ASK, CMD_CREATE, NAV_GROUPS, type NavItem } from "./nav-items";
 
 type Entry = { label: string; href: string; icon?: NavItem["icon"] };
+type SearchItem = { id: string; label: string; sublabel: string | null; href: string };
+type SearchResponse = { leads: SearchItem[]; clients: SearchItem[]; projects: SearchItem[]; documents: SearchItem[] };
+const SEARCH_GROUP_LABELS: Record<keyof SearchResponse, string> = {
+  leads: "Leads",
+  clients: "Clientes",
+  projects: "Proyectos",
+  documents: "Documentos",
+};
 
 const GO_ENTRIES: Entry[] = NAV_GROUPS.flatMap((g) => g.items.map((item) => ({ label: item.label, href: item.href, icon: item.icon })));
 
@@ -16,13 +24,41 @@ const GO_ENTRIES: Entry[] = NAV_GROUPS.flatMap((g) => g.items.map((item) => ({ l
 export default function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
+  const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   function openPalette() {
     setQuery("");
+    setSearchResults(null);
     setOpen(true);
   }
+
+  // Búsqueda real de contenido (leads/clientes/proyectos/documentos) vía
+  // /api/search, debounced — separada de los grupos estáticos de abajo
+  // (que solo filtran nav/atajos ya conocidos, sin red). El render solo
+  // muestra resultados cuando la query actual tiene ≥2 caracteres (ver
+  // showSearch más abajo), así que no hace falta limpiar el estado acá
+  // cuando el usuario borra caracteres — evita setState síncrono en el
+  // cuerpo del efecto.
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) return;
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(q)}`, { signal: controller.signal })
+        .then((res) => res.json())
+        .then((data: SearchResponse) => setSearchResults(data))
+        .catch(() => {})
+        .finally(() => setSearching(false));
+    }, 300);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [query]);
 
   useEffect(() => {
     function handleKeydown(e: KeyboardEvent) {
@@ -58,6 +94,14 @@ export default function CommandPalette() {
     router.push(href);
   }
 
+  const showSearch = query.trim().length >= 2;
+  const hasSearchResults = showSearch && searchResults ? Object.values(searchResults).some((items) => items.length > 0) : false;
+
+  function handleQueryChange(value: string) {
+    setQuery(value);
+    if (value.trim().length >= 2) setSearching(true);
+  }
+
   return (
     <>
       <button
@@ -85,7 +129,7 @@ export default function CommandPalette() {
               <input
                 ref={inputRef}
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => handleQueryChange(e.target.value)}
                 placeholder="Buscar, crear, navegar o preguntar…"
                 className="flex-1 border-none bg-transparent font-dp-sans text-[14.5px] text-tinta outline-none placeholder:text-concreto"
               />
@@ -93,6 +137,31 @@ export default function CommandPalette() {
             </div>
 
             <div className="max-h-[50vh] overflow-y-auto">
+              {showSearch &&
+                searchResults &&
+                (Object.keys(SEARCH_GROUP_LABELS) as (keyof SearchResponse)[]).map((key) =>
+                  searchResults[key].length > 0 ? (
+                    <div key={key}>
+                      <p className="px-5 pb-1 pt-3.5 font-dp-mono text-[9.5px] uppercase tracking-[0.16em] text-concreto">
+                        {SEARCH_GROUP_LABELS[key]}
+                      </p>
+                      {searchResults[key].map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => go(item.href)}
+                          className="flex w-full cursor-pointer items-center justify-between gap-3.5 px-5 py-2.5 text-left transition-colors duration-100 hover:bg-realce"
+                        >
+                          <span className="flex-1 truncate font-dp-sans text-[13.5px] text-tinta">{item.label}</span>
+                          {item.sublabel && (
+                            <span className="shrink-0 font-dp-mono text-[10.5px] text-concreto">{item.sublabel}</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null,
+                )}
+
               {groups.map((group) => (
                 <div key={group.name}>
                   <p className="px-5 pb-1 pt-3.5 font-dp-mono text-[9.5px] uppercase tracking-[0.16em] text-concreto">
@@ -111,9 +180,14 @@ export default function CommandPalette() {
                   ))}
                 </div>
               ))}
-              {groups.length === 0 && (
-                <p className="px-5 py-6 font-dp-sans text-[13px] text-concreto">Sin resultados para &ldquo;{query}&rdquo;.</p>
-              )}
+
+              {groups.length === 0 &&
+                !hasSearchResults &&
+                (showSearch && searching ? (
+                  <p className="px-5 py-6 font-dp-sans text-[13px] text-concreto">Buscando…</p>
+                ) : (
+                  <p className="px-5 py-6 font-dp-sans text-[13px] text-concreto">Sin resultados para &ldquo;{query}&rdquo;.</p>
+                ))}
             </div>
 
             <div className="flex gap-[18px] border-t border-filete px-5 py-3 font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">

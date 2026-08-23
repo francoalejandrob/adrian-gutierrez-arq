@@ -518,3 +518,35 @@ durante la sesión de pruebas antes de poder ejercitar en vivo la
 conversación completa de confirmación de borrado — el mecanismo en sí
 está verificado por código, esa corrida específica queda pendiente
 para cuando se reponga la cuota.
+
+## Hoja de ruta "resolver todo para un arquitecto" — Etapa 1 ✅
+
+El usuario pidió integrar una lista amplia de mejoras (recordatorios,
+Archi AI flotante, plantillas de proyecto, bandeja de atención,
+preview de documentos, búsqueda global) más conectar Google Drive para
+organizar archivos por proyecto — con la intención de que el sistema
+resuelva todas las necesidades de un arquitecto. Se acordó con el
+usuario: Drive en una etapa aparte (alcance "carpetas conectadas", sin
+reemplazar el sistema de documentos/aprobación actual) y empezar por
+lo rápido. Ver `ARCHITECTURE.md` §6n para el detalle técnico completo.
+
+- **Plantillas de proyecto por categoría**: las fases automáticas al
+  aceptar una cotización ahora varían según si el proyecto es
+  Residencial, Comercial, Institucional, Hospitalidad o Remodelación
+  (antes siempre las mismas 5 genéricas) — más un botón manual para
+  proyectos que nunca pasaron por una cotización. De paso se corrigió
+  un gap real: aceptar una cotización desde el chat de Archi AI no
+  creaba las fases automáticas, solo desde la UI.
+- **Bandeja de atención unificada**: el panel "Atención" del home pasó
+  de números en texto plano a una lista real con links directos a cada
+  tarea/pago/lead/aprobación. De paso se corrigió una inconsistencia
+  real: "aprobaciones pendientes" se contaba con dos lógicas distintas
+  en distintas partes del sistema, que ahora coinciden.
+- **Búsqueda global de verdad**: el ⌘K ahora busca contenido real
+  (leads, clientes, proyectos, documentos), no solo navega a rutas
+  fijas.
+
+Quedan para las próximas etapas: recordatorios automáticos por email,
+Archi AI como asistente flotante en todo el dashboard (ya existe el
+botón, falta conectarlo), preview de documentos sin descargar, y
+Google Drive.
