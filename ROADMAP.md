@@ -411,3 +411,31 @@ detalle técnico completo.
 real de días, convertirlo habría roto su continuidad visual); un
 toggle claro/oscuro — el pedido fue reemplazar el look, no agregar un
 selector de tema.
+
+## Login con email+contraseña + portal creado solo por admin ✅
+
+El usuario ya no quería depender de un enlace por correo en cada
+login — pidió email+contraseña, modificable desde dentro del sistema,
+y que las cuentas del portal de cliente solo las cree el
+administrador (nunca auto-registro). Ver `ARCHITECTURE.md` §6j para el
+detalle técnico completo.
+
+- **`signInWithOtp` → `signInWithPassword`** en el login compartido de
+  dashboard y portal, con recuperación de contraseña por correo como
+  único flujo que sigue mandando un email (y solo para eso, no para
+  cada login).
+- **Cambio de contraseña desde dentro del sistema**: nueva sección
+  "Cuenta" en `/dashboard/settings` (antes 100% de solo lectura) y
+  nueva página `/portal/account`.
+- **El portal deja de tener auto-registro**: crear el acceso de un
+  cliente ahora crea la cuenta real (`auth.admin.createUser`) con una
+  contraseña generada que el admin ve una sola vez para entregársela
+  al cliente — antes, "invitar" solo agregaba un email a una lista de
+  permitidos y la cuenta se auto-creaba la primera vez que ese email
+  pedía un magic link, sin que nadie lo autorizara antes de que
+  existiera.
+
+**Deliberadamente no incluido**: crear más cuentas de staff del
+dashboard (sigue siendo un allowlist de 2 emails hardcodeado); migrar
+`portal_access` a una FK directa a `auth.users` en vez de coincidencia
+por email.

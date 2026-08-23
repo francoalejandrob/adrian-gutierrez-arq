@@ -86,9 +86,12 @@ Con route groups, cada uno define su propio `layout.tsx` anidado dentro de
     para los pocos casos donde haga falta desde un Client Component
     (formularios interactivos del dashboard).
   - `lib/supabase/admin.ts` — cliente con `SUPABASE_SERVICE_ROLE_KEY`,
-    **solo** para el route handler de `api/contact` (necesita insertar un
-    lead sin que el visitante público tenga sesión ni permisos). Nunca se
-    importa desde un Client Component ni se expone al browser.
+    para código de servidor de confianza que necesita saltarse RLS o usar
+    la API de administración de Supabase Auth (`auth.admin.*`): el route
+    handler de `api/contact` (insertar un lead sin sesión del visitante),
+    `lib/notifications.ts`, y desde §6j la creación/reseteo de cuentas del
+    portal de cliente. Nunca se importa desde un Client Component ni se
+    expone al browser.
 - **Proxy** (`proxy.ts` en la raíz — se llamaba `middleware.ts` hasta
   Next.js 15; el nombre y la función exportada cambiaron a `proxy` en
   Next.js 16): en cada request a
@@ -581,6 +584,75 @@ verde-salvia/ámbar/azul-pizarra) en vez de saltar a colores genéricos
 tipo indigo/emerald que sugería la búsqueda inicial de la skill
 `ui-ux-pro-max` — es la identidad cromática de 5 pases anteriores,
 recalibrada para fondo oscuro, no reemplazada.
+
+## 6j. Login con email+contraseña + portal creado solo por admin
+
+Hasta acá, todo el acceso (dashboard admin y portal de cliente) era
+magic-link (`signInWithOtp`) a través de un único componente compartido
+(`components/dashboard/login-form.tsx`). El usuario pidió
+email+contraseña, modificable desde dentro del sistema, y que las
+cuentas del portal **solo** las cree el administrador — nunca
+auto-registro.
+
+La investigación previa reveló que el hueco de seguridad que motivaba
+el pedido ya existía: `signInWithOtp` crea una cuenta nueva
+automáticamente para *cualquier* email que la pida en `/portal/login`,
+sin que nadie lo autorice antes — `portal_access` (la tabla que liga un
+email a un `clients.id`) solo decide qué ve una cuenta ya creada, no
+si se puede crear. Al quitar `signInWithOtp` sin agregar ningún flujo
+de auto-registro, ese hueco se cierra solo: `signInWithPassword` nunca
+crea cuentas.
+
+- **Login** — `LoginForm` reemplaza `signInWithOtp` por
+  `signInWithPassword`, agrega el campo de contraseña y un link
+  "¿Olvidaste tu contraseña?" que dispara `resetPasswordForEmail` — el
+  único correo que sigue mandando el sistema, y solo para recuperación
+  (incluida la primera vez que cada una de las 2 cuentas admin
+  existentes fija su contraseña, no un flujo aparte). Reusa
+  `app/auth/callback/route.ts` sin cambios — el intercambio de `code`
+  por sesión ya era agnóstico al método de auth — y aterriza en la
+  nueva `app/auth/update-password/`, que verifica sesión a mano (no
+  está bajo el matcher de `proxy.ts`) antes de llamar a
+  `updateUser({ password })`.
+- **Cambiar contraseña desde dentro del sistema** —
+  `components/dashboard/change-password-form.tsx` (nuevo, compartido)
+  se usa tanto en la sección "Cuenta" de `/dashboard/settings` (antes
+  100% de solo lectura) como en la nueva `/portal/account`, con un link
+  "Cuenta" agregado al header del portal (necesario porque
+  `PortalHomePage` redirige directo al único proyecto cuando el cliente
+  solo tiene uno).
+- **Cuenta del portal creada solo por el admin** —
+  `invitePortalAccess` (`app/(dashboard)/dashboard/projects/[id]/actions.ts`)
+  pasó de solo insertar una fila en `portal_access` a crear la cuenta
+  real: `createAdminClient().auth.admin.createUser` con una contraseña
+  generada server-side (16 caracteres, alfabeto sin ambiguos). Si el
+  email ya tiene cuenta (invitación anterior o self-provisioning previo
+  a este cambio), usa `admin.auth.admin.updateUserById` en su lugar —
+  "invitar" y "restablecer acceso" son la misma acción, sin distinguir
+  casos en la UI. Nuevo `PortalAccessForm` (client component,
+  `useActionState`) muestra la contraseña generada una sola vez para
+  que el admin la copie y se la entregue al cliente por fuera del
+  sistema — nunca se manda por correo ni se guarda en texto plano.
+- **Verificado en vivo contra la API real de Supabase** (usuarios
+  descartables, creados y borrados en esta sesión, nunca datos reales
+  tocados): `signInWithPassword` responde 200 con credenciales
+  correctas y 400 `"Invalid login credentials"` con incorrectas (mismo
+  string que el formulario compara para el mensaje amigable);
+  `admin.createUser` con un email duplicado responde 422 con
+  `error_code: "email_exists"` (confirma la detección por
+  `error.status === 422`); `admin.updateUserById` cambia la contraseña
+  y el login posterior con la nueva funciona.
+
+**Fuera de alcance, a propósito**: crear más cuentas de staff del
+dashboard (el modelo de 2 admins hardcodeados en
+`0003_restrict_org_bootstrap.sql` no cambia, no fue parte del pedido);
+migrar `portal_access` de coincidencia por email a una FK directa a
+`auth.users` (sigue funcionando porque ahora ambas filas se escriben
+juntas, en la misma acción, con el mismo email normalizado — el riesgo
+de desajuste que tenía antes ya no aplica); borrar la cuenta de
+`auth.users` al revocar acceso a un proyecto (`revokePortalAccess`
+solo borra la fila de `portal_access` — un cliente puede tener acceso
+a otros proyectos vía otras filas).
 
 ## 7. Qué NO cambia
 
