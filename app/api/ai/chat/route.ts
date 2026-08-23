@@ -111,8 +111,27 @@ export async function POST(request: Request) {
           contents,
           system_instruction: { parts: [{ text: systemInstruction }] },
           tools: GEMINI_TOOLS,
+          // "minimal" recorta el presupuesto de "pensamiento" interno del
+          // modelo antes de responder — verificado en vivo contra la API
+          // real que, sin esto, gemini-3.6-flash puede gastar >2000 tokens
+          // de thinking en una respuesta de un párrafo (12-70s de espera
+          // *antes* del primer byte). Con "minimal" cae a thinking≈0. Es
+          // el ajuste de mayor impacto en latencia percibida — más que
+          // streaming, porque casi todo el tiempo se va en esta fase
+          // previa a que exista texto para transmitir.
+          generationConfig: { thinkingConfig: { thinkingLevel: "minimal" } },
         }),
       });
+
+      if (response.status === 429) {
+        return NextResponse.json({
+          configured: true,
+          reply:
+            "Archi AI alcanzó el límite diario de consultas gratuitas de Gemini por hoy. " +
+            "Vuelve a intentar más tarde, o habilita facturación en el proyecto de Google Cloud " +
+            "de la key para levantar ese límite (ver INTEGRATION_SETUP.md).",
+        });
+      }
 
       if (!response.ok) {
         throw new Error(`Gemini API error (${response.status}): ${await response.text()}`);
@@ -143,16 +162,21 @@ export async function POST(request: Request) {
 
       contents.push({ role: "model", parts });
 
-      const responseParts: GeminiPart[] = [];
-      for (const call of functionCalls) {
-        let result: unknown;
-        try {
-          result = await runTool(supabase, call.functionCall.name, call.functionCall.args ?? {});
-        } catch (error) {
-          result = { error: error instanceof Error ? error.message : "Error ejecutando la herramienta." };
-        }
-        responseParts.push({ functionResponse: { name: call.functionCall.name, response: { result } } });
-      }
+      // Cuando Gemini pide varias herramientas en la misma ronda, se
+      // ejecutan en paralelo (son consultas/escrituras independientes,
+      // no encadenadas) en vez de una por una — reduce la latencia total
+      // de la ronda al máximo de las herramientas, no a la suma.
+      const responseParts: GeminiPart[] = await Promise.all(
+        functionCalls.map(async (call) => {
+          let result: unknown;
+          try {
+            result = await runTool(supabase, call.functionCall.name, call.functionCall.args ?? {});
+          } catch (error) {
+            result = { error: error instanceof Error ? error.message : "Error ejecutando la herramienta." };
+          }
+          return { functionResponse: { name: call.functionCall.name, response: { result } } };
+        }),
+      );
       contents.push({ role: "user", parts: responseParts });
     }
 

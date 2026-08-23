@@ -46,6 +46,39 @@ La API key vive en `GEMINI_API_KEY` (Vercel + `.env.local`, nunca en el
 chat). Se generó gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
 — sin proyecto de Google Cloud ni facturación.
 
+**Optimización de latencia (probada en vivo)**: `gemini-3.6-flash`
+puede gastar más tokens de "thinking" interno que de respuesta real
+antes de devolver algo — en una prueba en vivo, un párrafo de 150
+palabras tardó entre 12 y 70 segundos con más de 2000 tokens de
+thinking (`usageMetadata.thoughtsTokenCount`) para ~195 tokens de
+respuesta. Casi todo ese tiempo ocurre *antes* del primer byte, así que
+streaming no lo hubiera arreglado. `route.ts` ahora manda
+`generationConfig.thinkingConfig.thinkingLevel: "minimal"` en cada
+request — verificado que elimina el thinking casi por completo, aunque
+no pude confirmar el efecto sobre la latencia total en una corrida
+exitosa (la prueba se quedó sin cupo del free tier a mitad de camino,
+ver abajo). Cuando pruebes Archi AI, si las respuestas siguen tardando
+más de unos segundos avísame — puede que este ajuste necesite subirse a
+`"low"` en vez de `"minimal"` para no perder calidad en respuestas más
+largas.
+
+**Límite del free tier — probablemente la causa real de la lentitud
+reportada**: la key actual corre sin facturación habilitada
+(`generate_content_free_tier_requests`), que Google limita a **20
+solicitudes por día por modelo**. Cada mensaje del chat que necesita
+una herramienta ya son 2+ solicitudes a Gemini (una que pide la
+herramienta, otra que redacta la respuesta), así que ese cupo se agota
+rápido con uso real — al llegar al límite, la API devuelve `429` y
+`route.ts` ahora lo detecta y responde con un mensaje claro en vez de
+un error genérico. Si Archi AI se siente lento o falla seguido, esta es
+la sospechosa principal, más que cualquier ajuste de código. La
+solución real es habilitar facturación (tarjeta) en el proyecto de
+Google Cloud de esta key en [Google AI Studio](https://aistudio.google.com/apikey)
+o [Google Cloud Console](https://console.cloud.google.com/) — el uso
+normal de un solo estudio se mantiene barato (Gemini Flash cobra
+centavos por millón de tokens), pero es una decisión de facturación que
+te toca a ti, no algo que pueda activar yo.
+
 ### Google Maps (mapa de clientes/proyectos, `/dashboard/map`)
 `lib/integrations/google-geocoding.ts`, `components/dashboard/map-view.tsx`,
 `/dashboard/map` — código escrito y listo para activarse, **no probado
