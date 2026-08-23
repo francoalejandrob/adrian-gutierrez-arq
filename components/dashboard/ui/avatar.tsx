@@ -1,9 +1,10 @@
 import { initials } from "@/lib/format";
 
-// Circular initials chip — the reference dashboard uses photo avatars,
-// but there are no client/user photos in this app, so initials is the
-// honest equivalent (reused from the sidebar's user chip, which now
-// renders through this same component instead of its own one-off span).
+// Circular initials chip — falls back to this when there's no real
+// photo. Since Fase "settings editable" (avatar_url en profiles, bucket
+// publico "avatars"), quien subió una foto real la ve acá en vez de
+// iniciales; quien no, sigue viendo el chip determinístico de siempre —
+// nunca una foto genérica ni un ícono de persona placeholder.
 // Color is deterministic per name (a hash into the palette), not random,
 // so the same person always gets the same color across the app.
 const PALETTE = ["bg-tinta", "bg-verde", "bg-azul", "bg-ambar", "bg-acento", "bg-grafito"];
@@ -14,7 +15,20 @@ function colorFor(name: string) {
   return PALETTE[hash % PALETTE.length];
 }
 
-export default function Avatar({ name, size = 26 }: { name: string; size?: number }) {
+export default function Avatar({ name, size = 26, src }: { name: string; size?: number; src?: string | null }) {
+  if (src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- URL pública dinámica (Supabase Storage), sin next.config remotePatterns todavía.
+      <img
+        src={src}
+        alt={name}
+        title={name}
+        className="inline-block shrink-0 rounded-full object-cover"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+
   return (
     <span
       className={`inline-flex shrink-0 items-center justify-center rounded-full font-dp-mono text-papel ${colorFor(name)}`}

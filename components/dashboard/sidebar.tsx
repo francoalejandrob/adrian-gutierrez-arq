@@ -9,11 +9,11 @@ export default async function Sidebar() {
   const supabase = await createClient();
 
   const { data: userRes } = await supabase.auth.getUser();
-  let member: { role: string; profiles: { full_name: string | null; email: string } | null } | null = null;
+  let member: { role: string; profiles: { full_name: string | null; email: string; avatar_url: string | null } | null } | null = null;
   if (userRes.user) {
     const { data } = await supabase
       .from("organization_members")
-      .select("role, profiles(full_name, email)")
+      .select("role, profiles(full_name, email, avatar_url)")
       .eq("user_id", userRes.user.id)
       .limit(1)
       .maybeSingle();
@@ -27,7 +27,7 @@ export default async function Sidebar() {
       <RecentProjects />
 
       <div className="mx-5 mt-6 flex items-center gap-2.5 border-t border-filete pt-4">
-        <Avatar name={displayName} size={30} />
+        <Avatar name={displayName} size={30} src={member?.profiles?.avatar_url} />
         <div className="min-w-0 flex-1">
           <p className="truncate font-dp-sans text-[12px] leading-tight text-tinta">{displayName}</p>
           <p className="mt-0.5 font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">{member?.role ?? "—"}</p>
