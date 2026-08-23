@@ -62,7 +62,7 @@ export default async function CalendarPage(props: PageProps<"/dashboard/calendar
           <div className="flex items-center gap-5">
             <Link
               href={`/dashboard/calendar?year=${prevMonth.year}&month=${prevMonth.month}`}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-concreto transition-colors hover:bg-[#EDEBE4] hover:text-tinta"
+              className="flex h-7 w-7 items-center justify-center rounded-full text-concreto transition-colors hover:bg-realce hover:text-tinta"
             >
               <ChevronLeft size={16} strokeWidth={1.75} aria-hidden="true" />
             </Link>
@@ -71,7 +71,7 @@ export default async function CalendarPage(props: PageProps<"/dashboard/calendar
             </span>
             <Link
               href={`/dashboard/calendar?year=${nextMonth.year}&month=${nextMonth.month}`}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-concreto transition-colors hover:bg-[#EDEBE4] hover:text-tinta"
+              className="flex h-7 w-7 items-center justify-center rounded-full text-concreto transition-colors hover:bg-realce hover:text-tinta"
             >
               <ChevronRight size={16} strokeWidth={1.75} aria-hidden="true" />
             </Link>
@@ -104,7 +104,7 @@ export default async function CalendarPage(props: PageProps<"/dashboard/calendar
             </div>
           ))}
           {cells.map((day, i) => (
-            <div key={i} className={`min-h-[92px] border-b border-r border-filete p-2 ${day === null ? "bg-[#EDEBE4]" : ""}`}>
+            <div key={i} className={`min-h-[92px] border-b border-r border-filete p-2 ${day === null ? "bg-realce" : ""}`}>
               {day !== null && (
                 <>
                   <span

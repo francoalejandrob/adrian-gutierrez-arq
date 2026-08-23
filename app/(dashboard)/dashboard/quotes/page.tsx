@@ -34,7 +34,7 @@ export default async function QuotesPage() {
               <Link
                 key={quote.id}
                 href={`/dashboard/quotes/${quote.id}`}
-                className="grid grid-cols-[1.6fr_1.6fr_1fr_1fr_1fr] items-center gap-4 border-b border-filete px-12 py-4 transition-colors duration-100 hover:bg-[#EDEBE4]"
+                className="grid grid-cols-[1.6fr_1.6fr_1fr_1fr_1fr] items-center gap-4 border-b border-filete px-12 py-4 transition-colors duration-100 hover:bg-realce"
               >
                 <span className="flex items-baseline gap-3 font-dp-sans text-[13.5px] text-tinta">
                   <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>

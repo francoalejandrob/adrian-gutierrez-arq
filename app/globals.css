@@ -12,27 +12,41 @@
   /* "El estudio como sistema" — paleta propia del dashboard/portal
      (DISEÑO PROFESIONAL/ARCHI.OS v2.dc.html), independiente de la marca
      del sitio público. Nombres calcados de la lámina "Design system" del
-     propio mockup para que el token y su documentación coincidan 1:1. */
-  --color-papel: #f4f3ef;
-  --color-superficie: #faf9f5;
-  --color-filete: #dddad1;
-  --color-corte: #c7c3b7;
-  --color-concreto: #8a867c;
-  --color-grafito: #45443f;
-  --color-tinta: #0f0f0e;
-  --color-acento: #a8382a;
+     propio mockup para que el token y su documentación coincidan 1:1.
+     Pase oscuro (referencia de dashboard SaaS con tema dark que trajo el
+     usuario): mismos 11 nombres/roles semánticos, valores recalibrados
+     a fondo oscuro — contraste verificado con la fórmula WCAG real antes
+     de fijar los hex, no a ojo (ver ARCHITECTURE.md §6i). `tinta` y
+     `papel` intercambian claridad (tinta pasa a ser el tono casi-blanco
+     de máximo contraste, papel el fondo casi-negro) porque en cada uso
+     existente `bg-tinta` ya viene emparejado con `text-papel` — el swap
+     de valores solo, sin tocar JSX, da el resultado correcto en botones/
+     avatares/overlays que usan ese par. */
+  --color-papel: #0b0b0d;
+  --color-superficie: #17171c;
+  --color-filete: #26262c;
+  --color-corte: #38383f;
+  --color-concreto: #918d85;
+  --color-grafito: #c7c4bb;
+  --color-tinta: #f4f3ef;
+  --color-acento: #e2564a;
   /* Segundo color del sistema — no está en el mockup original, se agregó
      porque el sistema de un solo acento leía "plano" en la práctica.
      Verde desaturado (no el verde-éxito genérico de SaaS) para "resuelto"
      en StatusBadge/StatusMark/gráficos y para la etapa "ganado" del
      pipeline. */
-  --color-verde: #3f6b52;
+  --color-verde: #5fae82;
   /* Cuarto y quinto color — se agregaron para adoptar el lenguaje de
      pastillas de estado con más matices (5 tonos en vez de 2) que pidió
      el usuario mostrando una referencia de dashboard SaaS. Misma familia
      desaturada que acento/verde, nunca un azul/ámbar saturado genérico. */
-  --color-ambar: #b07a34;
-  --color-azul: #47607a;
+  --color-ambar: #d9a05a;
+  --color-azul: #7a9dbd;
+  /* Fondo de hover/activo (nav, botones de ícono, filas del command
+     palette) — reemplaza un hex #EDEBE4 que estaba hardcodeado suelto en
+     4 archivos distintos (sidebar.tsx, sidebar-nav.tsx, sheet-header.tsx,
+     command-palette.tsx). Un solo token, un solo lugar para recalibrarlo. */
+  --color-realce: #201f24;
 }
 
 @theme inline {
@@ -57,6 +71,7 @@
   --color-verde: var(--color-verde);
   --color-ambar: var(--color-ambar);
   --color-azul: var(--color-azul);
+  --color-realce: var(--color-realce);
   --font-dp-serif: var(--font-instrument-serif);
   --font-dp-sans: var(--font-archivo);
   --font-dp-mono: var(--font-jetbrains-mono);
@@ -73,6 +88,14 @@ body {
 ::selection {
   background: var(--color-naranja);
   color: var(--color-hueso);
+}
+
+/* Scoped override so text selection inside the dashboard/portal uses
+   their own palette instead of the public site's orange/hueso bleeding
+   through (it was, unintentionally, until this rule existed). */
+.dp-scope ::selection {
+  background: var(--color-acento);
+  color: var(--color-papel);
 }
 
 /* Keyboard-only focus ring. Only fires for :focus-visible, so mouse/touch
@@ -109,21 +132,23 @@ textarea:focus-visible,
   background-color: var(--color-papel);
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.2'/%3E%3C/svg%3E"),
-    linear-gradient(180deg, #f6f5f1, #f1efe9);
+    linear-gradient(180deg, #0d0d10, #0a0a0c);
   background-size: 180px 180px, auto;
-  background-blend-mode: multiply, normal;
+  background-blend-mode: overlay, normal;
 }
 
-/* Stronger variant for the login split-panel. */
+/* Stronger variant for the login split-panel. Pase oscuro: mismo
+   patrón de textura+ruido, gradientes recalibrados a tonos oscuros en
+   vez de la variante clara original. */
 .dp-grain-strong {
-  background-color: #cfcbc3;
+  background-color: #131316;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"),
-    radial-gradient(130% 95% at 20% 14%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 62%),
-    radial-gradient(110% 85% at 80% 88%, rgba(15, 15, 14, 0.13), rgba(15, 15, 14, 0) 64%),
-    linear-gradient(162deg, #dcd8d0, #bebab1);
+    radial-gradient(130% 95% at 20% 14%, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 62%),
+    radial-gradient(110% 85% at 80% 88%, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 64%),
+    linear-gradient(162deg, #1c1c21, #0d0d10);
   background-size: 240px 240px, auto, auto, auto;
-  background-blend-mode: multiply, screen, multiply, normal;
+  background-blend-mode: overlay, screen, multiply, normal;
 }
 
 /* Every visible content block reads as a delimited card — rounded
@@ -140,9 +165,13 @@ textarea:focus-visible,
     border: 1px solid var(--color-filete);
     border-radius: 16px;
     overflow: hidden;
+    /* Pase oscuro: una sombra oscura sobre fondo ya oscuro casi no se
+       ve — el "levante" de la tarjeta ahora viene de un highlight sutil
+       en el borde superior (simula luz rebotando en el filo) más una
+       sombra de profundidad real hacia abajo. */
     box-shadow:
-      0 1px 2px rgba(15, 15, 14, 0.04),
-      0 10px 28px rgba(15, 15, 14, 0.05);
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 10px 28px rgba(0, 0, 0, 0.45);
   }
 }
 

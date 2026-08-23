@@ -13,12 +13,19 @@ const base =
 // which uses clean flat buttons with barely-there elevation. Tactile
 // feedback on :active is now a small translateY, not a shadow-offset
 // press.
+//
+// Pase oscuro: `tinta` ahora es el tono claro (ver globals.css), así que
+// el botón primario pasó de "sólido tinta sobre papel claro" a "sólido
+// claro sobre fondo oscuro" — mismo par bg-tinta/text-papel, resultado
+// visual correcto sin tocar las clases de color. Las sombras sí se
+// recalibraron a negro puro con más opacidad: una sombra rgba(15,15,14,…)
+// pensada para fondo claro casi no se distingue sobre un fondo ya oscuro.
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "border border-tinta bg-tinta text-papel shadow-[0_1px_2px_rgba(15,15,14,0.05),0_4px_10px_rgba(15,15,14,0.12)] " +
-    "hover:bg-grafito active:translate-y-px active:shadow-[0_1px_2px_rgba(15,15,14,0.08)]",
+    "border border-tinta bg-tinta text-papel shadow-[0_1px_2px_rgba(0,0,0,0.3),0_4px_14px_rgba(0,0,0,0.45)] " +
+    "hover:bg-grafito active:translate-y-px active:shadow-[0_1px_2px_rgba(0,0,0,0.35)]",
   secondary:
-    "border border-corte bg-superficie text-tinta shadow-[0_1px_2px_rgba(15,15,14,0.04)] " +
+    "border border-corte bg-superficie text-tinta shadow-[0_1px_2px_rgba(0,0,0,0.25)] " +
     "hover:border-tinta hover:bg-papel active:translate-y-px",
   tertiary: "border-none bg-transparent p-0 text-concreto hover:text-tinta",
   danger: "border-none bg-transparent p-0 text-concreto hover:text-acento",

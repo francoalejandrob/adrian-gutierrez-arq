@@ -20,7 +20,7 @@ export default async function RecentProjects() {
 
   return (
     <div className="mx-5 mt-6 border-t border-filete pt-4">
-      <p className="mb-[11px] font-dp-mono text-[9.5px] font-medium uppercase tracking-[0.16em] text-[#6E6A60]">Recientes</p>
+      <p className="mb-[11px] font-dp-mono text-[9.5px] font-medium uppercase tracking-[0.16em] text-concreto">Recientes</p>
       {projects.map((project, i) => (
         <Link
           key={project.id}

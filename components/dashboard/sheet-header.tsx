@@ -36,7 +36,7 @@ export default function SheetHeader({
           <Link
             href="/dashboard/notifications"
             title="Notificaciones"
-            className="relative flex h-[29px] w-[29px] shrink-0 items-center justify-center rounded-full text-concreto transition-colors duration-150 hover:bg-[#EDEBE4] hover:text-tinta"
+            className="relative flex h-[29px] w-[29px] shrink-0 items-center justify-center rounded-full text-concreto transition-colors duration-150 hover:bg-realce hover:text-tinta"
           >
             <Bell size={16} strokeWidth={1.75} aria-hidden="true" />
             {unreadCount > 0 && <span className="absolute right-1 top-1 h-[6px] w-[6px] rounded-full bg-acento" />}
@@ -44,7 +44,7 @@ export default function SheetHeader({
           <Link
             href="/dashboard/settings"
             title="Configuración"
-            className="flex h-[29px] w-[29px] shrink-0 items-center justify-center rounded-full text-concreto transition-colors duration-150 hover:bg-[#EDEBE4] hover:text-tinta"
+            className="flex h-[29px] w-[29px] shrink-0 items-center justify-center rounded-full text-concreto transition-colors duration-150 hover:bg-realce hover:text-tinta"
           >
             <Settings size={16} strokeWidth={1.75} aria-hidden="true" />
           </Link>

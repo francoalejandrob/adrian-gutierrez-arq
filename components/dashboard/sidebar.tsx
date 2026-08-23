@@ -30,13 +30,13 @@ export default async function Sidebar() {
         <Avatar name={displayName} size={30} />
         <div className="min-w-0 flex-1">
           <p className="truncate font-dp-sans text-[12px] leading-tight text-tinta">{displayName}</p>
-          <p className="mt-0.5 font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-[#6E6A60]">{member?.role ?? "—"}</p>
+          <p className="mt-0.5 font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">{member?.role ?? "—"}</p>
         </div>
         <form action={signOut}>
           <button
             type="submit"
             title="Salir"
-            className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-[#6E6A60] transition-colors duration-150 hover:bg-[#EDEBE4] hover:text-acento"
+            className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-concreto transition-colors duration-150 hover:bg-realce hover:text-acento"
           >
             <LogOut size={15} strokeWidth={1.75} aria-hidden="true" />
           </button>
