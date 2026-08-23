@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import FloatingAssistant from "@/components/dashboard/floating-assistant";
 import SheetHeader from "@/components/dashboard/sheet-header";
 import Sidebar from "@/components/dashboard/sidebar";
 import { dpFontVars } from "@/lib/dp-fonts";
@@ -28,6 +29,9 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
           <Sidebar />
         </div>
         <main className="min-w-0 flex-1 print:p-0">{children}</main>
+      </div>
+      <div className="print:hidden">
+        <FloatingAssistant />
       </div>
     </div>
   );
