@@ -98,6 +98,39 @@ body {
   color: var(--color-papel);
 }
 
+/* Scrollbar del navegador acorde al pase oscuro — sin esto, la barra de
+   scroll usa el estilo claro por defecto del navegador (no sigue la
+   paleta de tokens), tanto en la ventana como en cualquier contenedor
+   con overflow dentro del dashboard (sidebar, listas). `:has(.dp-scope)`
+   en vez de aplicarlo a `html` directamente para que solo afecte a
+   dashboard/portal/login (donde vive `.dp-scope`) y nunca al sitio
+   público, sin necesitar que el layout se reestructure en su propio
+   contenedor de scroll. */
+html:has(.dp-scope) {
+  color-scheme: dark;
+  scrollbar-color: var(--color-corte) var(--color-papel);
+  scrollbar-width: thin;
+}
+
+html:has(.dp-scope) ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html:has(.dp-scope) ::-webkit-scrollbar-track {
+  background: var(--color-papel);
+}
+
+html:has(.dp-scope) ::-webkit-scrollbar-thumb {
+  background: var(--color-corte);
+  border: 3px solid var(--color-papel);
+  border-radius: 999px;
+}
+
+html:has(.dp-scope) ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-concreto);
+}
+
 /* Keyboard-only focus ring. Only fires for :focus-visible, so mouse/touch
    users never see it — safe to apply globally without changing the look
    of either the public site or the dashboard for the common case. */
