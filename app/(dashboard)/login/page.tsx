@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import LoginForm from "@/components/dashboard/login-form";
+import LoginVideoBackground from "@/components/dashboard/login-video-background";
 import { dpFontVars } from "@/lib/dp-fonts";
 import { createClient } from "@/lib/supabase/server";
 
@@ -30,20 +31,23 @@ export default async function LoginPage() {
 
   return (
     <main className={`dp-scope ${dpFontVars} grid min-h-dvh grid-cols-1 font-dp-sans text-tinta md:grid-cols-2`}>
-      <div className="dp-grain-strong hidden flex-col justify-between border-r border-corte p-16 md:flex">
-        <p className="font-dp-mono text-[10px] uppercase tracking-[0.18em] text-grafito">ARCHI.OS &nbsp;·&nbsp; v2.0</p>
-        <div>
-          <h1 className="mb-6 max-w-[18ch] font-dp-serif text-[52px] leading-none tracking-[-0.025em] text-tinta">
-            El estudio como sistema.
-          </h1>
-          <p className="max-w-[40ch] font-dp-serif text-xl italic leading-relaxed text-grafito">
-            Comercial, producción, documentación y finanzas en una sola lámina de trabajo.
-          </p>
-        </div>
-        <div className="flex gap-11">
-          <Stat value={String(projectCount ?? 0).padStart(2, "0")} label="Proyectos" />
-          <Stat value={`$${currency.format(contracted)}`} label="Contratado" tone="positive" />
-          <Stat value={String(clientCount ?? 0)} label="Clientes" />
+      <div className="dp-grain-strong relative hidden overflow-hidden border-r border-corte md:flex">
+        <LoginVideoBackground />
+        <div className="relative z-10 flex flex-1 flex-col justify-between p-16">
+          <p className="font-dp-mono text-[10px] uppercase tracking-[0.18em] text-grafito">ARCHI.OS &nbsp;·&nbsp; v2.0</p>
+          <div>
+            <h1 className="mb-6 max-w-[18ch] font-dp-serif text-[52px] leading-none tracking-[-0.025em] text-tinta">
+              El estudio como sistema.
+            </h1>
+            <p className="max-w-[40ch] font-dp-serif text-xl italic leading-relaxed text-grafito">
+              Comercial, producción, documentación y finanzas en una sola lámina de trabajo.
+            </p>
+          </div>
+          <div className="flex gap-11">
+            <Stat value={String(projectCount ?? 0).padStart(2, "0")} label="Proyectos" />
+            <Stat value={`$${currency.format(contracted)}`} label="Contratado" tone="positive" />
+            <Stat value={String(clientCount ?? 0)} label="Clientes" />
+          </div>
         </div>
       </div>
 

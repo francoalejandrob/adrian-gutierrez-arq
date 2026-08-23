@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import LoginForm from "@/components/dashboard/login-form";
+import LoginVideoBackground from "@/components/dashboard/login-video-background";
 import { dpFontVars } from "@/lib/dp-fonts";
 import { createClient } from "@/lib/supabase/server";
 
@@ -23,19 +24,22 @@ export default async function PortalLoginPage() {
 
   return (
     <main className={`dp-scope ${dpFontVars} grid min-h-dvh grid-cols-1 font-dp-sans text-tinta md:grid-cols-2`}>
-      <div className="dp-grain-strong hidden flex-col justify-between border-r border-corte p-16 md:flex">
-        <p className="font-dp-mono text-[10px] uppercase tracking-[0.18em] text-grafito">ARCHI.OS &nbsp;·&nbsp; Portal de cliente</p>
-        <div>
-          <h1 className="mb-6 max-w-[16ch] font-dp-serif text-[52px] leading-none tracking-[-0.025em] text-tinta">
-            Tu proyecto, siempre a la vista.
-          </h1>
-          <p className="max-w-[40ch] font-dp-serif text-xl italic leading-relaxed text-grafito">
-            Avance, documentos, aprobaciones y pagos — en un solo lugar.
+      <div className="dp-grain-strong relative hidden overflow-hidden border-r border-corte md:flex">
+        <LoginVideoBackground />
+        <div className="relative z-10 flex flex-1 flex-col justify-between p-16">
+          <p className="font-dp-mono text-[10px] uppercase tracking-[0.18em] text-grafito">ARCHI.OS &nbsp;·&nbsp; Portal de cliente</p>
+          <div>
+            <h1 className="mb-6 max-w-[16ch] font-dp-serif text-[52px] leading-none tracking-[-0.025em] text-tinta">
+              Tu proyecto, siempre a la vista.
+            </h1>
+            <p className="max-w-[40ch] font-dp-serif text-xl italic leading-relaxed text-grafito">
+              Avance, documentos, aprobaciones y pagos — en un solo lugar.
+            </p>
+          </div>
+          <p className="font-dp-mono text-[10px] uppercase tracking-[0.14em] text-concreto">
+            {org?.name ?? "Adrián Gutiérrez Arquitectura"}
           </p>
         </div>
-        <p className="font-dp-mono text-[10px] uppercase tracking-[0.14em] text-concreto">
-          {org?.name ?? "Adrián Gutiérrez Arquitectura"}
-        </p>
       </div>
 
       <div className="flex items-center justify-center p-16">
