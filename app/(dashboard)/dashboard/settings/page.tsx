@@ -1,13 +1,15 @@
 import Avatar from "@/components/dashboard/ui/avatar";
 import PageHeader from "@/components/dashboard/ui/page-header";
+import ChangePasswordForm from "@/components/dashboard/change-password-form";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
 
-  const [{ data: org }, { data: members }] = await Promise.all([
+  const [{ data: org }, { data: members }, { data: userRes }] = await Promise.all([
     supabase.from("organizations").select("name, created_at").limit(1).maybeSingle(),
     supabase.from("organization_members").select("role, profiles(full_name, email)").order("created_at"),
+    supabase.auth.getUser(),
   ]);
 
   return (
@@ -58,6 +60,17 @@ export default async function SettingsPage() {
               );
             })}
             {(members ?? []).length === 0 && <p className="py-4 font-dp-sans text-sm text-concreto">Sin miembros todavía.</p>}
+          </div>
+        </div>
+
+        <div>
+          <p className="mb-5 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Cuenta</p>
+          <div className="flex flex-col gap-5 border-t border-filete pt-5">
+            <div>
+              <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">Correo</p>
+              <p className="mt-1.5 font-dp-sans text-[13.5px] text-tinta">{userRes.user?.email ?? "—"}</p>
+            </div>
+            <ChangePasswordForm />
           </div>
         </div>
       </div>
