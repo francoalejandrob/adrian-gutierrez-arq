@@ -710,6 +710,54 @@ el sitio público real.
   sin arrancar la configuración de GA4/Search Console todavía (sigue
   documentada como pendiente en `INTEGRATION_SETUP.md`).
 
+## 6l. Adaptación completa del dashboard (y portal) a mobile
+
+Una revisión en vivo con Playwright (primera vez con navegador real en
+la sesión, en vez de análisis estático) mostró el dashboard
+prácticamente inutilizable en 390px: el sidebar (`w-[225px]` fijo)
+ocupaba ~60% de la pantalla sin forma de colapsarlo. El shell de
+navegación (sidebar, header, nav) no tenía absolutamente ninguna clase
+`sm:`/`md:`/`lg:` — cero infraestructura responsive previa.
+
+- **Sidebar como drawer off-canvas** — `Sidebar` permanece Server
+  Component sin cambios; el estado abierto/cerrado vive en un Context
+  nuevo (`components/dashboard/sidebar-context.tsx`, `SidebarProvider`)
+  que envuelve tanto `SheetHeader` como el nuevo
+  `components/dashboard/mobile-sidebar-shell.tsx` (client wrapper con
+  `fixed ... -translate-x-full` en mobile, `md:static md:translate-x-0`
+  en desktop — el mismo elemento se comporta como drawer o como
+  columna fija según el breakpoint, sin lógica JS condicional). Botón
+  hamburguesa nuevo en `SheetHeader` (`md:hidden`); `SidebarNav` cierra
+  el drawer en cada click de navegación.
+- **Headers de página** — `PageHeader` (14 sitios) y los 4 headers de
+  detalle duplicados a mano (`leads/[id]`, `clients/[id]`,
+  `projects/[id]`, `quotes/[id]` — uno más de los que había detectado
+  la investigación inicial) reducen tamaño de título y padding vertical
+  por debajo de `sm:`.
+- **Tablas de columnas fijas** — ~9 tablas (`grid-cols-[...]`) que no
+  entraban en 390px bajo ningún diseño de columnas (Leads de 7
+  columnas, Cotizaciones, Contratos, Pagos pendientes, Pipeline,
+  listas de Proyectos/Clientes) se envuelven en
+  `overflow-x-auto` + `min-w-[...]`, el mismo patrón que ya usaba
+  `gantt-chart.tsx` — decisión tomada con el usuario (scroll horizontal
+  contenido, no rediseño a tarjetas por página) por ser la opción
+  uniforme y de menor riesgo para cubrirlas todas de una pasada.
+- **Padding y grids de KPI** — `px-12` (48px fijo) pasa a
+  `px-5 sm:px-12` en los contenedores de página; los grids de KPI sin
+  ningún breakpoint (`clients/[id]`, `projects/[id]` finanzas,
+  `marketing`, `website`) ganan columnas responsive siguiendo el patrón
+  ya usado en `finance/page.tsx` (`grid-cols-2 sm:grid-cols-3
+  lg:grid-cols-N`).
+- **Portal de cliente** — fix defensivo en
+  `app/(portal)/portal/(authenticated)/layout.tsx`: el nombre de
+  organización no tenía `truncate`/`min-w-0` en el header — bug latente
+  que un nombre largo dispararía en cualquier viewport, no solo mobile.
+
+Verificado con Playwright real en 390×844 (sin overflow horizontal en
+ninguna página tocada, drawer abre/cierra/navega) y en 1440×900 contra
+el estado anterior (layout de escritorio sin cambios) — antes y después
+del deploy a producción.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

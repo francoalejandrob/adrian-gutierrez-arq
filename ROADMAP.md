@@ -463,3 +463,27 @@ detalle técnico completo.
   `https://adrian-gutierrez-arq.vercel.app/` — confirmado con el
   usuario que la configuración de GA4/Search Console queda pendiente
   para más adelante.
+
+## Adaptación completa del dashboard (y portal) a mobile ✅
+
+Una revisión en vivo con Playwright (primer uso de navegador real en
+el proyecto) mostró el dashboard inutilizable en 390px: sidebar fijo
+sin colapsar, tablas de columnas fijas desbordando, cero clases
+responsive en el shell de navegación. El usuario pidió adaptar todo el
+sistema, no solo el sidebar. Ver `ARCHITECTURE.md` §6l para el detalle
+técnico completo.
+
+- **Sidebar → drawer off-canvas** en mobile (botón hamburguesa, cierra
+  al navegar o al tocar el fondo) — `Sidebar` sigue siendo Server
+  Component sin cambios, el layout de escritorio queda idéntico.
+- **~9 tablas de columnas fijas** (Leads, Cotizaciones, Contratos,
+  Pagos pendientes, Pipeline, listas de Proyectos/Clientes) ganan
+  scroll horizontal contenido — decisión tomada con el usuario sobre
+  rediseñarlas a tarjetas, por ser la opción uniforme y de menor
+  riesgo.
+- **Headers, padding y grids de KPI** responsive en todas las páginas
+  del dashboard y un fix defensivo en el header del portal de cliente.
+
+Verificado con Playwright real en 390px y 1440px, antes y después del
+deploy a producción — primera vez en el proyecto que un pase de UI se
+verifica con capturas reales de navegador en vez de solo build+lint.
