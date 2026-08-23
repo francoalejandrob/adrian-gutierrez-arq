@@ -37,14 +37,14 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
 
   return (
     <div>
-      <div className="border-b border-corte px-12 pb-[30px] pt-[52px]">
+      <div className="border-b border-corte px-5 pb-5 pt-8 sm:px-12 sm:pb-[30px] sm:pt-[52px]">
         <Link
           href="/dashboard/quotes"
           className="mb-[18px] inline-block font-dp-mono text-[10px] uppercase tracking-[0.14em] text-concreto hover:text-tinta"
         >
           ← Cotizaciones
         </Link>
-        <div className="flex items-end justify-between gap-10">
+        <div className="flex flex-wrap items-end justify-between gap-6 sm:gap-10">
           <div>
             <Link
               href={`/dashboard/projects/${quote.project_id}?tab=finance`}
@@ -52,7 +52,7 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
             >
               {quote.projects?.clients?.name} — {quote.projects?.name}
             </Link>
-            <h1 className="mt-3 font-dp-serif text-[38px] leading-none tracking-[-0.015em] text-tinta">
+            <h1 className="mt-3 font-dp-serif text-[24px] leading-none tracking-[-0.015em] text-tinta sm:text-[38px]">
               Cotización del {new Date(quote.issue_date).toLocaleDateString("es-EC")}
             </h1>
           </div>
@@ -72,31 +72,35 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
         </div>
       </div>
 
-      <div className="px-12 py-10">
+      <div className="px-5 py-8 sm:px-12 sm:py-10">
         <Section title="Ítems">
-          <div className="grid grid-cols-[2fr_0.8fr_1fr_1fr_0.8fr] gap-4 border-b border-corte pb-3 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
-            <span>Descripción</span>
-            <span className="text-right">Cantidad</span>
-            <span className="text-right">Precio unit.</span>
-            <span className="text-right">Total</span>
-            <span></span>
-          </div>
-          {items.map((item) => (
-            <div key={item.id} className="grid grid-cols-[2fr_0.8fr_1fr_1fr_0.8fr] items-center gap-4 border-b border-filete py-3">
-              <span className="font-dp-sans text-[13px] text-tinta">{item.description}</span>
-              <span className="text-right font-dp-mono text-[12.5px] text-tinta">{item.quantity}</span>
-              <span className="text-right font-dp-mono text-[12.5px] text-tinta">{currency.format(item.unit_price)}</span>
-              <span className="text-right font-dp-mono text-[12.5px] text-tinta">{currency.format(item.quantity * item.unit_price)}</span>
-              <form action={deleteQuoteItem.bind(null, id, item.id)} className="text-right">
-                <SubmitButton variant="danger" size="sm">
-                  Eliminar
-                </SubmitButton>
-              </form>
+          <div className="overflow-x-auto">
+            <div className="min-w-[560px]">
+              <div className="grid grid-cols-[2fr_0.8fr_1fr_1fr_0.8fr] gap-4 border-b border-corte pb-3 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
+                <span>Descripción</span>
+                <span className="text-right">Cantidad</span>
+                <span className="text-right">Precio unit.</span>
+                <span className="text-right">Total</span>
+                <span></span>
+              </div>
+              {items.map((item) => (
+                <div key={item.id} className="grid grid-cols-[2fr_0.8fr_1fr_1fr_0.8fr] items-center gap-4 border-b border-filete py-3">
+                  <span className="font-dp-sans text-[13px] text-tinta">{item.description}</span>
+                  <span className="text-right font-dp-mono text-[12.5px] text-tinta">{item.quantity}</span>
+                  <span className="text-right font-dp-mono text-[12.5px] text-tinta">{currency.format(item.unit_price)}</span>
+                  <span className="text-right font-dp-mono text-[12.5px] text-tinta">{currency.format(item.quantity * item.unit_price)}</span>
+                  <form action={deleteQuoteItem.bind(null, id, item.id)} className="text-right">
+                    <SubmitButton variant="danger" size="sm">
+                      Eliminar
+                    </SubmitButton>
+                  </form>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
           {items.length === 0 && <p className="py-3 font-dp-sans text-sm text-concreto">Sin ítems todavía.</p>}
 
-          <form action={boundAddItem} className="mt-5 grid grid-cols-4 gap-2.5">
+          <form action={boundAddItem} className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
             <input name="description" placeholder="Descripción" required className={`col-span-2 ${inputClass}`} />
             <input
               name="quantity"

@@ -58,7 +58,7 @@ export default function DesignSystemPage() {
     <div>
       <PageHeader eyebrow="Sistema" title="Design system" />
 
-      <div className="flex flex-col gap-14 px-12 py-10">
+      <div className="flex flex-col gap-14 px-5 py-8 sm:px-12 sm:py-10">
         <Section title="01 · Tipografía">
           <div className="flex flex-col gap-7">
             {TYPE_SPECIMENS.map((spec) => (

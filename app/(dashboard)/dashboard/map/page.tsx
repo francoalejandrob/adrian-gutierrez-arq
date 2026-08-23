@@ -10,7 +10,7 @@ export default async function MapPage() {
     return (
       <div>
         <PageHeader eyebrow="Inteligencia · Ubicación de clientes y proyectos" title="Mapa" />
-        <div className="px-12 py-10">
+        <div className="px-5 py-8 sm:px-12 sm:py-10">
           <EmptyState
             reason="Falta configurar Google Maps: NEXT_PUBLIC_GOOGLE_MAPS_API_KEY."
             hint="Ver INTEGRATION_SETUP.md en el repositorio para los pasos de configuración."
@@ -56,7 +56,7 @@ export default async function MapPage() {
   return (
     <div>
       <PageHeader eyebrow="Inteligencia · Ubicación de clientes y proyectos" title="Mapa" />
-      <div className="px-12 py-10">
+      <div className="px-5 py-8 sm:px-12 sm:py-10">
         {pins.length === 0 ? (
           <EmptyState
             reason="Todavía no hay clientes ni proyectos con una dirección geocodificada."

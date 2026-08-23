@@ -20,33 +20,35 @@ export default async function QuotesPage() {
       <PageHeader eyebrow="Comercial · Todas las cotizaciones, en cualquier proyecto" title="Cotizaciones" />
 
       {(quotes ?? []).length > 0 ? (
-        <div>
-          <div className="grid grid-cols-[1.6fr_1.6fr_1fr_1fr_1fr] gap-4 border-b border-filete px-12 py-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">
-            <span>Cliente</span>
-            <span>Proyecto</span>
-            <span>Total</span>
-            <span>Emitida</span>
-            <span>Estado</span>
+        <div className="overflow-x-auto">
+          <div className="min-w-[720px]">
+            <div className="grid grid-cols-[1.6fr_1.6fr_1fr_1fr_1fr] gap-4 border-b border-filete px-5 py-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto sm:px-12">
+              <span>Cliente</span>
+              <span>Proyecto</span>
+              <span>Total</span>
+              <span>Emitida</span>
+              <span>Estado</span>
+            </div>
+            {(quotes ?? []).map((quote, i) => {
+              const { total } = quoteTotal(quote.quote_items, quote.discount, quote.tax_rate);
+              return (
+                <Link
+                  key={quote.id}
+                  href={`/dashboard/quotes/${quote.id}`}
+                  className="grid grid-cols-[1.6fr_1.6fr_1fr_1fr_1fr] items-center gap-4 border-b border-filete px-5 py-4 transition-colors duration-100 hover:bg-realce sm:px-12"
+                >
+                  <span className="flex items-baseline gap-3 font-dp-sans text-[13.5px] text-tinta">
+                    <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
+                    {quote.projects?.clients?.name ?? "—"}
+                  </span>
+                  <span className="truncate font-dp-sans text-[12.5px] text-grafito">{quote.projects?.name ?? "—"}</span>
+                  <span className="font-dp-mono text-[12.5px] text-tinta">{currency.format(total)}</span>
+                  <span className="font-dp-mono text-[11px] text-concreto">{new Date(quote.issue_date).toLocaleDateString("es-EC")}</span>
+                  <StatusBadge label={QUOTE_STATUS_LABELS[quote.status]} tone={QUOTE_STATUS_TONE[quote.status]} />
+                </Link>
+              );
+            })}
           </div>
-          {(quotes ?? []).map((quote, i) => {
-            const { total } = quoteTotal(quote.quote_items, quote.discount, quote.tax_rate);
-            return (
-              <Link
-                key={quote.id}
-                href={`/dashboard/quotes/${quote.id}`}
-                className="grid grid-cols-[1.6fr_1.6fr_1fr_1fr_1fr] items-center gap-4 border-b border-filete px-12 py-4 transition-colors duration-100 hover:bg-realce"
-              >
-                <span className="flex items-baseline gap-3 font-dp-sans text-[13.5px] text-tinta">
-                  <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
-                  {quote.projects?.clients?.name ?? "—"}
-                </span>
-                <span className="truncate font-dp-sans text-[12.5px] text-grafito">{quote.projects?.name ?? "—"}</span>
-                <span className="font-dp-mono text-[12.5px] text-tinta">{currency.format(total)}</span>
-                <span className="font-dp-mono text-[11px] text-concreto">{new Date(quote.issue_date).toLocaleDateString("es-EC")}</span>
-                <StatusBadge label={QUOTE_STATUS_LABELS[quote.status]} tone={QUOTE_STATUS_TONE[quote.status]} />
-              </Link>
-            );
-          })}
         </div>
       ) : (
         <EmptyState

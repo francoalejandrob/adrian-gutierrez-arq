@@ -60,7 +60,7 @@ export default async function AiPage() {
   ].filter((s): s is { label: string; value: string; detail: string } => Boolean(s));
 
   return (
-    <div className="px-12 py-10">
+    <div className="px-5 py-8 sm:px-12 sm:py-10">
       <p className="mb-3 font-dp-mono text-[10px] uppercase tracking-[0.16em] text-concreto">Inteligencia · Archi AI</p>
       <div className="flex items-center gap-3.5">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-azul/10 text-azul">

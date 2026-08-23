@@ -49,7 +49,7 @@ export default async function CrmPage(props: PageProps<"/dashboard/crm">) {
         }
       />
 
-      <div className="flex gap-2 border-b border-corte px-12 pb-5 pt-5">
+      <div className="flex gap-2 overflow-x-auto border-b border-corte px-5 pb-5 pt-5 sm:px-12">
         <TabLink href="/dashboard/crm?tab=leads" label="Leads" icon={Users} active={tab === "leads"} />
         <TabLink href="/dashboard/crm?tab=clientes" label="Clientes" icon={Users} active={tab === "clientes"} />
         <TabLink href="/dashboard/crm?tab=pipeline" label="Pipeline" icon={TrendingUp} active={tab === "pipeline"} />
@@ -78,7 +78,7 @@ async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; stat
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-filete px-12 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-filete px-5 py-4 sm:px-12">
         <div className="flex flex-wrap gap-2">
           <TabLink href="/dashboard/crm?tab=leads" label="Todos" active={!statusFilter} size="sm" />
           {LEAD_STATUSES.map((status) => (
@@ -98,42 +98,46 @@ async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; stat
       </div>
 
       {view === "kanban" ? (
-        <div className="px-12 py-8">
+        <div className="px-5 py-8 sm:px-12">
           <LeadsKanban leads={leads ?? []} />
         </div>
       ) : (
         <div>
-          <div className="grid grid-cols-[2.1fr_1.4fr_1fr_1.1fr_1fr_36px_0.9fr] gap-4 border-b border-filete px-12 py-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">
-            <span>Lead</span>
-            <span>Necesidad</span>
-            <span>Valor</span>
-            <span>Fuente</span>
-            <span>Estado</span>
-            <span></span>
-            <span>Creado</span>
+          <div className="overflow-x-auto">
+            <div className="min-w-[760px]">
+              <div className="grid grid-cols-[2.1fr_1.4fr_1fr_1.1fr_1fr_36px_0.9fr] gap-4 border-b border-filete px-5 py-3 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto sm:px-12">
+                <span>Lead</span>
+                <span>Necesidad</span>
+                <span>Valor</span>
+                <span>Fuente</span>
+                <span>Estado</span>
+                <span></span>
+                <span>Creado</span>
+              </div>
+              {(leads ?? []).map((lead, i) => (
+                <Link
+                  key={lead.id}
+                  href={`/dashboard/leads/${lead.id}`}
+                  className="grid grid-cols-[2.1fr_1.4fr_1fr_1.1fr_1fr_36px_0.9fr] items-center gap-4 border-b border-filete px-5 py-4 transition-colors duration-100 hover:bg-realce sm:px-12"
+                >
+                  <span className="flex items-baseline gap-3 font-dp-sans text-[13.5px] text-tinta">
+                    <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
+                    {lead.name}
+                  </span>
+                  <span className="truncate font-dp-sans text-[12.5px] text-grafito">{lead.need || "—"}</span>
+                  <span className="font-dp-mono text-[12.5px] text-tinta">{lead.estimated_value ? currency.format(lead.estimated_value) : "—"}</span>
+                  <span className="font-dp-sans text-[12.5px] text-grafito">{lead.source}</span>
+                  <StatusBadge label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} tone={LEAD_STATUS_TONE[lead.status as LeadStatus]} />
+                  {lead.profiles ? (
+                    <Avatar name={lead.profiles.full_name || lead.profiles.email} size={24} />
+                  ) : (
+                    <span className="h-6 w-6 rounded-full border border-dashed border-corte" title="Sin asignar" />
+                  )}
+                  <span className="font-dp-mono text-[11px] text-concreto">{new Date(lead.created_at).toLocaleDateString("es-EC")}</span>
+                </Link>
+              ))}
+            </div>
           </div>
-          {(leads ?? []).map((lead, i) => (
-            <Link
-              key={lead.id}
-              href={`/dashboard/leads/${lead.id}`}
-              className="grid grid-cols-[2.1fr_1.4fr_1fr_1.1fr_1fr_36px_0.9fr] items-center gap-4 border-b border-filete px-12 py-4 transition-colors duration-100 hover:bg-realce"
-            >
-              <span className="flex items-baseline gap-3 font-dp-sans text-[13.5px] text-tinta">
-                <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
-                {lead.name}
-              </span>
-              <span className="truncate font-dp-sans text-[12.5px] text-grafito">{lead.need || "—"}</span>
-              <span className="font-dp-mono text-[12.5px] text-tinta">{lead.estimated_value ? currency.format(lead.estimated_value) : "—"}</span>
-              <span className="font-dp-sans text-[12.5px] text-grafito">{lead.source}</span>
-              <StatusBadge label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} tone={LEAD_STATUS_TONE[lead.status as LeadStatus]} />
-              {lead.profiles ? (
-                <Avatar name={lead.profiles.full_name || lead.profiles.email} size={24} />
-              ) : (
-                <span className="h-6 w-6 rounded-full border border-dashed border-corte" title="Sin asignar" />
-              )}
-              <span className="font-dp-mono text-[11px] text-concreto">{new Date(lead.created_at).toLocaleDateString("es-EC")}</span>
-            </Link>
-          ))}
           {(leads ?? []).length === 0 && (
             <EmptyState
               icon={Target}
@@ -199,22 +203,26 @@ async function ClientesTab({ supabase }: { supabase: Supa }) {
   return (
     <div>
       {(clients ?? []).length > 0 ? (
-        (clients ?? []).map((client, i) => {
-          const info = projectsByClient.get(client.id);
-          return (
-            <Link
-              key={client.id}
-              href={`/dashboard/clients/${client.id}`}
-              className="flex items-center gap-6 border-b border-filete px-12 py-5 transition-colors duration-100 hover:bg-realce"
-            >
-              <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
-              <Avatar name={client.name} size={30} />
-              <span className="min-w-[220px] font-dp-serif text-xl text-tinta">{client.name}</span>
-              <span className="flex-1 font-dp-sans text-[12.5px] text-concreto">{info?.category ?? client.company ?? "—"}</span>
-              <span className="font-dp-mono text-[11px] text-concreto">{info?.count ?? 0} proyecto{info?.count === 1 ? "" : "s"}</span>
-            </Link>
-          );
-        })
+        <div className="overflow-x-auto">
+          <div className="min-w-[560px]">
+            {(clients ?? []).map((client, i) => {
+              const info = projectsByClient.get(client.id);
+              return (
+                <Link
+                  key={client.id}
+                  href={`/dashboard/clients/${client.id}`}
+                  className="flex items-center gap-6 border-b border-filete px-5 py-5 transition-colors duration-100 hover:bg-realce sm:px-12"
+                >
+                  <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
+                  <Avatar name={client.name} size={30} />
+                  <span className="min-w-[220px] font-dp-serif text-xl text-tinta">{client.name}</span>
+                  <span className="flex-1 font-dp-sans text-[12.5px] text-concreto">{info?.category ?? client.company ?? "—"}</span>
+                  <span className="font-dp-mono text-[11px] text-concreto">{info?.count ?? 0} proyecto{info?.count === 1 ? "" : "s"}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       ) : (
         <EmptyState
           icon={Briefcase}
@@ -237,25 +245,27 @@ async function PipelineTab({ supabase }: { supabase: Supa }) {
   const maxValue = Math.max(1, ...pipeline.map((s) => s.value));
 
   return (
-    <div className="px-12 py-8">
-      <div className="flex flex-col">
-        {pipeline.map((stage) => (
-          <div key={stage.status} className="grid grid-cols-[140px_1fr_140px_60px] items-center gap-5 border-b border-filete py-4 last:border-0">
-            <span className={`font-dp-mono text-[10.5px] uppercase tracking-[0.1em] ${stage.status === "ganado" ? "text-verde font-medium" : "text-grafito"}`}>
-              {stage.label}
-            </span>
-            <div className="h-[3px] bg-filete">
-              <div
-                className={stage.status === "ganado" ? "h-[3px] bg-verde" : "h-[3px] bg-tinta"}
-                style={{ width: `${(stage.value / maxValue) * 100}%` }}
-              />
+    <div className="px-5 py-8 sm:px-12">
+      <div className="overflow-x-auto">
+        <div className="flex min-w-[480px] flex-col">
+          {pipeline.map((stage) => (
+            <div key={stage.status} className="grid grid-cols-[140px_1fr_140px_60px] items-center gap-5 border-b border-filete py-4 last:border-0">
+              <span className={`font-dp-mono text-[10.5px] uppercase tracking-[0.1em] ${stage.status === "ganado" ? "text-verde font-medium" : "text-grafito"}`}>
+                {stage.label}
+              </span>
+              <div className="h-[3px] bg-filete">
+                <div
+                  className={stage.status === "ganado" ? "h-[3px] bg-verde" : "h-[3px] bg-tinta"}
+                  style={{ width: `${(stage.value / maxValue) * 100}%` }}
+                />
+              </div>
+              <span className={`text-right font-dp-mono text-[13px] ${stage.status === "ganado" ? "text-verde" : "text-tinta"}`}>
+                {currency.format(stage.value)}
+              </span>
+              <span className="text-right font-dp-mono text-[11px] text-concreto">{stage.count}</span>
             </div>
-            <span className={`text-right font-dp-mono text-[13px] ${stage.status === "ganado" ? "text-verde" : "text-tinta"}`}>
-              {currency.format(stage.value)}
-            </span>
-            <span className="text-right font-dp-mono text-[11px] text-concreto">{stage.count}</span>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

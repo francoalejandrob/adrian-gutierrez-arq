@@ -79,7 +79,7 @@ export default async function CalendarPage(props: PageProps<"/dashboard/calendar
         }
       />
 
-      <form action={createEvent} className="grid grid-cols-2 gap-2.5 border-b border-filete px-12 py-6 sm:grid-cols-5">
+      <form action={createEvent} className="grid grid-cols-2 gap-2.5 border-b border-filete px-5 py-6 sm:grid-cols-5 sm:px-12">
         <input name="title" placeholder="Título de la reunión" required className={`col-span-2 ${inputClass}`} />
         <input name="date" type="date" required defaultValue={new Date().toISOString().slice(0, 10)} className={inputClass} />
         <input name="time" type="time" defaultValue="09:00" className={inputClass} />
@@ -96,7 +96,7 @@ export default async function CalendarPage(props: PageProps<"/dashboard/calendar
         </SubmitButton>
       </form>
 
-      <div className="px-12 py-8">
+      <div className="px-5 py-8 sm:px-12">
         <div className="dp-card grid grid-cols-7">
           {DAY_LABELS.map((label) => (
             <div key={label} className="border-b border-r border-filete px-2 py-2 text-center font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">

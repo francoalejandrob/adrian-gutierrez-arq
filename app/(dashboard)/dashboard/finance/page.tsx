@@ -84,7 +84,7 @@ export default async function FinancePage() {
         <SummaryStat label="Margen" value={`${marginPct.toFixed(1)}%`} tone="positive" />
       </div>
 
-      <div className="grid grid-cols-1 gap-12 px-12 py-10 lg:grid-cols-[1.3fr_1fr]">
+      <div className="grid grid-cols-1 gap-12 px-5 py-8 sm:px-12 sm:py-10 lg:grid-cols-[1.3fr_1fr]">
         <Section title="Flujo de caja · últimos 6 meses">
           <div className="flex h-[140px] items-end gap-3.5 border-b border-filete pb-0.5">
             {cashflow.map((m) => (
@@ -116,36 +116,40 @@ export default async function FinancePage() {
         </Section>
       </div>
 
-      <div className="border-t border-corte px-12 py-10">
+      <div className="border-t border-corte px-5 py-8 sm:px-12 sm:py-10">
         <Section title="Pagos pendientes y vencidos">
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 border-b border-corte pb-3 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
-            <span>Proyecto</span>
-            <span>Vence</span>
-            <span className="text-right">Monto</span>
-            <span>Estado</span>
+          <div className="overflow-x-auto">
+            <div className="min-w-[480px]">
+              <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 border-b border-corte pb-3 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
+                <span>Proyecto</span>
+                <span>Vence</span>
+                <span className="text-right">Monto</span>
+                <span>Estado</span>
+              </div>
+              {outstanding.map((payment) => {
+                const overdue = payment.status === "vencida" || (payment.due_date ?? "") < today;
+                return (
+                  <Link
+                    key={payment.id}
+                    href={`/dashboard/projects/${payment.project_id}?tab=finance`}
+                    className="grid grid-cols-[2fr_1fr_1fr_1fr] items-center gap-4 border-b border-filete py-3.5"
+                  >
+                    <span className="truncate font-dp-sans text-[13px] text-tinta">
+                      {payment.projects?.clients?.name} — {payment.projects?.name}
+                    </span>
+                    <span className={`font-dp-mono text-[11px] ${overdue ? "text-acento" : "text-concreto"}`}>
+                      {payment.due_date ?? "sin fecha"}
+                    </span>
+                    <span className="text-right font-dp-mono text-[12.5px] text-tinta">{currency.format(payment.amount)}</span>
+                    <StatusBadge
+                      label={PAYMENT_STATUS_LABELS[payment.status as PaymentStatus]}
+                      tone={overdue ? "attention" : PAYMENT_STATUS_TONE[payment.status as PaymentStatus]}
+                    />
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-          {outstanding.map((payment) => {
-            const overdue = payment.status === "vencida" || (payment.due_date ?? "") < today;
-            return (
-              <Link
-                key={payment.id}
-                href={`/dashboard/projects/${payment.project_id}?tab=finance`}
-                className="grid grid-cols-[2fr_1fr_1fr_1fr] items-center gap-4 border-b border-filete py-3.5"
-              >
-                <span className="truncate font-dp-sans text-[13px] text-tinta">
-                  {payment.projects?.clients?.name} — {payment.projects?.name}
-                </span>
-                <span className={`font-dp-mono text-[11px] ${overdue ? "text-acento" : "text-concreto"}`}>
-                  {payment.due_date ?? "sin fecha"}
-                </span>
-                <span className="text-right font-dp-mono text-[12.5px] text-tinta">{currency.format(payment.amount)}</span>
-                <StatusBadge
-                  label={PAYMENT_STATUS_LABELS[payment.status as PaymentStatus]}
-                  tone={overdue ? "attention" : PAYMENT_STATUS_TONE[payment.status as PaymentStatus]}
-                />
-              </Link>
-            );
-          })}
           {outstanding.length === 0 && (
             <p className="py-10 text-center font-dp-sans text-sm text-concreto">Sin pagos pendientes ni vencidos.</p>
           )}

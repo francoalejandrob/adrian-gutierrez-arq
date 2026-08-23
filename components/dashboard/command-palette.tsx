@@ -67,8 +67,8 @@ export default function CommandPalette() {
         className="flex h-[34px] max-w-[280px] flex-1 cursor-pointer items-center gap-2 rounded-full border border-filete bg-superficie px-3.5 text-left transition-colors duration-150 hover:border-tinta"
       >
         <Search size={14} strokeWidth={2} className="shrink-0 text-concreto" aria-hidden="true" />
-        <span className="min-w-0 flex-1 truncate font-dp-sans text-[12.5px] text-concreto">Buscar cualquier cosa</span>
-        <span className="shrink-0 rounded-md border border-filete px-1.5 py-0.5 font-dp-mono text-[9.5px] text-concreto">⌘K</span>
+        <span className="hidden min-w-0 flex-1 truncate font-dp-sans text-[12.5px] text-concreto sm:block">Buscar cualquier cosa</span>
+        <span className="hidden shrink-0 rounded-md border border-filete px-1.5 py-0.5 font-dp-mono text-[9.5px] text-concreto sm:block">⌘K</span>
       </button>
 
       {open && (

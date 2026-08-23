@@ -57,14 +57,14 @@ export default async function WebsitePage(props: PageProps<"/dashboard/website">
         }
       />
 
-      <div className="flex gap-2 border-b border-corte px-12 pb-5 pt-5">
+      <div className="flex gap-2 overflow-x-auto border-b border-corte px-5 pb-5 pt-5 sm:px-12">
         <TabLink href="/dashboard/website?tab=analytics" label="Tráfico" active={tab === "analytics"} />
         <TabLink href="/dashboard/website?tab=seo" label="Posicionamiento" active={tab === "seo"} />
         <TabLink href="/dashboard/website?tab=fuentes" label="Fuentes" active={tab === "fuentes"} />
       </div>
 
       {tab === "analytics" && (
-        <div className="px-12 py-10">
+        <div className="px-5 py-8 sm:px-12 sm:py-10">
           {traffic.configured ? (
             <>
               <div className="mb-10 grid grid-cols-2 gap-4">
@@ -96,25 +96,27 @@ export default async function WebsitePage(props: PageProps<"/dashboard/website">
       )}
 
       {tab === "seo" && (
-        <div className="px-12 py-10">
+        <div className="px-5 py-8 sm:px-12 sm:py-10">
           {search.configured ? (
-            <div>
-              <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4 border-b border-corte pb-3 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
-                <span>Consulta</span>
-                <span className="text-right">Clics</span>
-                <span className="text-right">Impresiones</span>
-                <span className="text-right">CTR</span>
-                <span className="text-right">Posición</span>
-              </div>
-              {search.data.topQueries.map((row) => (
-                <div key={row.query} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] items-center gap-4 border-b border-filete py-3">
-                  <span className="truncate font-dp-sans text-[13px] text-tinta">&ldquo;{row.query}&rdquo;</span>
-                  <span className="text-right font-dp-mono text-[12.5px] text-tinta">{row.clicks}</span>
-                  <span className="text-right font-dp-mono text-[12.5px] text-tinta">{row.impressions}</span>
-                  <span className="text-right font-dp-mono text-[12.5px] text-tinta">{(row.ctr * 100).toFixed(1)}%</span>
-                  <span className="text-right font-dp-mono text-[12.5px] text-tinta">{row.position.toFixed(1)}</span>
+            <div className="overflow-x-auto">
+              <div className="min-w-[640px]">
+                <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4 border-b border-corte pb-3 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
+                  <span>Consulta</span>
+                  <span className="text-right">Clics</span>
+                  <span className="text-right">Impresiones</span>
+                  <span className="text-right">CTR</span>
+                  <span className="text-right">Posición</span>
                 </div>
-              ))}
+                {search.data.topQueries.map((row) => (
+                  <div key={row.query} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] items-center gap-4 border-b border-filete py-3">
+                    <span className="truncate font-dp-sans text-[13px] text-tinta">&ldquo;{row.query}&rdquo;</span>
+                    <span className="text-right font-dp-mono text-[12.5px] text-tinta">{row.clicks}</span>
+                    <span className="text-right font-dp-mono text-[12.5px] text-tinta">{row.impressions}</span>
+                    <span className="text-right font-dp-mono text-[12.5px] text-tinta">{(row.ctr * 100).toFixed(1)}%</span>
+                    <span className="text-right font-dp-mono text-[12.5px] text-tinta">{row.position.toFixed(1)}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <NotConfigured reason={search.reason} />
@@ -123,11 +125,11 @@ export default async function WebsitePage(props: PageProps<"/dashboard/website">
       )}
 
       {tab === "fuentes" && (
-        <div className="px-12 py-10">
+        <div className="px-5 py-8 sm:px-12 sm:py-10">
           {funnelRows.length > 0 ? (
             <div className="flex flex-col">
               {funnelRows.map((row) => (
-                <div key={row.source} className="grid grid-cols-5 items-center gap-4 border-b border-filete py-5">
+                <div key={row.source} className="grid grid-cols-2 items-center gap-4 border-b border-filete py-5 sm:grid-cols-5">
                   <span className="font-dp-serif text-lg text-tinta">{row.source}</span>
                   <FunnelStat label="Leads" value={String(row.leads)} />
                   <FunnelStat label="Clientes" value={String(row.clients)} />

@@ -48,7 +48,7 @@ export default async function NotificationsPage() {
             const unread = !notification.read_at;
             const attention = unread && ATTENTION_TYPES.has(notification.type);
             return (
-            <div key={notification.id} className="flex items-start gap-4 border-b border-filete px-12 py-5 last:border-0">
+            <div key={notification.id} className="flex items-start gap-4 border-b border-filete px-5 py-5 sm:px-12">
               <span
                 className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
                   attention ? "bg-acento/10 text-acento" : unread ? "bg-azul/10 text-azul" : "bg-concreto/10 text-concreto"

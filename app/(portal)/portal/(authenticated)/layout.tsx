@@ -17,9 +17,9 @@ export default async function PortalAuthenticatedLayout({ children }: LayoutProp
 
   return (
     <div className={`dp-scope ${dpFontVars} min-h-dvh bg-papel font-dp-sans text-tinta`}>
-      <div className="dp-grain sticky top-0 z-40 flex h-[53px] items-center justify-between border-b border-corte px-6">
-        <p className="font-dp-sans text-sm font-medium tracking-[0.02em] text-tinta">{org?.name ?? "Adrián Gutiérrez Arq."}</p>
-        <div className="flex items-center gap-5">
+      <div className="dp-grain sticky top-0 z-40 flex h-[53px] items-center justify-between gap-4 border-b border-corte px-6">
+        <p className="min-w-0 flex-1 truncate font-dp-sans text-sm font-medium tracking-[0.02em] text-tinta">{org?.name ?? "Adrián Gutiérrez Arq."}</p>
+        <div className="flex shrink-0 items-center gap-5">
           <Link
             href="/portal/account"
             className="flex items-center gap-1.5 font-dp-mono text-[10px] uppercase tracking-[0.1em] text-concreto transition-colors duration-150 hover:text-tinta"

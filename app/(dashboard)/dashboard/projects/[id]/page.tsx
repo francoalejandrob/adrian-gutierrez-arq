@@ -195,23 +195,23 @@ export default async function ProjectDetailPage(
 
   return (
     <div>
-      <div className="border-b border-corte px-12 pb-[30px] pt-[52px]">
+      <div className="border-b border-corte px-5 pb-5 pt-8 sm:px-12 sm:pb-[30px] sm:pt-[52px]">
         <Link
           href="/dashboard/projects"
           className="mb-[18px] inline-block font-dp-mono text-[10px] uppercase tracking-[0.14em] text-concreto hover:text-tinta"
         >
           ← Proyectos
         </Link>
-        <div className="flex items-end justify-between gap-10">
+        <div className="flex flex-wrap items-end justify-between gap-6 sm:gap-10">
           <div>
-            <h1 className="font-dp-serif text-[44px] leading-none tracking-[-0.015em] text-tinta">{project.name}</h1>
+            <h1 className="font-dp-serif text-[28px] leading-none tracking-[-0.015em] text-tinta sm:text-[44px]">{project.name}</h1>
             <p className="mt-3 font-dp-sans text-[13px] text-concreto">
               {project.category ?? "Proyecto"} · {project.clients?.name}
               {project.location ? ` · ${project.location}` : ""}
             </p>
           </div>
           <div className="text-right">
-            <p className="font-dp-mono text-[36px] leading-none text-tinta">{project.progress}%</p>
+            <p className="font-dp-mono text-[28px] leading-none text-tinta sm:text-[36px]">{project.progress}%</p>
             <p className="mt-2 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Completado</p>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default async function ProjectDetailPage(
         </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto border-b border-corte px-12 pb-5 pt-5">
+      <div className="flex gap-2 overflow-x-auto border-b border-corte px-5 pb-5 pt-5 sm:px-12">
         {TABS.map((t) => (
           <TabLink
             key={t.key}
@@ -239,7 +239,7 @@ export default async function ProjectDetailPage(
       </div>
 
       {tab === "overview" && (
-        <div className="grid grid-cols-1 gap-12 px-12 py-10 lg:grid-cols-[1.4fr_1fr]">
+        <div className="grid grid-cols-1 gap-12 px-5 py-8 sm:px-12 sm:py-10 lg:grid-cols-[1.4fr_1fr]">
           <Section title="Fases del proyecto">
             <div className="flex flex-col">
               {(phases ?? []).map((phase, i) => (
@@ -282,7 +282,7 @@ export default async function ProjectDetailPage(
       )}
 
       {tab === "docs" && (
-        <div className="px-12 py-10">
+        <div className="px-5 py-8 sm:px-12 sm:py-10">
           {docsByCategory.size > 0 && (
             <div className="mb-8 flex flex-wrap gap-x-8 gap-y-2 border-b border-filete pb-6">
               {[...docsByCategory.entries()].map(([category, count]) => (
@@ -334,7 +334,7 @@ export default async function ProjectDetailPage(
             {(documents ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin documentos todavía.</p>}
           </div>
 
-          <form action={boundUpload} className="mt-8 grid grid-cols-4 gap-2.5 border-t border-filete pt-8">
+          <form action={boundUpload} className="mt-8 grid grid-cols-2 gap-2.5 sm:grid-cols-4 border-t border-filete pt-8">
             <input name="name" placeholder="Nombre del documento" required className={`col-span-2 ${inputClass}`} />
             <select name="category" className={selectClass}>
               {DOC_CATEGORIES.map((category) => (
@@ -356,7 +356,7 @@ export default async function ProjectDetailPage(
       )}
 
       {tab === "tasks" && (
-        <div className="px-12 py-10">
+        <div className="px-5 py-8 sm:px-12 sm:py-10">
           <div className="mb-6 flex justify-end">
             <form action={boundCreateTask} className="flex gap-2.5">
               <input name="title" placeholder="Nueva tarea" required className={inputClass} />
@@ -424,13 +424,13 @@ export default async function ProjectDetailPage(
       )}
 
       {tab === "gantt" && (
-        <div className="px-12 py-10">
+        <div className="px-5 py-8 sm:px-12 sm:py-10">
           <GanttChart phases={phases ?? []} />
         </div>
       )}
 
       {tab === "approvals" && (
-        <div className="flex flex-col gap-8 px-12 py-10">
+        <div className="flex flex-col gap-8 px-5 py-8 sm:px-12 sm:py-10">
           {pendingApprovals.map(({ doc, version }) => (
             <div key={version.id} className="max-w-lg overflow-hidden rounded-2xl border border-filete">
               <div className="dp-grain-strong flex aspect-[16/10] items-center justify-center">
@@ -459,8 +459,8 @@ export default async function ProjectDetailPage(
       )}
 
       {tab === "finance" && (
-        <div className="flex flex-col gap-10 px-12 py-10">
-          <div className="grid grid-cols-5 gap-4">
+        <div className="flex flex-col gap-10 px-5 py-8 sm:px-12 sm:py-10">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             <SummaryStat label="Contratado" value={currency.format(contracted)} />
             <SummaryStat label="Cobrado" value={currency.format(collected)} tone="positive" />
             <SummaryStat label="Pendiente" value={currency.format(pending)} tone="attention" />
@@ -518,7 +518,7 @@ export default async function ProjectDetailPage(
               ))}
               {(contracts ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin contratos todavía.</p>}
             </div>
-            <form action={boundCreateContract} className="mt-4 grid grid-cols-4 gap-2.5">
+            <form action={boundCreateContract} className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
               <input name="value" type="number" step="0.01" placeholder="Valor" required className={inputClass} />
               <input name="start_date" type="date" className={inputClass} />
               <input name="end_date" type="date" className={inputClass} />
@@ -553,7 +553,7 @@ export default async function ProjectDetailPage(
               ))}
               {(payments ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin pagos todavía.</p>}
             </div>
-            <form action={boundCreatePayment} className="mt-4 grid grid-cols-4 gap-2.5">
+            <form action={boundCreatePayment} className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
               <input name="amount" type="number" step="0.01" placeholder="Monto" required className={inputClass} />
               <input name="due_date" type="date" className={inputClass} />
               <input name="method" placeholder="Método" className={inputClass} />
@@ -588,7 +588,7 @@ export default async function ProjectDetailPage(
               ))}
               {(expenses ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin gastos todavía.</p>}
             </div>
-            <form action={boundCreateExpense} className="mt-4 grid grid-cols-4 gap-2.5">
+            <form action={boundCreateExpense} className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
               <input name="amount" type="number" step="0.01" placeholder="Monto" required className={inputClass} />
               <select name="category" className={selectClass}>
                 {EXPENSE_CATEGORIES.map((category) => (
@@ -632,7 +632,7 @@ export default async function ProjectDetailPage(
               ))}
               {(phases ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin fases todavía.</p>}
             </div>
-            <form action={boundCreatePhase} className="mt-4 grid grid-cols-4 gap-2.5">
+            <form action={boundCreatePhase} className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
               <input name="name" placeholder="Nombre de la fase" required className={`col-span-2 ${inputClass}`} />
               <input name="start_date" type="date" className={inputClass} />
               <input name="end_date" type="date" className={inputClass} />
@@ -670,7 +670,7 @@ export default async function ProjectDetailPage(
       )}
 
       {tab === "activity" && (
-        <div className="px-12 py-10">
+        <div className="px-5 py-8 sm:px-12 sm:py-10">
           <form action={boundAddNote} className="flex gap-2.5">
             <input name="body" placeholder="Agregar una nota…" className={`flex-1 ${inputClass}`} />
             <SubmitButton variant="secondary" pendingLabel="Agregando…">

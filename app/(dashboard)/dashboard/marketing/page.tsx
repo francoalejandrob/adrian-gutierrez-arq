@@ -30,7 +30,7 @@ export default async function MarketingPage() {
     <div>
       <PageHeader eyebrow="Inteligencia · De la visita al ingreso, calculado con datos propios" title="Marketing intelligence" />
 
-      <div className="mx-12 mt-8 grid grid-cols-5 gap-4">
+      <div className="mx-5 mt-8 grid grid-cols-2 gap-4 sm:mx-12 sm:grid-cols-3 lg:grid-cols-5">
         {stages.map((stage, i) => (
           <div key={stage.label} className="dp-card p-8">
             <p className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</p>
@@ -45,7 +45,7 @@ export default async function MarketingPage() {
       </div>
 
       {!traffic.configured && (
-        <p className="px-12 pt-8 font-dp-sans text-[13px] text-concreto">
+        <p className="px-5 pt-8 font-dp-sans text-[13px] text-concreto sm:px-12">
           Visitas requiere Google Analytics configurado — ver <span className="font-dp-mono text-[11.5px]">INTEGRATION_SETUP.md</span>. El
           resto del embudo es real y ya está disponible.
         </p>

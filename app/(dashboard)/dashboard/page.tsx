@@ -222,7 +222,7 @@ export default async function DashboardPage() {
     <div>
       <PageHeader eyebrow={`${greeting()}${firstName ? `, ${firstName}` : ""}`} title="Esto es lo importante hoy." />
 
-      <div className="grid grid-cols-2 gap-4 px-12 pt-8 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 px-5 pt-8 sm:px-12 lg:grid-cols-4">
         {instruments.map((item, i) => (
           <div key={item.label} className={`dp-card relative p-7 ${item.attention ? "border-acento/30" : ""}`}>
             {item.attention && <span className="absolute left-0 top-0 h-full w-[3px] bg-acento" />}
@@ -246,7 +246,7 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <div className="mx-12 mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mx-5 mt-6 grid grid-cols-2 gap-4 sm:mx-12 lg:grid-cols-4">
         {summary.map((item) => (
           <div key={item.label} className="dp-card p-6">
             <div className="flex items-start justify-between gap-2">
@@ -267,7 +267,7 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-12 px-12 py-10 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
+      <div className="grid grid-cols-1 gap-12 px-5 py-8 sm:px-12 sm:py-10 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
         <Section
           title="Proyectos activos"
           action={
@@ -331,7 +331,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="border-t border-corte px-12 py-10">
+      <div className="border-t border-corte px-5 py-8 sm:px-12 sm:py-10">
         <p className="mb-6 font-dp-mono text-[10px] uppercase tracking-[0.16em] text-concreto">Analíticas</p>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           <Section title="Pipeline por etapa">
@@ -387,7 +387,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="border-t border-corte px-12 py-10">
+      <div className="border-t border-corte px-5 py-8 sm:px-12 sm:py-10">
         <Section title="Actividad reciente">
           <div className="flex flex-col">
             {(activity ?? []).map((item) => (

@@ -42,7 +42,7 @@ export default async function ProjectsPage(
         }
       />
 
-      <div className="flex flex-wrap gap-2 border-b border-filete px-12 py-4">
+      <div className="flex flex-wrap gap-2 border-b border-filete px-5 py-4 sm:px-12">
         <TabLink href="/dashboard/projects" label="Todos" active={!statusFilter} size="sm" />
         {PROJECT_STATUSES.map((status) => (
           <TabLink
@@ -56,35 +56,37 @@ export default async function ProjectsPage(
       </div>
 
       {(projects ?? []).length > 0 ? (
-        <div>
-          {(projects ?? []).map((project, i) => (
-            <Link
-              key={project.id}
-              href={`/dashboard/projects/${project.id}`}
-              className="flex items-center gap-6 border-b border-filete px-12 py-5 transition-colors duration-100 hover:bg-realce"
-            >
-              <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
-              {project.clients?.name && <Avatar name={project.clients.name} size={28} />}
-              <div className="w-[220px] shrink-0">
-                <p className="truncate font-dp-serif text-xl text-tinta">{project.name}</p>
-                <p className="mt-1 font-dp-sans text-[12px] text-concreto">
-                  {project.category ?? "—"} · {project.clients?.name ?? "—"}
-                </p>
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="mb-2 flex items-baseline justify-between gap-4">
-                  <StatusBadge label={PROJECT_STATUS_LABELS[project.status]} tone={PROJECT_STATUS_TONE[project.status]} />
-                  <span className="font-dp-mono text-[12px] text-tinta">{project.progress}%</span>
+        <div className="overflow-x-auto">
+          <div className="min-w-[720px]">
+            {(projects ?? []).map((project, i) => (
+              <Link
+                key={project.id}
+                href={`/dashboard/projects/${project.id}`}
+                className="flex items-center gap-6 border-b border-filete px-5 py-5 transition-colors duration-100 hover:bg-realce sm:px-12"
+              >
+                <span className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</span>
+                {project.clients?.name && <Avatar name={project.clients.name} size={28} />}
+                <div className="w-[220px] shrink-0">
+                  <p className="truncate font-dp-serif text-xl text-tinta">{project.name}</p>
+                  <p className="mt-1 font-dp-sans text-[12px] text-concreto">
+                    {project.category ?? "—"} · {project.clients?.name ?? "—"}
+                  </p>
                 </div>
-                <ProgressBar value={project.progress} />
-              </div>
-              <span className="w-[150px] shrink-0 text-right font-dp-mono text-[11px] text-concreto">
-                {project.estimated_end_date
-                  ? `Entrega ${new Date(project.estimated_end_date).toLocaleDateString("es-EC")}`
-                  : "Sin fecha"}
-              </span>
-            </Link>
-          ))}
+                <div className="min-w-0 flex-1">
+                  <div className="mb-2 flex items-baseline justify-between gap-4">
+                    <StatusBadge label={PROJECT_STATUS_LABELS[project.status]} tone={PROJECT_STATUS_TONE[project.status]} />
+                    <span className="font-dp-mono text-[12px] text-tinta">{project.progress}%</span>
+                  </div>
+                  <ProgressBar value={project.progress} />
+                </div>
+                <span className="w-[150px] shrink-0 text-right font-dp-mono text-[11px] text-concreto">
+                  {project.estimated_end_date
+                    ? `Entrega ${new Date(project.estimated_end_date).toLocaleDateString("es-EC")}`
+                    : "Sin fecha"}
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       ) : (
         <EmptyState

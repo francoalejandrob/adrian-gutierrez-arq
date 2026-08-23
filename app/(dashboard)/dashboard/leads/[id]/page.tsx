@@ -37,16 +37,16 @@ export default async function LeadDetailPage(
 
   return (
     <div>
-      <div className="border-b border-corte px-12 pb-[30px] pt-[52px]">
+      <div className="border-b border-corte px-5 pb-5 pt-8 sm:px-12 sm:pb-[30px] sm:pt-[52px]">
         <Link
           href="/dashboard/crm?tab=leads"
           className="mb-[18px] inline-block font-dp-mono text-[10px] uppercase tracking-[0.14em] text-concreto hover:text-tinta"
         >
           ← CRM
         </Link>
-        <div className="flex items-end justify-between gap-10">
+        <div className="flex flex-wrap items-end justify-between gap-6 sm:gap-10">
           <div>
-            <h1 className="font-dp-serif text-[44px] leading-none tracking-[-0.015em] text-tinta">{lead.name}</h1>
+            <h1 className="font-dp-serif text-[28px] leading-none tracking-[-0.015em] text-tinta sm:text-[44px]">{lead.name}</h1>
             <p className="mt-3 font-dp-sans text-[13px] text-concreto">{lead.email}</p>
           </div>
           {lead.status !== "ganado" && (
@@ -67,7 +67,7 @@ export default async function LeadDetailPage(
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-10 px-12 py-10 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-10 px-5 py-8 sm:px-12 sm:py-10 lg:grid-cols-2">
         <Section title="Editar información">
           <LeadForm action={boundUpdate} defaultValues={lead} members={members} />
         </Section>

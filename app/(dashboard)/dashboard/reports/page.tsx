@@ -16,7 +16,7 @@ export default function ReportsPage() {
 
       <div>
         {REPORTS.map((report) => (
-          <div key={report.type} className="flex items-center justify-between gap-8 border-b border-filete px-12 py-6">
+          <div key={report.type} className="flex flex-wrap items-center justify-between gap-4 border-b border-filete px-5 py-6 sm:px-12">
             <div className="flex items-center gap-4">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-azul/10 text-azul">
                 <report.icon size={16} strokeWidth={1.75} aria-hidden="true" />

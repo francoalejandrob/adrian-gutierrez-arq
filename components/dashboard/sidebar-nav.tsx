@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { NAV_GROUPS } from "./nav-items";
+import { useSidebar } from "./sidebar-context";
 
 export default function SidebarNav() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
+  const { close } = useSidebar();
 
   return (
     <nav>
@@ -25,6 +27,7 @@ export default function SidebarNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={close}
                 aria-current={active ? "page" : undefined}
                 className={`mx-2 flex items-center gap-[11px] rounded-lg px-3 py-[7px] font-dp-sans text-[13px] transition-colors duration-150 ${
                   active ? "bg-realce font-medium text-tinta" : "text-grafito hover:bg-realce hover:text-tinta"

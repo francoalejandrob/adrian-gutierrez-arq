@@ -22,7 +22,7 @@ export default async function SettingsPage() {
     <div>
       <PageHeader eyebrow="Sistema" title="Configuración" />
 
-      <div className="grid grid-cols-1 gap-12 px-12 py-10 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-12 px-5 py-8 sm:px-12 sm:py-10 lg:grid-cols-2">
         <div>
           <p className="mb-5 font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">Estudio</p>
           <div className="flex flex-col gap-5 border-t border-filete pt-5">
