@@ -26,10 +26,8 @@ export default function SidebarNav() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex w-full items-center gap-[11px] border-l-2 py-[7px] pl-[18px] pr-5 font-dp-sans text-[13px] transition-colors duration-150 ${
-                  active
-                    ? "border-tinta bg-realce font-medium text-tinta"
-                    : "border-transparent text-grafito hover:bg-realce hover:text-tinta"
+                className={`mx-2 flex items-center gap-[11px] rounded-lg px-3 py-[7px] font-dp-sans text-[13px] transition-colors duration-150 ${
+                  active ? "bg-realce font-medium text-tinta" : "text-grafito hover:bg-realce hover:text-tinta"
                 }`}
               >
                 <Icon size={16} strokeWidth={1.75} className={`shrink-0 ${active ? "text-acento" : "text-concreto"}`} aria-hidden="true" />
