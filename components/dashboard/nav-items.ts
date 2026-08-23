@@ -7,6 +7,7 @@ import {
   FolderKanban,
   Globe,
   LayoutDashboard,
+  MapPin,
   Megaphone,
   Palette,
   Settings,
@@ -79,6 +80,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { num: "11", href: "/dashboard/marketing", label: "Marketing", icon: Megaphone, match: (p) => p.startsWith("/dashboard/marketing") },
       { num: "12", href: "/dashboard/ai", label: "Archi AI", icon: Sparkles, match: (p) => p.startsWith("/dashboard/ai") },
       { num: "13", href: "/dashboard/reports", label: "Reportes", icon: BarChart3, match: (p) => p.startsWith("/dashboard/reports") },
+      { num: "17", href: "/dashboard/map", label: "Mapa", icon: MapPin, match: (p) => p.startsWith("/dashboard/map") },
     ],
   },
   {
@@ -105,6 +107,7 @@ export const CRUMBS: { test: (pathname: string) => boolean; label: string }[] = 
   { test: (p) => p.startsWith("/dashboard/marketing"), label: "Inteligencia / Marketing" },
   { test: (p) => p.startsWith("/dashboard/ai"), label: "Inteligencia / Archi AI" },
   { test: (p) => p.startsWith("/dashboard/reports"), label: "Inteligencia / Reportes" },
+  { test: (p) => p.startsWith("/dashboard/map"), label: "Inteligencia / Mapa" },
   { test: (p) => p.startsWith("/dashboard/notifications"), label: "Sistema / Notificaciones" },
   { test: (p) => p.startsWith("/dashboard/settings"), label: "Sistema / Configuración" },
   { test: (p) => p.startsWith("/dashboard/design-system"), label: "Sistema / Design system" },
