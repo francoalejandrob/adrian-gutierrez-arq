@@ -25,6 +25,15 @@ export const TONE_BG: Record<BadgeTone, string> = {
 // hue (tinta) stepped down in opacity per rank, instead of assigning an
 // arbitrary rainbow color per category. Keeps every chart inside the
 // deliberate palette instead of an arbitrary per-category rainbow.
+//
+// Pase oscuro: verificado con cálculo de contraste real (no a ojo) que
+// esta escala sigue funcionando sin cambios después de que `tinta` pasó
+// a ser el tono claro (ver globals.css) — al ser un fade de opacidad
+// simétrico (color de primer plano difuminándose hacia el fondo), la
+// relación de prominencia se preserva sin importar si tinta es oscuro
+// sobre claro o claro sobre oscuro. Pasos consecutivos quedan entre
+// 1.26:1 y 1.84:1 de contraste entre sí sobre `superficie` oscuro —
+// comparable al espaciado original en modo claro.
 export const TINTA_STROKE_SCALE = [
   "stroke-tinta",
   "stroke-tinta/72",

@@ -461,12 +461,12 @@ export default async function ProjectDetailPage(
 
       {tab === "finance" && (
         <div className="flex flex-col gap-10 px-12 py-10">
-          <div className="dp-card grid grid-cols-5">
+          <div className="grid grid-cols-5 gap-4">
             <SummaryStat label="Contratado" value={currency.format(contracted)} />
             <SummaryStat label="Cobrado" value={currency.format(collected)} tone="positive" />
             <SummaryStat label="Pendiente" value={currency.format(pending)} tone="attention" />
             <SummaryStat label="Gastos" value={currency.format(spent)} />
-            <SummaryStat label="Margen" value={currency.format(margin)} tone="positive" last />
+            <SummaryStat label="Margen" value={currency.format(margin)} tone="positive" />
           </div>
 
           <Section title="Cotizaciones">
@@ -721,10 +721,10 @@ function PhaseRow({ phase, isCurrent }: { phase: Phase; isCurrent: boolean }) {
   );
 }
 
-function SummaryStat({ label, value, tone, last }: { label: string; value: string; tone?: "positive" | "attention"; last?: boolean }) {
+function SummaryStat({ label, value, tone }: { label: string; value: string; tone?: "positive" | "attention" }) {
   const toneClass = tone === "positive" ? "text-verde" : tone === "attention" ? "text-acento" : "text-tinta";
   return (
-    <div className={`p-6 text-center ${last ? "" : "border-r border-filete"}`}>
+    <div className="dp-card p-6 text-center">
       <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">{label}</p>
       <p className={`mt-2.5 font-dp-mono text-lg ${toneClass}`}>{value}</p>
     </div>

@@ -46,12 +46,12 @@ export default async function WebsitePage(props: PageProps<"/dashboard/website">
         <div className="px-12 py-10">
           {traffic.configured ? (
             <>
-              <div className="dp-card mb-10 grid grid-cols-2">
-                <div className="border-r border-filete p-7">
+              <div className="mb-10 grid grid-cols-2 gap-4">
+                <div className="dp-card p-7">
                   <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">Usuarios activos</p>
                   <p className="mt-2.5 font-dp-mono text-2xl text-tinta">{traffic.data.totals.activeUsers.toLocaleString("es-EC")}</p>
                 </div>
-                <div className="p-7">
+                <div className="dp-card p-7">
                   <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">Sesiones</p>
                   <p className="mt-2.5 font-dp-mono text-2xl text-tinta">{traffic.data.totals.sessions.toLocaleString("es-EC")}</p>
                 </div>

@@ -246,9 +246,9 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <div className="dp-card mx-12 mt-6 grid grid-cols-2 lg:grid-cols-4">
-        {summary.map((item, i) => (
-          <div key={item.label} className={`p-6 ${i > 0 ? "border-l border-filete" : ""}`}>
+      <div className="mx-12 mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {summary.map((item) => (
+          <div key={item.label} className="dp-card p-6">
             <div className="flex items-start justify-between gap-2">
               <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">{item.label}</p>
               <item.icon size={15} strokeWidth={1.75} className="shrink-0 text-corte" aria-hidden="true" />

@@ -4,9 +4,12 @@ export function SkeletonBlock({ className = "" }: { className?: string }) {
 
 export function StatBandSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className="grid border-b border-corte" style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}>
+    <div
+      className="mx-12 mt-8 grid gap-4"
+      style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}
+    >
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className={`p-8 ${i < count - 1 ? "border-r border-filete" : ""}`}>
+        <div key={i} className="dp-card p-8">
           <SkeletonBlock className="h-3 w-6" />
           <SkeletonBlock className="mt-4 h-10 w-16" />
           <SkeletonBlock className="mt-4 h-3 w-20" />

@@ -75,13 +75,13 @@ export default async function FinancePage() {
     <div>
       <PageHeader eyebrow="Inteligencia · Resumen de todos los proyectos" title="Finanzas" />
 
-      <div className="dp-card mx-12 mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mx-12 mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <SummaryStat label="Contratado" value={currency.format(contracted)} />
         <SummaryStat label="Cobrado" value={currency.format(collected)} tone="positive" />
         <SummaryStat label="Pendiente" value={currency.format(pending)} tone="attention" />
         <SummaryStat label="Gastos" value={currency.format(spent)} />
         <SummaryStat label="Utilidad" value={currency.format(profit)} tone="positive" />
-        <SummaryStat label="Margen" value={`${marginPct.toFixed(1)}%`} tone="positive" last />
+        <SummaryStat label="Margen" value={`${marginPct.toFixed(1)}%`} tone="positive" />
       </div>
 
       <div className="grid grid-cols-1 gap-12 px-12 py-10 lg:grid-cols-[1.3fr_1fr]">
@@ -159,16 +159,14 @@ function SummaryStat({
   label,
   value,
   tone,
-  last,
 }: {
   label: string;
   value: string;
   tone?: "attention" | "positive";
-  last?: boolean;
 }) {
   const toneClass = tone === "attention" ? "text-acento" : tone === "positive" ? "text-verde" : "text-tinta";
   return (
-    <div className={`p-6 ${last ? "" : "border-r border-filete"}`}>
+    <div className="dp-card p-6">
       <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.1em] text-concreto">{label}</p>
       <p className={`mt-2.5 font-dp-mono text-lg ${toneClass}`}>{value}</p>
     </div>

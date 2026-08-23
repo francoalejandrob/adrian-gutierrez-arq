@@ -100,10 +100,10 @@ export default async function ClientDetailPage(
         </Section>
       </div>
 
-      <div className="mx-12 mt-8 grid grid-cols-3 dp-card">
+      <div className="mx-12 mt-8 grid grid-cols-3 gap-4">
         <StatCell label="Contrato" value={currency.format(contractedTotal)} hint={firstSignedAt ? `Firmado ${new Date(firstSignedAt).toLocaleDateString("es-EC")}` : "Sin contratos firmados"} />
         <StatCell label="Cobrado" value={currency.format(collectedTotal)} hint={`${(payments ?? []).filter((p) => p.status === "pagada").length} pago(s)`} />
-        <StatCell label="Comunicación" value={String(communicationCount)} hint="Interacciones registradas" last />
+        <StatCell label="Comunicación" value={String(communicationCount)} hint="Interacciones registradas" />
       </div>
 
       <div className="grid grid-cols-1 gap-10 px-12 py-10 lg:grid-cols-2">
@@ -198,9 +198,9 @@ function PageHeaderWithBack({
   );
 }
 
-function StatCell({ label, value, hint, last }: { label: string; value: string; hint: string; last?: boolean }) {
+function StatCell({ label, value, hint }: { label: string; value: string; hint: string }) {
   return (
-    <div className={`p-8 ${last ? "" : "border-r border-filete"}`}>
+    <div className="dp-card p-8">
       <p className="font-dp-mono text-[9.5px] uppercase tracking-[0.13em] text-concreto">{label}</p>
       <p className="mt-4 font-dp-mono text-2xl text-tinta">{value}</p>
       <p className="mt-2 font-dp-sans text-[11.5px] text-concreto">{hint}</p>

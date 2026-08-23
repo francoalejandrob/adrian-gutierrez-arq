@@ -30,9 +30,9 @@ export default async function MarketingPage() {
     <div>
       <PageHeader eyebrow="Inteligencia · De la visita al ingreso, calculado con datos propios" title="Marketing intelligence" />
 
-      <div className="dp-card mx-12 mt-8 grid grid-cols-5">
+      <div className="mx-12 mt-8 grid grid-cols-5 gap-4">
         {stages.map((stage, i) => (
-          <div key={stage.label} className={`p-8 ${i > 0 ? "border-l border-filete" : ""}`}>
+          <div key={stage.label} className="dp-card p-8">
             <p className="font-dp-mono text-[10px] text-concreto">{String(i + 1).padStart(2, "0")}</p>
             <p
               className={`mt-4 font-dp-mono text-2xl leading-none ${stage.label === "Ingresos" ? "text-verde" : "text-tinta"}`}
