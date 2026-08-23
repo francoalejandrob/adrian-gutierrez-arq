@@ -49,7 +49,7 @@ export default async function CrmPage(props: PageProps<"/dashboard/crm">) {
         }
       />
 
-      <div className="flex gap-2 border-b border-corte px-12 pb-5">
+      <div className="flex gap-2 border-b border-corte px-12 pb-5 pt-5">
         <TabLink href="/dashboard/crm?tab=leads" label="Leads" icon={Users} active={tab === "leads"} />
         <TabLink href="/dashboard/crm?tab=clientes" label="Clientes" icon={Users} active={tab === "clientes"} />
         <TabLink href="/dashboard/crm?tab=pipeline" label="Pipeline" icon={TrendingUp} active={tab === "pipeline"} />

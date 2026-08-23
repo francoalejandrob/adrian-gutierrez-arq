@@ -227,7 +227,7 @@ export default async function ProjectDetailPage(
         </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto border-b border-corte px-12 pb-5">
+      <div className="flex gap-2 overflow-x-auto border-b border-corte px-12 pb-5 pt-5">
         {TABS.map((t) => (
           <TabLink
             key={t.key}
