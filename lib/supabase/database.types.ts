@@ -153,6 +153,8 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           name: string
           notes: string | null
           organization_id: string
@@ -165,6 +167,8 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           name: string
           notes?: string | null
           organization_id: string
@@ -177,6 +181,8 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           name?: string
           notes?: string | null
           organization_id?: string
@@ -822,7 +828,9 @@ export type Database = {
           description: string | null
           estimated_end_date: string | null
           id: string
+          latitude: number | null
           location: string | null
+          longitude: number | null
           name: string
           organization_id: string
           progress: number
@@ -841,7 +849,9 @@ export type Database = {
           description?: string | null
           estimated_end_date?: string | null
           id?: string
+          latitude?: number | null
           location?: string | null
+          longitude?: number | null
           name: string
           organization_id: string
           progress?: number
@@ -860,7 +870,9 @@ export type Database = {
           description?: string | null
           estimated_end_date?: string | null
           id?: string
+          latitude?: number | null
           location?: string | null
+          longitude?: number | null
           name?: string
           organization_id?: string
           progress?: number

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { geocodeAddress } from "@/lib/integrations/google-geocoding";
 import type { createClient } from "@/lib/supabase/server";
 import { getCurrentOrganizationId } from "@/lib/supabase/org";
 
@@ -202,9 +203,16 @@ export async function createClientTool(supabase: SupabaseClient, args: Record<st
   const organizationId = await getCurrentOrganizationId(supabase);
   if (!organizationId) throw new Error("Sin organización asociada.");
 
+  const coords = parsed.data.address ? await geocodeAddress(parsed.data.address) : null;
+
   const { data, error } = await supabase
     .from("clients")
-    .insert({ organization_id: organizationId, ...parsed.data })
+    .insert({
+      organization_id: organizationId,
+      ...parsed.data,
+      latitude: coords?.lat ?? null,
+      longitude: coords?.lng ?? null,
+    })
     .select("id, name")
     .single();
   if (error) throw new Error(error.message);

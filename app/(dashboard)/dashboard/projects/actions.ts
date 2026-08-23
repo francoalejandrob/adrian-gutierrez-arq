@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { geocodeAddress } from "@/lib/integrations/google-geocoding";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentOrganizationId } from "@/lib/supabase/org";
 import { PROJECT_CATEGORIES, PROJECT_STATUSES } from "@/lib/supabase/types";
@@ -40,12 +41,15 @@ export async function createProject(formData: FormData) {
   if (!organizationId) throw new Error("Sin organización asociada");
 
   const { category, ...rest } = parsed.data;
+  const coords = rest.location ? await geocodeAddress(rest.location) : null;
   const { data: project, error } = await supabase
     .from("projects")
     .insert({
       organization_id: organizationId,
       category: category || null,
       ...rest,
+      latitude: coords?.lat ?? null,
+      longitude: coords?.lng ?? null,
     })
     .select("id")
     .single();
@@ -67,10 +71,17 @@ export async function updateProject(id: string, formData: FormData) {
   }
 
   const { category, ...rest } = parsed.data;
+  const coords = rest.location ? await geocodeAddress(rest.location) : null;
   const supabase = await createClient();
   const { error } = await supabase
     .from("projects")
-    .update({ ...rest, category: category || null, updated_at: new Date().toISOString() })
+    .update({
+      ...rest,
+      category: category || null,
+      latitude: coords?.lat ?? null,
+      longitude: coords?.lng ?? null,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", id);
   if (error) throw new Error(error.message);
 

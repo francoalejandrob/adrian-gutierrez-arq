@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { geocodeAddress } from "@/lib/integrations/google-geocoding";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentOrganizationId } from "@/lib/supabase/org";
 
@@ -25,9 +26,13 @@ export async function createClientRecord(formData: FormData) {
   const organizationId = await getCurrentOrganizationId(supabase);
   if (!organizationId) throw new Error("Sin organización asociada");
 
+  const coords = parsed.data.address ? await geocodeAddress(parsed.data.address) : null;
+
   const { error } = await supabase.from("clients").insert({
     organization_id: organizationId,
     ...parsed.data,
+    latitude: coords?.lat ?? null,
+    longitude: coords?.lng ?? null,
   });
   if (error) throw new Error(error.message);
 
@@ -41,8 +46,13 @@ export async function updateClientRecord(id: string, formData: FormData) {
     throw new Error(parsed.error.issues[0]?.message ?? "Datos inválidos");
   }
 
+  const coords = parsed.data.address ? await geocodeAddress(parsed.data.address) : null;
+
   const supabase = await createClient();
-  const { error } = await supabase.from("clients").update(parsed.data).eq("id", id);
+  const { error } = await supabase
+    .from("clients")
+    .update({ ...parsed.data, latitude: coords?.lat ?? null, longitude: coords?.lng ?? null })
+    .eq("id", id);
   if (error) throw new Error(error.message);
 
   revalidatePath(`/dashboard/clients/${id}`);
