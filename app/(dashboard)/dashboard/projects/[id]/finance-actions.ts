@@ -171,6 +171,17 @@ export async function createContract(projectId: string, formData: FormData) {
   revalidatePath(`/dashboard/projects/${projectId}`);
 }
 
+// Para crear un contrato desde /dashboard/contracts (sin estar ya
+// parado en la ficha de un proyecto) — mismo patrón que
+// createQuoteForProject: el proyecto viene del propio formulario.
+export async function createContractForProject(formData: FormData) {
+  const projectId = String(formData.get("project_id") ?? "").trim();
+  if (!projectId) throw new Error("Selecciona un proyecto");
+
+  await createContract(projectId, formData);
+  revalidatePath("/dashboard/contracts");
+}
+
 export async function updateContractStatus(projectId: string, contractId: string, formData: FormData) {
   const status = z
     .enum(["draft", "active", "completed", "cancelled"])
