@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import StatusSelect from "@/components/dashboard/status-select";
 import { buttonClass } from "@/components/dashboard/ui/button";
+import SavedIndicator from "@/components/dashboard/ui/saved-indicator";
 import Section from "@/components/dashboard/ui/section";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
 import { inputClass, labelClass, textareaClass } from "@/components/dashboard/ui/styles";
@@ -198,9 +199,12 @@ export default async function QuoteDetailPage(props: PageProps<"/dashboard/quote
                   className={textareaClass}
                 />
               </div>
-              <SubmitButton size="md" pendingLabel="Guardando…" className="col-span-2 w-fit">
-                Guardar
-              </SubmitButton>
+              <div className="col-span-2 flex items-center gap-4">
+                <SubmitButton size="md" pendingLabel="Guardando…" className="w-fit">
+                  Guardar
+                </SubmitButton>
+                <SavedIndicator />
+              </div>
             </form>
           </Section>
         </div>
