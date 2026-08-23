@@ -1,7 +1,9 @@
 "use server";
 
+import { randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentOrganizationId } from "@/lib/supabase/org";
 import {
@@ -199,23 +201,84 @@ export async function uploadDocumentVersion(projectId: string, formData: FormDat
 }
 
 // Portal access ---------------------------------------------------------
+//
+// Solo el administrador puede crear una cuenta del portal — nunca hay
+// auto-registro (pedido explícito del usuario). Esta acción crea (o, si
+// el email ya tiene una cuenta de una invitación/reset anterior,
+// restablece) la cuenta real en auth.users con una contraseña generada,
+// además de la fila de portal_access que ya existía. La contraseña se
+// devuelve una sola vez al formulario que la llamó — nunca se guarda en
+// texto plano ni se manda por correo; el admin la copia y se la entrega
+// al cliente por fuera del sistema.
 
-const emailSchema = z.string().trim().email("Email inválido");
+const emailSchema = z
+  .string()
+  .trim()
+  .email("Email inválido")
+  .transform((v) => v.toLowerCase());
 
-export async function invitePortalAccess(projectId: string, clientId: string, formData: FormData) {
-  const email = emailSchema.parse(formData.get("email"));
+export type PortalInviteState = { email: string; password: string } | { error: string } | null;
+
+function generatePortalPassword(): string {
+  // 16 caracteres de un alfabeto sin 0/O/1/l/I (ambiguos al copiar a
+  // mano) — sobra entropía para una contraseña inicial que el cliente
+  // puede cambiar después desde /portal/account.
+  const alphabet = "23456789ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz";
+  const bytes = randomBytes(16);
+  let out = "";
+  for (let i = 0; i < bytes.length; i++) out += alphabet[bytes[i] % alphabet.length];
+  return out;
+}
+
+export async function invitePortalAccess(
+  projectId: string,
+  clientId: string,
+  _prevState: PortalInviteState,
+  formData: FormData,
+): Promise<PortalInviteState> {
+  const parsed = emailSchema.safeParse(formData.get("email"));
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Email inválido" };
+  const email = parsed.data;
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { error } = await supabase
+  const admin = createAdminClient();
+  const password = generatePortalPassword();
+
+  const { error: createError } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+  });
+
+  if (createError) {
+    if (createError.status !== 422) return { error: createError.message };
+
+    // El email ya tiene una cuenta (invitación o self-provisioning de
+    // antes de este cambio) — se le restablece la contraseña en vez de
+    // fallar, así "invitar" y "restablecer acceso" son la misma acción.
+    const { data: existing, error: lookupError } = await admin
+      .from("profiles")
+      .select("id")
+      .ilike("email", email)
+      .maybeSingle();
+    if (lookupError) return { error: lookupError.message };
+    if (!existing) return { error: "Ya existe una cuenta con ese email pero no se pudo encontrar para restablecerla." };
+
+    const { error: updateError } = await admin.auth.admin.updateUserById(existing.id, { password });
+    if (updateError) return { error: updateError.message };
+  }
+
+  const { error: accessError } = await supabase
     .from("portal_access")
-    .insert({ client_id: clientId, email, invited_by: user?.id });
-  if (error) throw new Error(error.message);
+    .upsert({ client_id: clientId, email, invited_by: user?.id }, { onConflict: "client_id,email" });
+  if (accessError) return { error: accessError.message };
 
   revalidatePath(`/dashboard/projects/${projectId}`);
+  return { email, password };
 }
 
 export async function revokePortalAccess(projectId: string, accessId: string) {

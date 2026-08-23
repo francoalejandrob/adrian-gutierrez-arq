@@ -4,6 +4,7 @@ import GanttChart from "@/components/dashboard/gantt-chart";
 import ProjectForm from "@/components/dashboard/project-form";
 import StatusSelect from "@/components/dashboard/status-select";
 import DownloadButton from "@/components/dashboard/download-button";
+import PortalAccessForm from "@/components/dashboard/portal-access-form";
 import Avatar from "@/components/dashboard/ui/avatar";
 import Section from "@/components/dashboard/ui/section";
 import StatusBadge from "@/components/dashboard/ui/status-badge";
@@ -657,19 +658,11 @@ export default async function ProjectDetailPage(
               ))}
               {(portalAccess ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">El cliente todavía no tiene acceso al portal.</p>}
             </div>
-            <form action={boundInvitePortal} className="mt-4 flex gap-2.5">
-              <input
-                name="email"
-                type="email"
-                required
-                defaultValue={project.clients?.email ?? ""}
-                placeholder="email@cliente.com"
-                className={`flex-1 ${inputClass}`}
-              />
-              <SubmitButton variant="secondary" pendingLabel="Invitando…">
-                Invitar
-              </SubmitButton>
-            </form>
+            <p className="mt-4 font-dp-sans text-[12px] text-concreto">
+              Crea la cuenta del cliente acá — nunca se auto-registra nadie. Vas a ver la contraseña inicial una sola
+              vez para copiarla y entregársela por fuera del sistema.
+            </p>
+            <PortalAccessForm action={boundInvitePortal} defaultEmail={project.clients?.email ?? ""} />
           </Section>
 
           <Section title="Editar información" className="max-w-xl">
