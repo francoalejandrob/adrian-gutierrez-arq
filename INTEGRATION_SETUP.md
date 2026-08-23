@@ -37,10 +37,31 @@ documentación pública no dejaba claras:
   supported`), a pesar de que así lo mostraba la guía de function-calling
   consultada.
 
-No verificado todavía: una corrida real a través de `/dashboard/ai` en
-el navegador (con sesión autenticada) — solo el contrato crudo de
-`generateContent` vía requests directos. Si algo falla ahí, revisar
-primero `app/api/ai/chat/route.ts`.
+**Ahora sí probado a través de `/dashboard/ai` en el navegador real**
+(Playwright, sesión autenticada), no solo el contrato crudo de
+`generateContent`. Esa prueba encontró el bug real detrás de "le pido
+que agende algo y no aparece": el `system_instruction` nunca le decía
+al modelo la fecha de hoy, así que "mañana" se resolvía a un mes/año
+cualquiera y el evento se creaba igual, solo que en un mes que
+`/dashboard/calendar` (filtra por mes visible) nunca muestra. Ya
+corregido — se inyecta la fecha real del servidor en cada request. Un
+único hallazgo pendiente, no bloqueante: si una ronda intermedia del
+loop de tool-calling falla con un 503 transitorio de Gemini después de
+que una herramienta de escritura ya se ejecutó, el usuario ve un error
+en vez de la confirmación, y reintentar el mismo pedido puede duplicar
+la acción (el turno fallido no queda registrado en el historial local
+del chat) — no se corrigió en este pase, ver `ARCHITECTURE.md`.
+
+Se amplió la cobertura de herramientas a casi todo el sistema (antes
+solo 3: crear cliente, agendar evento, crear cotización) — ver
+`ARCHITECTURE.md` para la tabla completa. Las que borran o cancelan
+algo requieren que el usuario confirme antes de ejecutarse de verdad
+(mecanismo en código, no solo instrucción de prompt) — verificado por
+inspección de código y build/lint; la conversación completa "pide
+confirmación → el usuario confirma → recién ahí borra" contra la API
+real de Gemini quedó pendiente de una corrida en vivo porque la cuota
+gratuita diaria (ver abajo) se agotó durante esta misma sesión de
+pruebas.
 
 La API key vive en `GEMINI_API_KEY` (Vercel + `.env.local`, nunca en el
 chat). Se generó gratis en [aistudio.google.com/apikey](https://aistudio.google.com/apikey)

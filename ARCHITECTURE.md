@@ -758,6 +758,84 @@ ninguna página tocada, drawer abre/cierra/navega) y en 1440×900 contra
 el estado anterior (layout de escritorio sin cambios) — antes y después
 del deploy a producción.
 
+## 6m. Archi AI: acceso real a todo el sistema + fix del bug de fecha
+
+El usuario reportó que pedirle a Archi AI que agende reuniones no las
+dejaba visibles en `/dashboard/agenda`. Diagnóstico confirmado con una
+llamada real a la API de Gemini (mismo modelo/key que producción): el
+tool-calling ya insertaba de verdad en `calendar_events`, pero el
+`system_instruction` en `app/api/ai/chat/route.ts` nunca le decía al
+modelo qué fecha era "hoy". Al pedir "mañana", el modelo inventó un mes
+distinto (probado en vivo: pidió "mañana" un 2026-08-23 y calculó
+2026-03-23) — el evento se creaba igual, solo que en un mes que
+`app/(dashboard)/dashboard/calendar/page.tsx` nunca muestra (filtra
+estrictamente `gte(monthStart).lt(monthEnd)` del mes visible).
+
+- **Fix de la causa raíz**: `route.ts` inyecta ahora la fecha real del
+  servidor (con día de la semana, zona `America/Guayaquil`) en el
+  `system_instruction`, con instrucción explícita de calcular fechas
+  relativas a partir de ella. Verificado en vivo con Playwright contra
+  `/dashboard/ai`: "agenda una reunión mañana" desde un 23 de agosto
+  creó el evento en el 24 — confirmado tanto por el chip de acción en
+  el chat como visitando `/dashboard/agenda` directamente.
+- **Mostrar qué hizo de verdad (`describeToolResult` en
+  `lib/ai/tools.ts`)**: cada tool de escritura exitosa se traduce a un
+  `{label, href}` que `chat.tsx` renderiza como chip clickeable debajo
+  de la respuesta — antes, el chat solo mostraba el texto que Gemini
+  redactó, sin ninguna confirmación estructurada de que algo se
+  hubiera creado de verdad.
+- **Confirmación obligatoria antes de borrar/cancelar**: `deleteTask`,
+  `deletePhase`, `deleteExpense`, `deleteEvent`, y
+  `updateProjectStatus`/`updateContractStatus` cuando el estado destino
+  es `"cancelled"` reciben un parámetro `confirm` — sin
+  `confirm: true` explícito, la función busca el registro real y
+  devuelve `{requiresConfirmation, message}` sin escribir nada. Es un
+  mecanismo de código (el `switch` de `runTool` nunca llega al
+  `.delete()`/`.update()` sin ese flag), no solo una instrucción de
+  prompt que el modelo podría ignorar. `systemInstruction` documenta la
+  lista exacta y la regla: primera llamada sin `confirm`, solo se repite
+  con `confirm: true` después de que el usuario responda que sí en un
+  turno posterior.
+- **Cobertura ampliada** — de 3 a ~24 herramientas de escritura, mismo
+  patrón que las 3 originales (Zod junto a la función,
+  `getCurrentOrganizationId` para scoping, cliente de sesión — nunca
+  admin, RLS es el límite real): leads (`createLead`,
+  `updateLeadStatus`, `convertLeadToClient`), clientes
+  (`updateClientRecord`), proyectos (`createProject`,
+  `updateProjectStatus`), fases (`createPhase`, `updatePhaseStatus`,
+  `deletePhase`), tareas (`createTask`, `updateTaskStatus`,
+  `deleteTask`), calendario (`deleteEvent`), contratos
+  (`createContract`, `updateContractStatus`), pagos (`createPayment`,
+  `updatePaymentStatus`), gastos (`createExpense`, `deleteExpense`),
+  cotizaciones (`updateQuoteStatus`) — cada una con su `list*` de
+  lectura correspondiente (`listPhases`, `listTasks`, `listContracts`,
+  `listExpenses`, `listQuotes`, `listUpcomingEvents`) para que el
+  modelo resuelva nombres a ids reales, mismo rol que ya cumplían
+  `listProjects`/`listClients`.
+- **Fuera de alcance a propósito** (decidido con el usuario):
+  `invitePortalAccess`/`revokePortalAccess` (la contraseña generada una
+  sola vez no debe vivir en un historial de chat ni pasar por la API de
+  Gemini) y `uploadDocumentVersion` (necesita un archivo real).
+
+Verificado en vivo contra `/dashboard/ai` con Playwright: creación de
+proyecto, tarea y evento confirmados tanto por el chip de acción como
+visitando las páginas reales del dashboard después. La cuota gratuita
+de Gemini (20 solicitudes/día/modelo) se agotó durante la misma sesión
+de pruebas — el mecanismo de confirmación antes de borrar (Fix 3) está
+verificado por inspección de código y build/lint (es una condición
+booleana simple, sin estado externo), pero la conversación completa
+"pide confirmación → el usuario confirma → recién ahí borra" contra la
+API real de Gemini queda pendiente de una corrida en vivo cuando se
+reponga la cuota. Se detectó también, sin corregir en este pase: si una
+ronda intermedia del loop de tool-calling falla con un 503 transitorio
+*después* de que una herramienta de escritura ya se ejecutó, el chat le
+muestra un error al usuario y un reintento del mismo pedido puede
+duplicar la acción — el turno fallido no queda en el historial local
+del chat (`chat.tsx` solo agrega el turno del asistente si la respuesta
+fue exitosa). Datos de prueba de esta verificación (un proyecto, una
+tarea y dos eventos) se crearon y se borraron de producción al
+terminar.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

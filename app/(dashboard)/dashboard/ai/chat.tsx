@@ -1,11 +1,13 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { Send } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle2, Send } from "lucide-react";
 import { buttonClass } from "@/components/dashboard/ui/button";
 import { inputClass } from "@/components/dashboard/ui/styles";
 
-type Message = { role: "user" | "assistant"; content: string };
+type ActionTaken = { label: string; href: string };
+type Message = { role: "user" | "assistant"; content: string; actions?: ActionTaken[] };
 
 export default function AiChat() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -41,7 +43,10 @@ export default function AiChat() {
       } else if (!response.ok) {
         setError(data.error ?? "Error inesperado.");
       } else {
-        setMessages([...nextMessages, { role: "assistant", content: data.reply }]);
+        setMessages([
+          ...nextMessages,
+          { role: "assistant", content: data.reply, actions: data.actions as ActionTaken[] | undefined },
+        ]);
       }
     } catch {
       setError("No se pudo conectar con Archi AI.");
@@ -72,7 +77,7 @@ export default function AiChat() {
         {(messages.length > 0 || loading) && (
           <div ref={scrollRef} className="mb-5 flex max-h-[420px] flex-col gap-3.5 overflow-y-auto">
             {messages.map((message, i) => (
-              <div key={i} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div key={i} className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"}`}>
                 <div
                   className={`max-w-[75%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 font-dp-sans text-[13.5px] ${
                     message.role === "user" ? "bg-superficie text-tinta" : "bg-tinta text-papel"
@@ -80,6 +85,20 @@ export default function AiChat() {
                 >
                   {message.content}
                 </div>
+                {message.actions && message.actions.length > 0 && (
+                  <div className="mt-1.5 flex max-w-[75%] flex-wrap gap-1.5">
+                    {message.actions.map((action, j) => (
+                      <Link
+                        key={j}
+                        href={action.href}
+                        className="flex items-center gap-1.5 rounded-full border border-verde/40 bg-verde/10 px-3 py-1 font-dp-sans text-[11.5px] text-verde transition-colors duration-150 hover:bg-verde/20"
+                      >
+                        <CheckCircle2 size={12} strokeWidth={2} aria-hidden="true" />
+                        {action.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             {loading && (

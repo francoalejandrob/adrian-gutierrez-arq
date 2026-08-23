@@ -487,3 +487,34 @@ técnico completo.
 Verificado con Playwright real en 390px y 1440px, antes y después del
 deploy a producción — primera vez en el proyecto que un pase de UI se
 verifica con capturas reales de navegador en vez de solo build+lint.
+
+## Archi AI: acceso real a todo el sistema + fix del bug de fecha ✅
+
+El usuario reportó que Archi AI "agendaba" reuniones que nunca
+aparecían en la agenda, y pidió acceso completo y probado a todo el
+sistema, no solo consultas. Ver `ARCHITECTURE.md` §6m para el detalle
+técnico completo.
+
+- **Causa raíz encontrada y corregida**: el chat nunca le decía al
+  modelo la fecha de hoy, así que "mañana" se resolvía a un mes
+  cualquiera y el evento se creaba igual, solo en un mes que la agenda
+  nunca muestra. Confirmado en vivo: ya calcula "mañana" bien.
+- **El chat ahora muestra qué hizo de verdad** — un chip clickeable por
+  cada acción real ejecutada, en vez de solo el texto que redactó el
+  modelo.
+- **Cobertura ampliada de 3 a ~24 herramientas de escritura**: leads,
+  clientes, proyectos, fases, tareas, calendario, contratos, pagos,
+  gastos y cotizaciones — todo el sistema salvo la creación de cuentas
+  del portal de cliente y la subida de documentos, dejadas fuera a
+  propósito por seguridad/factibilidad.
+- **Borrar o cancelar algo ahora requiere confirmación real** en el
+  chat antes de ejecutarse — no se dispara solo como sí hacen
+  crear/actualizar.
+
+Verificado en vivo contra `/dashboard/ai` con Playwright: creación de
+proyecto, tarea y evento confirmados también visitando las páginas
+reales del dashboard. La cuota gratuita diaria de Gemini se agotó
+durante la sesión de pruebas antes de poder ejercitar en vivo la
+conversación completa de confirmación de borrado — el mecanismo en sí
+está verificado por código, esa corrida específica queda pendiente
+para cuando se reponga la cuota.
