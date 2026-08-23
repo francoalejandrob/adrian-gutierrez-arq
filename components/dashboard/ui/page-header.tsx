@@ -13,7 +13,7 @@ export default function PageHeader({
         {eyebrow && (
           <p className="mb-[18px] font-dp-mono text-[10px] uppercase tracking-[0.16em] text-concreto">{eyebrow}</p>
         )}
-        <h1 className="font-dp-serif text-[52px] leading-none tracking-[-0.015em] text-tinta">{title}</h1>
+        <h1 className="font-dp-serif text-[34px] leading-none tracking-[-0.015em] text-tinta">{title}</h1>
       </div>
       {action}
     </div>
