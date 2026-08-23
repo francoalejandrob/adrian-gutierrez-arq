@@ -11,6 +11,7 @@ const clientSchema = z.object({
   email: z.string().trim().email("Email inválido").optional().or(z.literal("")),
   phone: z.string().trim().optional(),
   company: z.string().trim().optional(),
+  address: z.string().trim().optional(),
   notes: z.string().trim().optional(),
 });
 

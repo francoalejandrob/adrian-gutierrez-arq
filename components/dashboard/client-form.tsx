@@ -17,6 +17,7 @@ export default function ClientForm({
         <TextField label="Teléfono" name="phone" defaultValue={defaultValues?.phone ?? ""} />
       </div>
       <TextField label="Empresa" name="company" defaultValue={defaultValues?.company ?? ""} />
+      <TextField label="Dirección" name="address" defaultValue={defaultValues?.address ?? ""} />
       <TextareaField label="Notas" name="notes" rows={3} defaultValue={defaultValues?.notes ?? ""} />
 
       <SubmitButton size="lg" pendingLabel="Guardando…" className="w-fit">

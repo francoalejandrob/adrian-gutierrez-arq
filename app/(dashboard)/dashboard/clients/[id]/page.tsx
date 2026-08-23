@@ -1,3 +1,4 @@
+import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ClientForm from "@/components/dashboard/client-form";
@@ -159,7 +160,11 @@ export default async function ClientDetailPage(
   );
 }
 
-function PageHeaderWithBack({ client }: { client: { id: string; name: string; created_at: string; company: string | null } }) {
+function PageHeaderWithBack({
+  client,
+}: {
+  client: { id: string; name: string; created_at: string; company: string | null; address: string | null };
+}) {
   return (
     <div className="border-b border-corte px-12 pb-[30px] pt-[52px]">
       <Link
@@ -177,6 +182,12 @@ function PageHeaderWithBack({ client }: { client: { id: string; name: string; cr
               Cliente desde {new Date(client.created_at).toLocaleDateString("es-EC", { month: "short", year: "numeric" })}
               {client.company ? ` · ${client.company}` : ""}
             </p>
+            {client.address && (
+              <p className="mt-1.5 flex items-center gap-1.5 font-dp-sans text-[12.5px] text-concreto">
+                <MapPin className="h-3.5 w-3.5" strokeWidth={1.5} />
+                {client.address}
+              </p>
+            )}
           </div>
         </div>
         <Link href={`/dashboard/projects/new?client_id=${client.id}`} className={buttonClass("primary", "md")}>
