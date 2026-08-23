@@ -10,6 +10,7 @@ import Section from "@/components/dashboard/ui/section";
 import StatusBadge from "@/components/dashboard/ui/status-badge";
 import StatusMark from "@/components/dashboard/ui/status-mark";
 import SubmitButton from "@/components/dashboard/ui/submit-button";
+import { TabLink } from "@/components/dashboard/ui/tabs";
 import { inputClass, selectClass } from "@/components/dashboard/ui/styles";
 import { getAssignableMembers } from "@/lib/members";
 import { createClient } from "@/lib/supabase/server";
@@ -226,17 +227,14 @@ export default async function ProjectDetailPage(
         </div>
       </div>
 
-      <div className="flex gap-8 overflow-x-auto border-b border-corte px-12">
+      <div className="flex gap-3 overflow-x-auto border-b border-corte px-12 pb-4">
         {TABS.map((t) => (
-          <Link
+          <TabLink
             key={t.key}
             href={`/dashboard/projects/${id}?tab=${t.key}`}
-            className={`whitespace-nowrap border-b-2 py-3.5 font-dp-mono text-[10.5px] uppercase tracking-[0.12em] transition-colors duration-150 ${
-              tab === t.key ? "border-tinta text-tinta" : "border-transparent text-concreto hover:text-tinta"
-            }`}
-          >
-            {t.label}
-          </Link>
+            label={t.label}
+            active={tab === t.key}
+          />
         ))}
       </div>
 

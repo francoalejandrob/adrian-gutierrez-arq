@@ -1,7 +1,7 @@
-import Link from "next/link";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import Section from "@/components/dashboard/ui/section";
 import StatusMark from "@/components/dashboard/ui/status-mark";
+import { TabLink } from "@/components/dashboard/ui/tabs";
 import { computeMarketingFunnel } from "@/lib/marketing";
 import { getTrafficSummary } from "@/lib/integrations/google-analytics";
 import { getSearchPerformance } from "@/lib/integrations/google-search-console";
@@ -36,10 +36,10 @@ export default async function WebsitePage(props: PageProps<"/dashboard/website">
     <div>
       <PageHeader eyebrow="Inteligencia · Tráfico y posicionamiento del sitio público" title="Observatorio digital" />
 
-      <div className="flex gap-8 border-b border-corte px-12">
-        <WebsiteTab href="/dashboard/website?tab=analytics" label="Tráfico" active={tab === "analytics"} />
-        <WebsiteTab href="/dashboard/website?tab=seo" label="Posicionamiento" active={tab === "seo"} />
-        <WebsiteTab href="/dashboard/website?tab=fuentes" label="Fuentes" active={tab === "fuentes"} />
+      <div className="flex gap-3 border-b border-corte px-12 pb-4">
+        <TabLink href="/dashboard/website?tab=analytics" label="Tráfico" active={tab === "analytics"} />
+        <TabLink href="/dashboard/website?tab=seo" label="Posicionamiento" active={tab === "seo"} />
+        <TabLink href="/dashboard/website?tab=fuentes" label="Fuentes" active={tab === "fuentes"} />
       </div>
 
       {tab === "analytics" && (
@@ -121,19 +121,6 @@ export default async function WebsitePage(props: PageProps<"/dashboard/website">
         </div>
       )}
     </div>
-  );
-}
-
-function WebsiteTab({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return (
-    <Link
-      href={href}
-      className={`border-b-2 py-3.5 font-dp-mono text-[10.5px] uppercase tracking-[0.12em] transition-colors duration-150 ${
-        active ? "border-tinta text-tinta" : "border-transparent text-concreto hover:text-tinta"
-      }`}
-    >
-      {label}
-    </Link>
   );
 }
 

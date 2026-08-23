@@ -5,6 +5,7 @@ import { buttonClass } from "@/components/dashboard/ui/button";
 import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import StatusBadge from "@/components/dashboard/ui/status-badge";
+import { TabLink } from "@/components/dashboard/ui/tabs";
 import { computePipeline } from "@/lib/pipeline";
 import { createClient } from "@/lib/supabase/server";
 import { LEAD_STATUS_LABELS, LEAD_STATUS_TONE, LEAD_STATUSES, type LeadStatus } from "@/lib/supabase/types";
@@ -48,29 +49,16 @@ export default async function CrmPage(props: PageProps<"/dashboard/crm">) {
         }
       />
 
-      <div className="flex gap-8 border-b border-corte px-12">
-        <CrmTab href="/dashboard/crm?tab=leads" label="Leads" active={tab === "leads"} />
-        <CrmTab href="/dashboard/crm?tab=clientes" label="Clientes" active={tab === "clientes"} />
-        <CrmTab href="/dashboard/crm?tab=pipeline" label="Pipeline" active={tab === "pipeline"} />
+      <div className="flex gap-3 border-b border-corte px-12 pb-4">
+        <TabLink href="/dashboard/crm?tab=leads" label="Leads" active={tab === "leads"} />
+        <TabLink href="/dashboard/crm?tab=clientes" label="Clientes" active={tab === "clientes"} />
+        <TabLink href="/dashboard/crm?tab=pipeline" label="Pipeline" active={tab === "pipeline"} />
       </div>
 
       {tab === "leads" && <LeadsTab supabase={supabase} statusFilter={statusFilter} view={view} />}
       {tab === "clientes" && <ClientesTab supabase={supabase} />}
       {tab === "pipeline" && <PipelineTab supabase={supabase} />}
     </div>
-  );
-}
-
-function CrmTab({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return (
-    <Link
-      href={href}
-      className={`border-b-2 py-3.5 font-dp-mono text-[10.5px] uppercase tracking-[0.12em] transition-colors duration-150 ${
-        active ? "border-tinta text-tinta" : "border-transparent text-concreto hover:text-tinta"
-      }`}
-    >
-      {label}
-    </Link>
   );
 }
 
@@ -91,24 +79,21 @@ async function LeadsTab({ supabase, statusFilter, view }: { supabase: Supa; stat
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-filete px-12 py-4">
-        <div className="flex flex-wrap gap-5">
-          <FilterLink href="/dashboard/crm?tab=leads" label="Todos" active={!statusFilter} />
+        <div className="flex flex-wrap gap-2">
+          <TabLink href="/dashboard/crm?tab=leads" label="Todos" active={!statusFilter} size="sm" />
           {LEAD_STATUSES.map((status) => (
-            <FilterLink
+            <TabLink
               key={status}
               href={`/dashboard/crm?tab=leads&status=${status}`}
               label={LEAD_STATUS_LABELS[status]}
               active={statusFilter === status}
+              size="sm"
             />
           ))}
         </div>
-        <div className="flex gap-4 font-dp-mono text-[9.5px] uppercase tracking-[0.1em]">
-          <Link href={viewParam("table")} className={view === "table" ? "text-tinta" : "text-concreto hover:text-tinta"}>
-            Tabla
-          </Link>
-          <Link href={viewParam("kanban")} className={view === "kanban" ? "text-tinta" : "text-concreto hover:text-tinta"}>
-            Kanban
-          </Link>
+        <div className="flex gap-2">
+          <TabLink href={viewParam("table")} label="Tabla" active={view === "table"} size="sm" />
+          <TabLink href={viewParam("kanban")} label="Kanban" active={view === "kanban"} size="sm" />
         </div>
       </div>
 
@@ -276,15 +261,3 @@ async function PipelineTab({ supabase }: { supabase: Supa }) {
   );
 }
 
-function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return (
-    <Link
-      href={href}
-      className={`font-dp-mono text-[10px] uppercase tracking-[0.1em] transition-colors duration-150 ${
-        active ? "text-tinta" : "text-concreto hover:text-tinta"
-      }`}
-    >
-      {label}
-    </Link>
-  );
-}

@@ -6,6 +6,7 @@ import EmptyState from "@/components/dashboard/ui/empty-state";
 import PageHeader from "@/components/dashboard/ui/page-header";
 import ProgressBar from "@/components/dashboard/ui/progress-bar";
 import StatusBadge from "@/components/dashboard/ui/status-badge";
+import { TabLink } from "@/components/dashboard/ui/tabs";
 import { createClient } from "@/lib/supabase/server";
 import { PROJECT_STATUS_LABELS, PROJECT_STATUS_TONE, PROJECT_STATUSES } from "@/lib/supabase/types";
 
@@ -41,14 +42,15 @@ export default async function ProjectsPage(
         }
       />
 
-      <div className="flex flex-wrap gap-6 border-b border-filete px-12 py-4">
-        <FilterLink href="/dashboard/projects" label="Todos" active={!statusFilter} />
+      <div className="flex flex-wrap gap-2 border-b border-filete px-12 py-4">
+        <TabLink href="/dashboard/projects" label="Todos" active={!statusFilter} size="sm" />
         {PROJECT_STATUSES.map((status) => (
-          <FilterLink
+          <TabLink
             key={status}
             href={`/dashboard/projects?status=${status}`}
             label={PROJECT_STATUS_LABELS[status]}
             active={statusFilter === status}
+            size="sm"
           />
         ))}
       </div>
@@ -100,15 +102,3 @@ export default async function ProjectsPage(
   );
 }
 
-function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return (
-    <Link
-      href={href}
-      className={`font-dp-mono text-[10px] uppercase tracking-[0.1em] transition-colors duration-150 ${
-        active ? "text-tinta" : "text-concreto hover:text-tinta"
-      }`}
-    >
-      {label}
-    </Link>
-  );
-}
