@@ -11,17 +11,18 @@ import StatusMark from "@/components/dashboard/ui/status-mark";
 import Button from "@/components/dashboard/ui/button";
 
 const PALETTE = [
-  { name: "Papel", hex: "#F4F3EF", role: "Fondo" },
-  { name: "Superficie", hex: "#FAF9F5", role: "Campos y paneles" },
-  { name: "Filete", hex: "#DDDAD1", role: "Separador fino" },
-  { name: "Corte", hex: "#C7C3B7", role: "Separador mayor" },
-  { name: "Concreto", hex: "#8A867C", role: "Metadatos" },
-  { name: "Grafito", hex: "#45443F", role: "Texto secundario" },
-  { name: "Tinta", hex: "#0F0F0E", role: "Texto y acción" },
-  { name: "Acento", hex: "#A8382A", role: "Atención" },
-  { name: "Verde", hex: "#3F6B52", role: "Resuelto / positivo" },
-  { name: "Ámbar", hex: "#B07A34", role: "Advertencia / en curso" },
-  { name: "Azul", hex: "#47607A", role: "Informativo" },
+  { name: "Papel", hex: "#0B0B0D", role: "Fondo" },
+  { name: "Superficie", hex: "#17171C", role: "Campos y paneles" },
+  { name: "Filete", hex: "#26262C", role: "Separador fino" },
+  { name: "Corte", hex: "#38383F", role: "Separador mayor" },
+  { name: "Concreto", hex: "#918D85", role: "Metadatos" },
+  { name: "Grafito", hex: "#C7C4BB", role: "Texto secundario" },
+  { name: "Tinta", hex: "#F4F3EF", role: "Texto y acción" },
+  { name: "Acento", hex: "#E2564A", role: "Atención" },
+  { name: "Verde", hex: "#5FAE82", role: "Resuelto / positivo" },
+  { name: "Ámbar", hex: "#D9A05A", role: "Advertencia / en curso" },
+  { name: "Azul", hex: "#7A9DBD", role: "Informativo" },
+  { name: "Realce", hex: "#201F24", role: "Fondo de hover / activo" },
 ];
 
 const TYPE_SPECIMENS = [
@@ -67,6 +68,15 @@ export default function DesignSystemPage() {
         </Section>
 
         <Section title="02 · Paleta">
+          <p className="mb-6 max-w-[65ch] font-dp-sans text-[13.5px] leading-relaxed text-grafito">
+            Pase oscuro sobre una referencia de dashboard SaaS que trajo el usuario: los mismos 11 tokens
+            semánticos (más <span className="font-dp-mono text-[12px]">Realce</span>, nuevo) se recalibraron a
+            fondo oscuro — contraste verificado con la fórmula WCAG real antes de fijar los valores, no a ojo.{" "}
+            <span className="font-dp-mono text-[12px]">Tinta</span> y{" "}
+            <span className="font-dp-mono text-[12px]">Papel</span> intercambian claridad porque en el código
+            existente <span className="font-dp-mono text-[12px]">bg-tinta</span> siempre viene emparejado con{" "}
+            <span className="font-dp-mono text-[12px]">text-papel</span>.
+          </p>
           <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
             {PALETTE.map((color) => (
               <div key={color.name}>
@@ -123,7 +133,9 @@ export default function DesignSystemPage() {
             12 columnas, márgenes de lámina de 48px, medianil de 22px. Cada bloque de contenido es una tarjeta
             delimitada — borde fino, esquina de 16px, sombra suave (clase compartida{" "}
             <span className="font-dp-mono text-[12px]">.dp-card</span>) — en vez de solo separadores de 1px; los
-            separadores siguen usándose dentro de una tarjeta, para las filas de una lista o tabla.
+            separadores siguen usándose dentro de una tarjeta, para las filas de una lista o tabla. Cuando varias
+            estadísticas van juntas (KPIs, resumen financiero), cada una es su propia tarjeta con gap real entre
+            ellas — nunca varias estadísticas compartiendo una tarjeta dividida por líneas internas.
           </p>
         </Section>
 

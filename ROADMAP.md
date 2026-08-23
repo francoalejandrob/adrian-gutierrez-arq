@@ -379,3 +379,35 @@ para acciones en lote que no existen como feature en esta app);
 reemplazar Instrument Serif por el sans-serif genérico de la referencia
 (no fue parte del pedido y es la seña de identidad más elogiada del
 sistema en las vueltas anteriores de feedback).
+
+## Dark theme + tarjetas individuales redondeadas ✅
+
+Sexto pase visual: nueva captura de un dashboard SaaS de tickets, esta
+vez con tema oscuro, pidiendo "el mismo color" más un "efecto de
+cuadrado con puntas redondeadas alrededor de cada elemento" y usar la
+skill `ui-ux-pro-max` para pulir la interfaz. Confirmado con el usuario
+(AskUserQuestion): se mantiene Instrument Serif, no se pasa a
+sans-serif como la referencia. Ver `ARCHITECTURE.md` §6i para el
+detalle técnico completo.
+
+- **Los 11 tokens de color del dashboard/portal se recalibraron a
+  fondo oscuro** en `app/globals.css` (contraste verificado con la
+  fórmula WCAG real antes de fijar los valores) — mismos roles
+  semánticos, mismas familias de color (rojo-terracota/verde-salvia/
+  ámbar/azul-pizarra), no una paleta genérica nueva. Como la mayoría de
+  los componentes ya eran "token-driven" (`chart-colors.ts`,
+  `StatusBadge`, `Avatar`, `Sparkline`, `StatusMark`), cambiaron de
+  color solos; lo que no lo era (sombras, texturas, un hex `#EDEBE4`
+  hardcodeado en 11 archivos) se recalibró a mano.
+- **Tarjetas individuales redondeadas**: 6 lugares donde varias
+  estadísticas compartían una tarjeta dividida por líneas internas
+  ahora son grids de tarjetas separadas con gap real — el mismo patrón
+  "cuadrado con puntas redondeadas por elemento" que pidió el usuario,
+  ya visible antes solo en la banda de KPIs del dashboard home.
+- **Nav como píldoras redondeadas** en vez de rectángulo con barra de
+  acento izquierda.
+
+**Deliberadamente no incluido**: el grid del calendario (es una grilla
+real de días, convertirlo habría roto su continuidad visual); un
+toggle claro/oscuro — el pedido fue reemplazar el look, no agregar un
+selector de tema.

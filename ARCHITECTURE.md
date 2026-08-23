@@ -505,6 +505,83 @@ y esa restricción las bloquearía). Ambas requieren un proyecto de Google
 Cloud con facturación habilitada — a diferencia de la key de Gemini de
 Fase 7 — ver `INTEGRATION_SETUP.md`.
 
+## 6i. Sexto pase: dark theme + tarjetas individuales redondeadas
+
+El usuario mandó una captura de un dashboard SaaS de tickets con tema
+oscuro (fondo casi negro, tarjetas gris oscuro separadas con esquinas
+muy redondeadas por elemento, acentos verde/rojo/azul) y pidió el mismo
+color más un "efecto de cuadrado con puntas redondeadas alrededor de
+cada elemento", usando la skill `ui-ux-pro-max` para pulir la interfaz.
+Confirmado con el usuario (AskUserQuestion): se mantiene Instrument
+Serif para títulos, no se pasa a sans-serif como la referencia —sigue
+siendo la seña de identidad preservada en cada pase anterior.
+
+**Los 11 tokens semánticos del dashboard/portal (`app/globals.css`) se
+recalibraron a valores oscuros** — mismo nombre/rol, valor nuevo,
+contraste verificado con la fórmula WCAG real (no a ojo) antes de
+fijarlos: texto principal 17.7:1, texto secundario 5.4–5.9:1, los 4
+acentos 5.3–8.6:1 contra el nuevo fondo. Swap semántico clave: `tinta`
+(máximo contraste) pasa de negro-tinta a casi-blanco; `papel` (fondo de
+página) pasa de casi-blanco a casi-negro — como en el código existente
+`bg-tinta` siempre viene emparejado con `text-papel` (botón primario,
+avatar, overlay del command palette), el swap de valores solo, sin
+tocar JSX, da el resultado correcto. Se agregó un token nuevo,
+`--color-realce` (fondo de hover/activo), que además reemplazó un hex
+`#EDEBE4` que estaba hardcodeado suelto en 11 archivos distintos (y un
+`#6E6A60` por el token `concreto` ya existente).
+
+Como `chart-colors.ts`, `status-badge.tsx`, `avatar.tsx`,
+`sparkline.tsx` y `status-mark.tsx` son 100% "token-driven" (sin hex
+hardcodeado), cambiaron de color solos con el swap de tokens. Se
+verificó con cálculo de contraste (no se asumió) que la escala de
+opacidad `TINTA_STROKE_SCALE`/`TINTA_BG_SCALE` de `chart-colors.ts`
+sigue funcionando sin cambios tras el swap — es un fade simétrico de
+color-de-primer-plano-hacia-el-fondo, la relación de prominencia se
+preserva sin importar si `tinta` es oscuro-sobre-claro o
+claro-sobre-oscuro. También se recalibró la opacidad de relleno de
+`StatusBadge` de `/10` a `/6`: a `/10` el tono "attention" (`acento`)
+quedaba justo debajo del mínimo de contraste texto-normal (4.36:1
+contra 4.5:1 requerido); a `/6` los 5 tonos quedan entre 4.54:1 y
+9.53:1.
+
+Lo que **no** era token-driven se recalibró a mano: sombra de
+`.dp-card` (pasó de una sombra rgba oscura —invisible sobre fondo ya
+oscuro— a un highlight superior sutil + sombra de profundidad real),
+sombras de `button.tsx`, `.dp-grain`/`.dp-grain-strong` (textura de
+sidebar/header y panel de login), y se agregó `.dp-scope ::selection`
+para que la selección de texto del dashboard no herede el naranja del
+sitio público (se filtraba sin querer). Se corrigió además un bug real
+que el swap habría introducido: el overlay del command palette usaba
+`bg-tinta/[0.28]` como scrim oscurecedor — al volverse `tinta` claro,
+ese overlay habría empezado a aclarar en vez de oscurecer; ahora usa
+`bg-papel/70`.
+
+**Efecto "cuadrado con puntas redondeadas por elemento"** — no era solo
+color: 6 lugares del código agrupaban varias estadísticas dentro de
+**una** `.dp-card` compartida, separadas por líneas internas
+(`border-r`/`border-l border-filete` + una prop `last`/`first`) en vez
+de ser tarjetas individuales con gap real: dashboard home ("Resumen
+general"), ficha de cliente (`StatCell`), finanzas (`SummaryStat`),
+marketing (funnel), workspace de proyecto tab finanzas (`SummaryStat`),
+website (2 celdas). Se convirtieron los 6 al mismo patrón que ya usaba
+la banda de KPIs del dashboard home (grid con `gap-4`, cada celda su
+propia `.dp-card`). Excluido a propósito: el grid de
+`dashboard/calendar/page.tsx` (7 columnas de días reales, no una banda
+de estadísticas — convertirlo habría roto la continuidad visual del
+calendario). `StatBandSkeleton` (`components/dashboard/ui/skeleton.tsx`)
+se actualizó para que el loading state coincida con el patrón nuevo.
+
+Los ítems del sidebar pasaron de rectángulo a todo lo ancho + barra de
+acento izquierda, a píldoras redondeadas (`rounded-lg`, margen propio)
+usando `realce` como fondo activo/hover — mismo lenguaje visual
+aplicado a la navegación.
+
+**Se mantienen las mismas familias de color** (rojo-terracota/
+verde-salvia/ámbar/azul-pizarra) en vez de saltar a colores genéricos
+tipo indigo/emerald que sugería la búsqueda inicial de la skill
+`ui-ux-pro-max` — es la identidad cromática de 5 pases anteriores,
+recalibrada para fondo oscuro, no reemplazada.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.
