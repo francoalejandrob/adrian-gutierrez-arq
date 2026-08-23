@@ -891,6 +891,53 @@ Quedan para etapas siguientes (documentado en `ROADMAP.md`):
 recordatorios automáticos por email, Archi AI como asistente flotante
 global, preview de documentos inline, y Google Drive.
 
+## 6o. Simplificar el workspace de proyecto (Fases/Cronograma/Tareas) + Agenda
+
+El usuario probó el sistema él mismo y reportó que le resultó genuinamente
+difícil de usar, con foco en la pestaña de un proyecto. Se diagnosticó
+navegando el sistema en vivo con Playwright (no solo leyendo código)
+contra un proyecto real, en vez de asumir causas — apareció una causa
+raíz concreta y no obvia, más un bug crítico independiente.
+
+- **Causa raíz del Cronograma "vacío"**: las fechas de una fase solo se
+  podían fijar al momento de CREARLA — el formulario "Agregar fase"
+  tiene inputs de fecha, pero una fase ya creada solo permitía cambiar
+  su estado, nunca sus fechas. Como `applyPhaseTemplate` (pase
+  anterior) crea fases sin fechas, cualquier proyecto que arrancara
+  desde una plantilla quedaba con un Cronograma permanentemente vacío,
+  sin ninguna forma de arreglarlo salvo borrar y recrear cada fase.
+  Se agrega `updatePhaseDates` (`app/(dashboard)/dashboard/projects/[id]/actions.ts`)
+  y `components/dashboard/phase-date-inputs.tsx` (mismo patrón de
+  auto-submit-on-change que `status-select.tsx`).
+- **Fases se editan ahora desde Cronograma, no desde Finanzas**: el
+  único formulario para crear/editar fases vivía al final de la
+  pestaña Finanzas, después de Cotizaciones/Contratos/Pagos/Gastos —
+  sin ninguna relación conceptual con fases, y sin ningún indicio
+  desde Overview (que solo mostraba una lista de solo lectura) de a
+  dónde ir. El bloque completo (lista editable + botón "Aplicar
+  plantilla de fases" + formulario "Agregar fase") se mueve a la
+  pestaña Cronograma, arriba del `GanttChart` — que ahora se genera
+  automáticamente en cuanto una fase tiene ambas fechas. Overview
+  conserva su resumen de solo lectura con un link "Editar en
+  Cronograma →".
+- **Bug crítico corregido en la Agenda**: cada evento del calendario
+  era literalmente un `<button type="submit">` que lo BORRABA al
+  hacer clic, sin confirmación — un clic para "ver" una reunión la
+  eliminaba. Ahora el evento es una fila informativa (con el nombre
+  del proyecto, antes oculto) y el borrado es un botón `×` separado y
+  explícito, mismo patrón que ya usa el kanban de tareas del proyecto.
+- **Tareas con menos ruido en un proyecto nuevo**: el selector "Fase"
+  del formulario de nueva tarea solo aparece si el proyecto tiene
+  fases (antes siempre se mostraba con "Sin fase" como única opción);
+  un proyecto sin tareas todavía muestra un solo mensaje en vez de 5
+  columnas de kanban vacías.
+
+Verificado en vivo con Playwright: plantilla de fases aplicada,
+fechas editadas por fila, el Gantt aparece automáticamente; Finanzas
+confirmado sin sección Fases; selector de Fase ausente/presente según
+corresponda en Tareas; clic en un evento de Agenda ya no lo borra.
+Datos de prueba borrados al terminar.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import GanttChart from "@/components/dashboard/gantt-chart";
+import PhaseDateInputs from "@/components/dashboard/phase-date-inputs";
 import ProjectForm from "@/components/dashboard/project-form";
 import StatusSelect from "@/components/dashboard/status-select";
 import DownloadButton from "@/components/dashboard/download-button";
@@ -47,6 +48,7 @@ import {
   invitePortalAccess,
   revokePortalAccess,
   updateDocumentVersionStatus,
+  updatePhaseDates,
   updatePhaseStatus,
   updateTaskStatus,
   uploadDocumentVersion,
@@ -242,21 +244,22 @@ export default async function ProjectDetailPage(
 
       {tab === "overview" && (
         <div className="grid grid-cols-1 gap-12 px-5 py-8 sm:px-12 sm:py-10 lg:grid-cols-[1.4fr_1fr]">
-          <Section title="Fases del proyecto">
+          <Section
+            title="Fases del proyecto"
+            action={
+              <Link
+                href={`/dashboard/projects/${id}?tab=gantt`}
+                className="font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto hover:text-tinta"
+              >
+                Editar en Cronograma →
+              </Link>
+            }
+          >
             <div className="flex flex-col">
               {(phases ?? []).map((phase, i) => (
                 <PhaseRow key={phase.id} phase={phase} isCurrent={isCurrentPhase(phases ?? [], i)} />
               ))}
-              {(phases ?? []).length === 0 && (
-                <div className="flex flex-col items-start gap-3">
-                  <p className="font-dp-sans text-sm text-concreto">Sin fases todavía.</p>
-                  <form action={boundApplyPhaseTemplate}>
-                    <SubmitButton variant="secondary" size="sm" pendingLabel="Aplicando…">
-                      Aplicar plantilla de fases
-                    </SubmitButton>
-                  </form>
-                </div>
-              )}
+              {(phases ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin fases todavía.</p>}
             </div>
           </Section>
 
@@ -371,14 +374,16 @@ export default async function ProjectDetailPage(
           <div className="mb-6 flex justify-end">
             <form action={boundCreateTask} className="flex gap-2.5">
               <input name="title" placeholder="Nueva tarea" required className={inputClass} />
-              <select name="phase_id" className={selectClass}>
-                <option value="">Sin fase</option>
-                {(phases ?? []).map((phase) => (
-                  <option key={phase.id} value={phase.id}>
-                    {phase.name}
-                  </option>
-                ))}
-              </select>
+              {(phases ?? []).length > 0 && (
+                <select name="phase_id" className={selectClass}>
+                  <option value="">Sin fase</option>
+                  {(phases ?? []).map((phase) => (
+                    <option key={phase.id} value={phase.id}>
+                      {phase.name}
+                    </option>
+                  ))}
+                </select>
+              )}
               <select name="assigned_to" className={selectClass}>
                 <option value="">Sin asignar</option>
                 {members.map((member) => (
@@ -393,50 +398,105 @@ export default async function ProjectDetailPage(
               </SubmitButton>
             </form>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-            {TASK_STATUSES.map((status, si) => (
-              <div key={status} className={si > 0 ? "lg:border-l lg:border-filete lg:pl-6" : ""}>
-                <p className="mb-3 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
-                  {TASK_STATUS_LABELS[status]} · {(tasksByStatus.get(status) ?? []).length}
-                </p>
-                <div className="flex flex-col gap-2.5">
-                  {(tasksByStatus.get(status) ?? []).map((task) => (
-                    <div key={task.id} className="border border-filete bg-superficie p-3.5">
-                      <div className="mb-2.5 flex items-start justify-between gap-2">
-                        <p className="font-dp-sans text-[12.5px] text-tinta">{task.title}</p>
-                        {task.profiles && <Avatar name={task.profiles.full_name || task.profiles.email} size={20} />}
-                      </div>
-                      <div className="flex items-center justify-between">
-                        {task.due_date && (
-                          <span className="font-dp-mono text-[10.5px] text-concreto">
-                            {new Date(task.due_date).toLocaleDateString("es-EC", { day: "numeric", month: "short" })}
-                          </span>
-                        )}
-                        <div className="ml-auto flex items-center gap-2">
-                          <StatusSelect
-                            action={updateTaskStatus.bind(null, id, task.id)}
-                            defaultValue={task.status}
-                            options={TASK_STATUSES.map((s) => ({ value: s, label: TASK_STATUS_LABELS[s] }))}
-                          />
-                          <form action={deleteTask.bind(null, id, task.id)}>
-                            <SubmitButton variant="danger" size="sm">
-                              ×
-                            </SubmitButton>
-                          </form>
+          {(tasks ?? []).length === 0 ? (
+            <p className="font-dp-sans text-sm text-concreto">
+              Todavía no hay tareas — agregá la primera con el formulario de arriba.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+              {TASK_STATUSES.map((status, si) => (
+                <div key={status} className={si > 0 ? "lg:border-l lg:border-filete lg:pl-6" : ""}>
+                  <p className="mb-3 font-dp-mono text-[9.5px] uppercase tracking-[0.12em] text-concreto">
+                    {TASK_STATUS_LABELS[status]} · {(tasksByStatus.get(status) ?? []).length}
+                  </p>
+                  <div className="flex flex-col gap-2.5">
+                    {(tasksByStatus.get(status) ?? []).map((task) => (
+                      <div key={task.id} className="border border-filete bg-superficie p-3.5">
+                        <div className="mb-2.5 flex items-start justify-between gap-2">
+                          <p className="font-dp-sans text-[12.5px] text-tinta">{task.title}</p>
+                          {task.profiles && <Avatar name={task.profiles.full_name || task.profiles.email} size={20} />}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          {task.due_date && (
+                            <span className="font-dp-mono text-[10.5px] text-concreto">
+                              {new Date(task.due_date).toLocaleDateString("es-EC", { day: "numeric", month: "short" })}
+                            </span>
+                          )}
+                          <div className="ml-auto flex items-center gap-2">
+                            <StatusSelect
+                              action={updateTaskStatus.bind(null, id, task.id)}
+                              defaultValue={task.status}
+                              options={TASK_STATUSES.map((s) => ({ value: s, label: TASK_STATUS_LABELS[s] }))}
+                            />
+                            <form action={deleteTask.bind(null, id, task.id)}>
+                              <SubmitButton variant="danger" size="sm">
+                                ×
+                              </SubmitButton>
+                            </form>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {tab === "gantt" && (
         <div className="px-5 py-8 sm:px-12 sm:py-10">
-          <GanttChart phases={phases ?? []} />
+          <Section title="Fases">
+            <div className="flex flex-col">
+              {(phases ?? []).map((phase) => (
+                <div key={phase.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-filete py-3.5 last:border-0">
+                  <p className="font-dp-sans text-[13px] text-tinta">{phase.name}</p>
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <PhaseDateInputs
+                      action={updatePhaseDates.bind(null, id, phase.id)}
+                      defaultStartDate={phase.start_date}
+                      defaultEndDate={phase.end_date}
+                    />
+                    <StatusSelect
+                      action={updatePhaseStatus.bind(null, id, phase.id)}
+                      defaultValue={phase.status}
+                      options={PHASE_STATUSES.map((status) => ({ value: status, label: PHASE_STATUS_LABELS[status] }))}
+                    />
+                    <form action={deletePhase.bind(null, id, phase.id)}>
+                      <SubmitButton variant="danger" size="sm">
+                        Eliminar
+                      </SubmitButton>
+                    </form>
+                  </div>
+                </div>
+              ))}
+              {(phases ?? []).length === 0 && (
+                <div className="flex flex-col items-start gap-3 py-3">
+                  <p className="font-dp-sans text-sm text-concreto">
+                    Sin fases todavía — elegí las fases automáticas según el tipo de proyecto, o agregá las tuyas abajo.
+                  </p>
+                  <form action={boundApplyPhaseTemplate}>
+                    <SubmitButton variant="secondary" size="sm" pendingLabel="Aplicando…">
+                      Aplicar plantilla de fases
+                    </SubmitButton>
+                  </form>
+                </div>
+              )}
+            </div>
+            <form action={boundCreatePhase} className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              <input name="name" placeholder="Nombre de la fase" required className={`col-span-2 ${inputClass}`} />
+              <input name="start_date" type="date" className={inputClass} />
+              <input name="end_date" type="date" className={inputClass} />
+              <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
+                Agregar fase
+              </SubmitButton>
+            </form>
+          </Section>
+
+          <div className="mt-10">
+            <GanttChart phases={phases ?? []} />
+          </div>
         </div>
       )}
 
@@ -613,42 +673,6 @@ export default async function ProjectDetailPage(
               <input name="description" placeholder="Descripción" className={`col-span-4 ${inputClass}`} />
               <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
                 Agregar gasto
-              </SubmitButton>
-            </form>
-          </Section>
-
-          <Section title="Fases">
-            <div className="flex flex-col">
-              {(phases ?? []).map((phase) => (
-                <div key={phase.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-filete py-3.5 last:border-0">
-                  <div>
-                    <p className="font-dp-sans text-[13px] text-tinta">{phase.name}</p>
-                    <p className="mt-1 font-dp-mono text-[10.5px] text-concreto">
-                      {phase.start_date ?? "sin fecha"} → {phase.end_date ?? "sin fecha"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <StatusSelect
-                      action={updatePhaseStatus.bind(null, id, phase.id)}
-                      defaultValue={phase.status}
-                      options={PHASE_STATUSES.map((status) => ({ value: status, label: PHASE_STATUS_LABELS[status] }))}
-                    />
-                    <form action={deletePhase.bind(null, id, phase.id)}>
-                      <SubmitButton variant="danger" size="sm">
-                        Eliminar
-                      </SubmitButton>
-                    </form>
-                  </div>
-                </div>
-              ))}
-              {(phases ?? []).length === 0 && <p className="font-dp-sans text-sm text-concreto">Sin fases todavía.</p>}
-            </div>
-            <form action={boundCreatePhase} className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-              <input name="name" placeholder="Nombre de la fase" required className={`col-span-2 ${inputClass}`} />
-              <input name="start_date" type="date" className={inputClass} />
-              <input name="end_date" type="date" className={inputClass} />
-              <SubmitButton variant="secondary" size="sm" pendingLabel="Agregando…" className="col-span-4 w-fit">
-                Agregar fase
               </SubmitButton>
             </form>
           </Section>

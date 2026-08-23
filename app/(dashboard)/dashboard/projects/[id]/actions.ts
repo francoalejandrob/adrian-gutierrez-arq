@@ -77,6 +77,25 @@ export async function deletePhase(projectId: string, phaseId: string) {
   revalidatePath(`/dashboard/projects/${projectId}`);
 }
 
+const phaseDatesSchema = z.object({
+  start_date: dateOrNull,
+  end_date: dateOrNull,
+});
+
+// Antes las fechas de una fase solo se podían fijar al crearla — una
+// fase ya creada (por ejemplo, por applyPhaseTemplate) no tenía forma
+// de recibir fechas después, así que el Cronograma quedaba vacío para
+// siempre. Esta es la pieza que faltaba.
+export async function updatePhaseDates(projectId: string, phaseId: string, formData: FormData) {
+  const parsed = phaseDatesSchema.parse(Object.fromEntries(formData));
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("phases").update(parsed).eq("id", phaseId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+}
+
 // Para proyectos que nunca pasaron por una cotización aceptada (el
 // único disparador automático hoy) — botón manual en la pestaña
 // Overview, visible solo cuando el proyecto no tiene fases todavía.

@@ -116,15 +116,25 @@ export default async function CalendarPage(props: PageProps<"/dashboard/calendar
                   </span>
                   <div className="mt-1.5 flex flex-col gap-1">
                     {(eventsByDay.get(day) ?? []).map((event) => (
-                      <form key={event.id} action={deleteEvent.bind(null, event.id)}>
-                        <button
-                          type="submit"
-                          title="Eliminar evento"
-                          className="w-full cursor-pointer truncate border-l-2 border-tinta bg-superficie px-1.5 py-0.5 text-left font-dp-sans text-[10.5px] text-grafito transition-colors hover:border-acento hover:text-acento"
-                        >
+                      <div
+                        key={event.id}
+                        title={event.projects?.name ? `${event.title} · ${event.projects.name}` : event.title}
+                        className="group flex items-center gap-1 border-l-2 border-tinta bg-superficie px-1.5 py-0.5"
+                      >
+                        <span className="min-w-0 flex-1 truncate font-dp-sans text-[10.5px] text-grafito">
                           {new Date(event.starts_at).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })} {event.title}
-                        </button>
-                      </form>
+                          {event.projects?.name && <span className="text-concreto"> · {event.projects.name}</span>}
+                        </span>
+                        <form action={deleteEvent.bind(null, event.id)}>
+                          <button
+                            type="submit"
+                            title="Eliminar evento"
+                            className="shrink-0 cursor-pointer font-dp-mono text-[11px] text-concreto opacity-0 transition-opacity hover:text-acento group-hover:opacity-100"
+                          >
+                            ×
+                          </button>
+                        </form>
+                      </div>
                     ))}
                   </div>
                 </>

@@ -550,3 +550,30 @@ Quedan para las próximas etapas: recordatorios automáticos por email,
 Archi AI como asistente flotante en todo el dashboard (ya existe el
 botón, falta conectarlo), preview de documentos sin descargar, y
 Google Drive.
+
+## Simplificar el workspace de proyecto + arreglar la Agenda ✅
+
+El usuario probó el sistema y le pareció genuinamente difícil de usar,
+sobre todo la pestaña de un proyecto — "Fases" no se entendía,
+"Cronograma" no mostraba nada útil, pidió mejorar Tareas y la Agenda.
+Se diagnosticó navegando el sistema en vivo (no solo leyendo código) y
+aparecieron causas concretas. Ver `ARCHITECTURE.md` §6o.
+
+- **Cronograma ahora funciona de entrada**: la causa real de que
+  apareciera vacío era que las fechas de una fase solo se podían fijar
+  al crearla — nunca después. Ahora cada fase tiene sus fechas
+  editables directamente, y el Gantt se genera solo en cuanto las
+  cargás.
+- **Fases se gestionan desde Cronograma, no desde Finanzas** — antes
+  el único formulario para crear/editar una fase estaba escondido al
+  final de la pestaña de Finanzas, sin ninguna relación con fases.
+- **Bug crítico corregido**: en la Agenda, cada evento era un botón
+  que lo borraba con un solo clic, sin confirmación. Ahora borrar es
+  una acción explícita separada, y cada evento muestra su proyecto.
+- **Tareas con menos ruido**: ya no aparecen campos ni columnas vacías
+  sin sentido en un proyecto recién creado.
+
+Verificado en vivo con Playwright de punta a punta: plantilla de
+fases → fechas editadas → Gantt visual real; confirmado que un clic en
+un evento de la Agenda ya no lo elimina. Datos de prueba borrados al
+terminar.
