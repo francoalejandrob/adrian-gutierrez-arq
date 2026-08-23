@@ -197,16 +197,22 @@ al estudio o al cliente (Fase 6).
       quedan sujetas exactamente a la misma RLS que el resto del
       dashboard; no hay una puerta más ancha para la IA
 - [x] `app/api/ai/chat/route.ts`: wiring real de tool-calling contra la
-      Chat Completions API de OpenAI (fetch directo, sin sumar el SDK
-      `openai` — mismo criterio que las integraciones de Google), con
-      hasta 4 rondas de llamadas a herramientas antes de responder
+      Generative Language API de Google (Gemini, fetch directo, sin SDK
+      — mismo criterio que las demás integraciones de Google), con hasta
+      4 rondas de llamadas a herramientas antes de responder. Empezó
+      escrito contra la Chat Completions API de OpenAI; se re-escribió
+      para usar Gemini a pedido explícito del usuario ("conectar la API
+      de Google") — ver `ARCHITECTURE.md` no tiene sección propia para
+      esto porque es un swap de proveedor sobre wiring ya documentado
+      acá, no un cambio de arquitectura.
 - [x] `/dashboard/ai`: interfaz de chat
 
 **No incluido en Fase 7**:
-- Probado de punta a punta — no hay `OPENAI_API_KEY` real todavía. El
+- Probado de punta a punta — no hay `GEMINI_API_KEY` real todavía. El
   request/response sigue el contrato documentado de la API, pero podría
-  necesitar un ajuste menor la primera vez que corra contra la API real.
-  Ver `INTEGRATION_SETUP.md`.
+  necesitar un ajuste menor la primera vez que corra contra la API real
+  (ver la nota sobre el `role` de `functionResponse` en
+  `INTEGRATION_SETUP.md`).
 - Streaming de la respuesta — con la interfaz esperando una sola
   respuesta corta por pregunta, el costo de implementar y probar SSE sin
   poder verificarlo end-to-end no se justificaba en esta fase.

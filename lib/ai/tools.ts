@@ -144,9 +144,12 @@ export async function getMarketingPerformance(supabase: SupabaseClient) {
     .map((row) => ({ ...row, contracted: currency.format(row.contracted) }));
 }
 
-// JSON-schema tool definitions for the OpenAI Chat Completions API
-// (function-calling). Kept next to the implementations so the two never
-// drift apart.
+// JSON-schema tool definitions (function-calling). Kept next to the
+// implementations so the two never drift apart. Written once in this
+// neutral, lowercase-JSON-Schema shape and converted below to whatever
+// casing/nesting a given provider's API expects — right now that's
+// Gemini (see GEMINI_TOOLS), previously OpenAI's Chat Completions
+// `tools` array used the exact same shape unconverted.
 export const AI_TOOLS = [
   {
     type: "function" as const,
@@ -199,6 +202,40 @@ export const AI_TOOLS = [
       description: "Leads, clientes convertidos y valor contratado, agrupados por fuente de marketing.",
       parameters: { type: "object", properties: {}, required: [] },
     },
+  },
+];
+
+// Gemini's function-calling `parameters` schema uses uppercase type
+// names (OBJECT/STRING/…) instead of JSON Schema's lowercase — this
+// converts AI_TOOLS once rather than maintaining a second, parallel
+// list of tool definitions that could drift out of sync.
+type ParamSchema = { type: string; description?: string; properties?: Record<string, ParamSchema>; required?: string[] };
+
+function toGeminiSchema(schema: ParamSchema): Record<string, unknown> {
+  if (schema.type === "object") {
+    const properties: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(schema.properties ?? {})) {
+      properties[key] = toGeminiSchema(value);
+    }
+    return {
+      type: "OBJECT",
+      properties,
+      ...(schema.required?.length ? { required: schema.required } : {}),
+    };
+  }
+  return {
+    type: schema.type.toUpperCase(),
+    ...(schema.description ? { description: schema.description } : {}),
+  };
+}
+
+export const GEMINI_TOOLS = [
+  {
+    functionDeclarations: AI_TOOLS.map((tool) => ({
+      name: tool.function.name,
+      description: tool.function.description,
+      parameters: toGeminiSchema(tool.function.parameters as ParamSchema),
+    })),
   },
 ];
 

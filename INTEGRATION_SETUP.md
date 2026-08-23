@@ -15,22 +15,30 @@ credenciales reales (regla del master prompt, sección 53).
 
 ## Necesitan que tú hagas algo primero
 
-### OpenAI (Fase 7 — Archi AI)
+### Gemini API (Fase 7 — Archi AI)
 El código ya está escrito y listo para activarse
 (`lib/ai/tools.ts`, `app/api/ai/chat/route.ts`, `/dashboard/ai`) — el
-wiring de tool-calling sigue el contrato documentado de la Chat
-Completions API (fetch directo, sin el SDK `openai`, mismo criterio que
-las integraciones de Google). **No probado de punta a punta**: no tengo
-una key real contra la cual probarlo, así que no lo reporto como
-"listo y probado" — puede necesitar un ajuste menor la primera vez que
-corra contra la API real.
+wiring de tool-calling llama directo a `generateContent` de la
+Generative Language API de Google (fetch directo, sin SDK, mismo
+criterio que las demás integraciones de Google — GA4/Search Console).
+**No probado de punta a punta**: no tengo una key real contra la cual
+probarlo, así que no lo reporto como "listo y probado". El campo más
+propenso a necesitar un ajuste una vez que corra contra la API real es
+el `role` que Gemini espera en el turno que devuelve el resultado de una
+herramienta (`functionResponse`) — está implementado como `"function"`
+según la guía de function-calling de Google, pero algunas versiones de
+la API esperan `"user"` ahí; si Archi AI responde con un error después
+de intentar usar una herramienta, ese es el primer lugar a revisar
+(`app/api/ai/chat/route.ts`, el `contents.push({ role: "function", ... })`).
 
-1. Crear cuenta en [platform.openai.com](https://platform.openai.com) si
-   no tienes.
-2. Generar una API key.
-3. Agregar en Vercel: `OPENAI_API_KEY` (nunca en el chat — igual que con
-   el token de Instagram). Opcional: `OPENAI_MODEL` si querés un modelo
-   distinto al default (`gpt-4o-mini`).
+Elegida sobre Vertex AI/OpenAI porque no requiere proyecto de Google
+Cloud ni facturación — la key se genera gratis en un par de minutos.
+
+1. Entrar a [ai.google.dev](https://ai.google.dev) (Google AI Studio) con
+   una cuenta de Google y generar una API key ("Get API key").
+2. Agregar en Vercel: `GEMINI_API_KEY` (nunca en el chat — igual que con
+   el token de Instagram). Opcional: `GEMINI_MODEL` si querés un modelo
+   distinto al default (`gemini-2.5-flash`).
 
 ### Google Analytics 4 + Search Console (Fase 5)
 El código ya está escrito y listo para activarse
