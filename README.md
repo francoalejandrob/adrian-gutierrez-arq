@@ -9,20 +9,17 @@ Framer Motion.
 `RESEND_API_KEY` en las variables de entorno del proyecto en Vercel — ver
 más abajo).
 
-## ARCHI.OS — panel privado
+## ARCHI.OS
 
-Este repo también aloja el panel interno del estudio (CRM) bajo `/dashboard`
-y `/login`, separado del sitio público por route groups de Next.js — ver
-`ARCHITECTURE.md` para el porqué. Estado actual, alcance de esta primera
-fase y lo que falta: `AUDIT.md`, `ARCHITECTURE.md`, `DATABASE.md`,
-`ROADMAP.md`, `INTEGRATION_SETUP.md`.
+El panel interno del estudio (CRM, proyectos, finanzas, Archi AI) vivió
+en este mismo repo hasta que se separó en su propio producto: ahora es
+https://github.com/francoalejandrob/archi-os, desplegado en
+https://archi-os.vercel.app, con su propio `package.json` y su propio
+deploy de Vercel — mismo proyecto de Supabase que este repo.
 
-Requiere las variables `NEXT_PUBLIC_SUPABASE_URL`,
-`NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` (proyecto
-Supabase `ArqSystem&Website`) — ver `.env.local.example`. El login es por
-enlace mágico a tu email; el primer usuario que inicia sesión queda
-automáticamente como `org_admin` del estudio (ver la migración
-`supabase/migrations/0002_seed_and_bootstrap.sql`).
+Lo único que queda acá de esa integración es el formulario de contacto
+(`/api/contact`), que sigue creando el lead directo en la base de datos
+de ARCHI.OS vía `lib/supabase/admin.ts` — ver más abajo.
 
 ## Contenido de demostración
 
@@ -149,16 +146,13 @@ Abre [http://localhost:3000](http://localhost:3000).
 ```
 app/
 ├─ (public)/                → sitio público (mismas URLs de siempre: /, /proyectos, ...)
-├─ (dashboard)/              → panel privado: /login, /dashboard/*
-├─ auth/callback/route.ts   → callback del enlace mágico de Supabase
-└─ api/contact/route.ts     → envía el email (Resend) y crea el lead en Supabase
+└─ api/contact/route.ts     → envía el email (Resend) y crea el lead en ARCHI.OS
 components/                 → una sección/pieza de UI por archivo (sitio público)
-components/dashboard/       → componentes del panel privado
 lib/content.ts              → todo el contenido de texto del sitio público
 lib/resend.ts               → cliente de Resend
-lib/supabase/                → clientes de Supabase (server/browser/admin) + tipos
-supabase/migrations/         → esquema de la base de datos, versionado
-proxy.ts                     → protege /dashboard/* (antes "middleware.ts")
+lib/notifications.ts        → notifica al estudio cuando entra un lead del formulario
+lib/supabase/admin.ts       → cliente de Supabase con service role (crear el lead)
+lib/supabase/database.types.ts → tipos generados del esquema de ARCHI.OS
 ```
 
 ## Despliegue en Vercel
@@ -169,7 +163,7 @@ El código ya está en GitHub: https://github.com/francoalejandrob/adrian-gutier
 2. Importa el proyecto en [Vercel](https://vercel.com/new).
 3. Agrega las variables de entorno (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
    `CONTACT_FROM_EMAIL`, `NEXT_PUBLIC_SUPABASE_URL`,
-   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y, si ya
-   tienes el feed de Instagram configurado, `IG_ACCESS_TOKEN` e
-   `IG_USER_ID`) en la configuración del proyecto en Vercel.
+   `SUPABASE_SERVICE_ROLE_KEY` y, si ya tienes el feed de Instagram
+   configurado, `IG_ACCESS_TOKEN` e `IG_USER_ID`) en la configuración del
+   proyecto en Vercel.
 4. Despliega.

@@ -1,4 +1,21 @@
-# ARCHITECTURE.md — ARCHI.OS
+# ARCHITECTURE.md — ARCHI.OS (histórico)
+
+**ARCHI.OS se separó de este repo.** Todo lo que este documento describe
+sobre el panel interno (`(dashboard)`, `(portal)`, Archi AI, etc.) vivió
+acá durante su desarrollo, pero el código real ahora está en
+https://github.com/francoalejandrob/archi-os (desplegado en
+https://archi-os.vercel.app), como producto independiente — mismo
+proyecto de Supabase, repo y deploy propios. Este archivo se conserva
+tal cual quedó, como registro histórico de cómo y por qué se construyó
+cada pieza; para la arquitectura *actual* del panel, ver la copia
+(idéntica al momento del split) que vive en `ARCHITECTURE.md` del repo
+`archi-os`, que sigue evolucionando ahí.
+
+Lo único de ARCHI.OS que sigue activo en este repo es la creación del
+lead desde `/api/contact` (`lib/supabase/admin.ts`, `lib/notifications.ts`)
+— ver el README de este repo.
+
+---
 
 Arquitectura objetivo para convertir `AdrianGutierrezArq` en ARCHI.OS,
 manteniendo el sitio público intacto. Ver `AUDIT.md` para el estado previo

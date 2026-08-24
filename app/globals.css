@@ -1,52 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  /* Paleta "Concreto Cálido" — sitio público, nunca tocar desde el dashboard. */
+  /* Paleta "Concreto Cálido" — sitio público de Adrián Gutiérrez. */
   --color-hueso: #f1eee8;
   --color-carbon: #000000;
   --color-naranja: #b26a45;
   --color-naranja-oscuro: #8c5335;
   --color-arena: #e4dfd4;
   --color-piedra: #6e6659;
-
-  /* "El estudio como sistema" — paleta propia del dashboard/portal
-     (DISEÑO PROFESIONAL/ARCHI.OS v2.dc.html), independiente de la marca
-     del sitio público. Nombres calcados de la lámina "Design system" del
-     propio mockup para que el token y su documentación coincidan 1:1.
-     Pase oscuro (referencia de dashboard SaaS con tema dark que trajo el
-     usuario): mismos 11 nombres/roles semánticos, valores recalibrados
-     a fondo oscuro — contraste verificado con la fórmula WCAG real antes
-     de fijar los hex, no a ojo (ver ARCHITECTURE.md §6i). `tinta` y
-     `papel` intercambian claridad (tinta pasa a ser el tono casi-blanco
-     de máximo contraste, papel el fondo casi-negro) porque en cada uso
-     existente `bg-tinta` ya viene emparejado con `text-papel` — el swap
-     de valores solo, sin tocar JSX, da el resultado correcto en botones/
-     avatares/overlays que usan ese par. */
-  --color-papel: #0b0b0d;
-  --color-superficie: #17171c;
-  --color-filete: #26262c;
-  --color-corte: #38383f;
-  --color-concreto: #918d85;
-  --color-grafito: #c7c4bb;
-  --color-tinta: #f4f3ef;
-  --color-acento: #e2564a;
-  /* Segundo color del sistema — no está en el mockup original, se agregó
-     porque el sistema de un solo acento leía "plano" en la práctica.
-     Verde desaturado (no el verde-éxito genérico de SaaS) para "resuelto"
-     en StatusBadge/StatusMark/gráficos y para la etapa "ganado" del
-     pipeline. */
-  --color-verde: #5fae82;
-  /* Cuarto y quinto color — se agregaron para adoptar el lenguaje de
-     pastillas de estado con más matices (5 tonos en vez de 2) que pidió
-     el usuario mostrando una referencia de dashboard SaaS. Misma familia
-     desaturada que acento/verde, nunca un azul/ámbar saturado genérico. */
-  --color-ambar: #d9a05a;
-  --color-azul: #7a9dbd;
-  /* Fondo de hover/activo (nav, botones de ícono, filas del command
-     palette) — reemplaza un hex #EDEBE4 que estaba hardcodeado suelto en
-     4 archivos distintos (sidebar.tsx, sidebar-nav.tsx, sheet-header.tsx,
-     command-palette.tsx). Un solo token, un solo lugar para recalibrarlo. */
-  --color-realce: #201f24;
 }
 
 @theme inline {
@@ -59,29 +20,6 @@
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-plex-sans);
   --font-mono: var(--font-plex-mono);
-
-  --color-papel: var(--color-papel);
-  --color-superficie: var(--color-superficie);
-  --color-filete: var(--color-filete);
-  --color-corte: var(--color-corte);
-  --color-concreto: var(--color-concreto);
-  --color-grafito: var(--color-grafito);
-  --color-tinta: var(--color-tinta);
-  --color-acento: var(--color-acento);
-  --color-verde: var(--color-verde);
-  --color-ambar: var(--color-ambar);
-  --color-azul: var(--color-azul);
-  --color-realce: var(--color-realce);
-  /* Toda la tipografía del dashboard/portal es Rethink Sans — los 3
-     alias apuntaban antes a 3 tipografías distintas (Instrument
-     Serif/Archivo/JetBrains Mono); ahora los tres resuelven a la misma
-     fuente (lib/dp-fonts.ts), así que ninguno de los ~410 usos de
-     font-dp-serif/dp-sans/dp-mono en el resto del código necesitó
-     cambiar — la distinción de rol (título/cuerpo/etiqueta) sigue
-     viniendo del tamaño/peso/tracking que cada uso ya tenía. */
-  --font-dp-serif: var(--font-rethink-sans);
-  --font-dp-sans: var(--font-rethink-sans);
-  --font-dp-mono: var(--font-rethink-sans);
 
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
@@ -97,50 +35,8 @@ body {
   color: var(--color-hueso);
 }
 
-/* Scoped override so text selection inside the dashboard/portal uses
-   their own palette instead of the public site's orange/hueso bleeding
-   through (it was, unintentionally, until this rule existed). */
-.dp-scope ::selection {
-  background: var(--color-acento);
-  color: var(--color-papel);
-}
-
-/* Scrollbar del navegador acorde al pase oscuro — sin esto, la barra de
-   scroll usa el estilo claro por defecto del navegador (no sigue la
-   paleta de tokens), tanto en la ventana como en cualquier contenedor
-   con overflow dentro del dashboard (sidebar, listas). `:has(.dp-scope)`
-   en vez de aplicarlo a `html` directamente para que solo afecte a
-   dashboard/portal/login (donde vive `.dp-scope`) y nunca al sitio
-   público, sin necesitar que el layout se reestructure en su propio
-   contenedor de scroll. */
-html:has(.dp-scope) {
-  color-scheme: dark;
-  scrollbar-color: var(--color-corte) var(--color-papel);
-  scrollbar-width: thin;
-}
-
-html:has(.dp-scope) ::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-html:has(.dp-scope) ::-webkit-scrollbar-track {
-  background: var(--color-papel);
-}
-
-html:has(.dp-scope) ::-webkit-scrollbar-thumb {
-  background: var(--color-corte);
-  border: 3px solid var(--color-papel);
-  border-radius: 999px;
-}
-
-html:has(.dp-scope) ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-concreto);
-}
-
 /* Keyboard-only focus ring. Only fires for :focus-visible, so mouse/touch
-   users never see it — safe to apply globally without changing the look
-   of either the public site or the dashboard for the common case. */
+   users never see it. */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -149,70 +45,6 @@ textarea:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid var(--color-naranja);
   outline-offset: 2px;
-}
-
-/* Same rule, tinta-de-revisión colored, scoped to the dashboard/portal
-   subtree (.dp-scope, applied on their root layout wrappers) so keyboard
-   focus stays visible there without borrowing the public site's orange. */
-.dp-scope a:focus-visible,
-.dp-scope button:focus-visible,
-.dp-scope input:focus-visible,
-.dp-scope select:focus-visible,
-.dp-scope textarea:focus-visible,
-.dp-scope [tabindex]:focus-visible {
-  outline: 2px solid var(--color-acento);
-  outline-offset: 2px;
-}
-
-/* Fine paper grain (SVG feTurbulence noise) + a soft top-to-bottom
-   gradient, from DISEÑO PROFESIONAL/ARCHI.OS v2.dc.html — defined once
-   here instead of repeating the same long data-URI in every file that
-   needs the dashboard's paper texture. */
-.dp-grain {
-  background-color: var(--color-papel);
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.2'/%3E%3C/svg%3E"),
-    linear-gradient(180deg, #0d0d10, #0a0a0c);
-  background-size: 180px 180px, auto;
-  background-blend-mode: overlay, normal;
-}
-
-/* Stronger variant for the login split-panel. Pase oscuro: mismo
-   patrón de textura+ruido, gradientes recalibrados a tonos oscuros en
-   vez de la variante clara original. */
-.dp-grain-strong {
-  background-color: #131316;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"),
-    radial-gradient(130% 95% at 20% 14%, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 62%),
-    radial-gradient(110% 85% at 80% 88%, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 64%),
-    linear-gradient(162deg, #1c1c21, #0d0d10);
-  background-size: 240px 240px, auto, auto, auto;
-  background-blend-mode: overlay, screen, multiply, normal;
-}
-
-/* Every visible content block reads as a delimited card — rounded
-   corners, a soft ambient shadow — instead of sitting flush on the page
-   separated only by hairline rules. Centralized here so every card in
-   the dashboard/portal shares one exact look. In the `components` layer
-   (not bare CSS) so Tailwind utility classes placed alongside `dp-card`
-   (e.g. a one-off border color for an "attention" card) still win —
-   bare CSS outside Tailwind's layers beats layered utilities regardless
-   of source order, which would silently make those overrides no-ops. */
-@layer components {
-  .dp-card {
-    background: var(--color-superficie);
-    border: 1px solid var(--color-filete);
-    border-radius: 16px;
-    overflow: hidden;
-    /* Pase oscuro: una sombra oscura sobre fondo ya oscuro casi no se
-       ve — el "levante" de la tarjeta ahora viene de un highlight sutil
-       en el borde superior (simula luz rebotando en el filo) más una
-       sombra de profundidad real hacia abajo. */
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.04),
-      0 10px 28px rgba(0, 0, 0, 0.45);
-  }
 }
 
 .press {
@@ -242,48 +74,6 @@ textarea:focus-visible,
 
 .nav-link:hover::after {
   transform: scaleX(1);
-}
-
-@keyframes dp-draw {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes dp-rise {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* One-shot entrance for DonutChart — a single fade+scale on the whole
-   ring, not per-slice, per the "animate 1-2 key elements, not everything"
-   guidance. */
-@keyframes dp-chart-in {
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Draw-in for Sparkline — pathLength is normalized to 100, so this is
-   stack-independent of the actual line length. */
-@keyframes dp-draw-line {
-  to {
-    stroke-dashoffset: 0;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
