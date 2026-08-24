@@ -279,3 +279,30 @@ export const LEAD_STATUS_TONE: Record<LeadStatus, BadgeTone> = {
   ganado: "resolved",
   perdido: "neutral",
 };
+
+// Calificación específica de arquitectura, agregada a leads/clientes
+// a pedido del usuario — no son campos genéricos de CRM.
+
+export type LeadTimeline = "inmediato" | "unos_meses" | "explorando";
+export const LEAD_TIMELINE: LeadTimeline[] = ["inmediato", "unos_meses", "explorando"];
+export const LEAD_TIMELINE_LABELS: Record<LeadTimeline, string> = {
+  inmediato: "Inmediato",
+  unos_meses: "En unos meses",
+  explorando: "Explorando opciones",
+};
+
+export type HasLand = "si" | "no" | "buscando";
+export const HAS_LAND_OPTIONS: HasLand[] = ["si", "no", "buscando"];
+export const HAS_LAND_LABELS: Record<HasLand, string> = {
+  si: "Sí, ya lo tiene",
+  no: "No tiene",
+  buscando: "Buscando terreno",
+};
+
+export type ContactPreference = "email" | "telefono" | "whatsapp";
+export const CONTACT_PREFERENCE: ContactPreference[] = ["email", "telefono", "whatsapp"];
+export const CONTACT_PREFERENCE_LABELS: Record<ContactPreference, string> = {
+  email: "Email",
+  telefono: "Teléfono",
+  whatsapp: "WhatsApp",
+};

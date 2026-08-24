@@ -6,6 +6,7 @@ import { z } from "zod";
 import { geocodeAddress } from "@/lib/integrations/google-geocoding";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentOrganizationId } from "@/lib/supabase/org";
+import { CONTACT_PREFERENCE } from "@/lib/supabase/types";
 
 const clientSchema = z.object({
   name: z.string().trim().min(1, "El nombre es obligatorio"),
@@ -14,6 +15,16 @@ const clientSchema = z.object({
   company: z.string().trim().optional(),
   address: z.string().trim().optional(),
   notes: z.string().trim().optional(),
+  city: z.string().trim().optional(),
+  country: z.string().trim().optional(),
+  tax_id: z.string().trim().optional(),
+  secondary_contact_name: z.string().trim().optional(),
+  secondary_contact_phone: z.string().trim().optional(),
+  contact_preference: z
+    .enum(CONTACT_PREFERENCE as [string, ...string[]])
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || null),
 });
 
 export async function createClientRecord(formData: FormData) {

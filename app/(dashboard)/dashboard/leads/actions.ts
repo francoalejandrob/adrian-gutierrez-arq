@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentOrganizationId } from "@/lib/supabase/org";
-import { LEAD_STATUSES } from "@/lib/supabase/types";
+import { HAS_LAND_OPTIONS, LEAD_STATUSES, LEAD_TIMELINE, PROJECT_CATEGORIES } from "@/lib/supabase/types";
 
 const leadSchema = z.object({
   name: z.string().trim().min(1, "El nombre es obligatorio"),
@@ -21,6 +21,25 @@ const leadSchema = z.object({
   assigned_to: z
     .string()
     .uuid()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || null),
+  project_type: z
+    .enum(PROJECT_CATEGORIES as [string, ...string[]])
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || null),
+  has_land: z
+    .enum(HAS_LAND_OPTIONS as [string, ...string[]])
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || null),
+  approx_area: z
+    .string()
+    .optional()
+    .transform((v) => (v ? Number(v) : null)),
+  timeline: z
+    .enum(LEAD_TIMELINE as [string, ...string[]])
     .optional()
     .or(z.literal(""))
     .transform((v) => v || null),

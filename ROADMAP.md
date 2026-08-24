@@ -577,3 +577,25 @@ Verificado en vivo con Playwright de punta a punta: plantilla de
 fases → fechas editadas → Gantt visual real; confirmado que un clic en
 un evento de la Agenda ya no lo elimina. Datos de prueba borrados al
 terminar.
+
+## Tres correcciones puntuales: calendario, contratos directos, campos de calificación ✅
+
+Feedback directo tras usar el sistema, tres pedidos en un mismo
+mensaje. Ver `ARCHITECTURE.md` §6p.
+
+- **Bug real en el selector de fecha del Cronograma**: al navegar de
+  mes con las flechitas del calendario nativo, guardaba de inmediato
+  como si el usuario hubiera terminado de elegir — deshabilitando el
+  campo a mitad de la interacción. Corregido: ahora solo guarda al
+  perder el foco del campo (`onBlur`), no en cada cambio intermedio.
+- **Contratos ganan creación directa**, mismo patrón que Cotizaciones:
+  selector de proyecto + botón "Nuevo contrato" desde
+  `/dashboard/contracts`, sin pasar por Finanzas.
+- **Más campos de calificación para leads y clientes**, pensados para
+  un estudio de arquitectura (no un CRM genérico): tipo de proyecto,
+  si tiene terreno, área aproximada y cuándo quiere empezar (leads);
+  ciudad/país, cédula/RUC, contacto secundario y preferencia de
+  contacto (clientes). Archi AI también puede capturarlos.
+
+Verificado en vivo con Playwright tras aplicar la migración
+`0014_lead_client_details.sql`. Datos de prueba borrados al terminar.

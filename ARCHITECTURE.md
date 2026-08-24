@@ -938,6 +938,52 @@ confirmado sin sección Fases; selector de Fase ausente/presente según
 corresponda en Tareas; clic en un evento de Agenda ya no lo borra.
 Datos de prueba borrados al terminar.
 
+## 6p. Tres correcciones puntuales: calendario de fechas, contratos directos, más campos de calificación
+
+Feedback directo tras usar el sistema, tres pedidos en un mismo
+mensaje.
+
+- **Bug real en el selector de fecha del Cronograma**
+  (`components/dashboard/phase-date-inputs.tsx`, agregado en §6o):
+  guardaba en cada `onChange`, pero un `<input type="date">` nativo
+  dispara `onChange` en interacciones intermedias (navegar de mes
+  dentro del selector, ajustar un segmento con las flechitas) antes de
+  que el usuario termine de elegir la fecha real — eso deshabilitaba
+  el campo a mitad de la interacción. Ahora `onChange` solo actualiza
+  el estado local (el campo sigue respondiendo) y el guardado real se
+  dispara en `onBlur`. Verificado en vivo: el input ya no se
+  deshabilita en cambios intermedios y persiste correctamente al
+  perder el foco.
+- **Contratos ganan el mismo patrón que Cotizaciones** (§ pase
+  anterior): selector de proyecto + botón "Nuevo contrato" en
+  `/dashboard/contracts`, vía `createContractForProject` en
+  `finance-actions.ts` (mismo criterio que `createQuoteForProject` —
+  el proyecto viene del formulario en vez de pre-atado con `.bind()`).
+- **Campos de calificación específicos de arquitectura** — el usuario
+  sintió que leads/clientes tenían muy poca información y pidió
+  sugerencias; se propuso una lista concreta (no CRM genérico) y se
+  confirmó. Migración `0014_lead_client_details.sql`:
+  - `leads` gana `project_type` (mismo catálogo que
+    `PROJECT_CATEGORIES`), `has_land`, `approx_area`, `timeline`.
+  - `clients` gana `city`, `country`, `tax_id`, `secondary_contact_name`,
+    `secondary_contact_phone`, `contact_preference`.
+
+  Investigado antes de tocar código: `LeadForm`/`ClientForm`
+  (`components/dashboard/lead-form.tsx`/`client-form.tsx`) y
+  `leadSchema`/`clientSchema`
+  (`app/(dashboard)/dashboard/leads|clients/actions.ts`) ya son
+  compartidos entre crear y editar, y las páginas de detalle hacen
+  `select("*")` — un solo lugar por campo, sin duplicar lógica.
+  `lib/ai/tools.ts` también gana estos campos en `createLeadTool`,
+  `createClientTool` y `updateClientTool`, mismo principio de mantener
+  a Archi AI al día con lo que puede capturar la UI.
+
+  La migración la corrió el usuario directamente en el SQL Editor de
+  Supabase (no hay CLI vinculado ni connection string en esta sesión).
+  Verificado en vivo con Playwright después de confirmar que corrió:
+  lead y cliente de prueba con todos los campos nuevos, persistencia
+  confirmada al reabrir su ficha. Datos de prueba borrados al terminar.
+
 ## 7. Qué NO cambia
 
 - Ningún archivo de `app/(public)` cambia de comportamiento ni de URL.

@@ -148,8 +148,11 @@ export type Database = {
       clients: {
         Row: {
           address: string | null
+          city: string | null
           company: string | null
+          contact_preference: string | null
           converted_from_lead_id: string | null
+          country: string | null
           created_at: string
           email: string | null
           id: string
@@ -159,11 +162,17 @@ export type Database = {
           notes: string | null
           organization_id: string
           phone: string | null
+          secondary_contact_name: string | null
+          secondary_contact_phone: string | null
+          tax_id: string | null
         }
         Insert: {
           address?: string | null
+          city?: string | null
           company?: string | null
+          contact_preference?: string | null
           converted_from_lead_id?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -173,11 +182,17 @@ export type Database = {
           notes?: string | null
           organization_id: string
           phone?: string | null
+          secondary_contact_name?: string | null
+          secondary_contact_phone?: string | null
+          tax_id?: string | null
         }
         Update: {
           address?: string | null
+          city?: string | null
           company?: string | null
+          contact_preference?: string | null
           converted_from_lead_id?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -187,6 +202,9 @@ export type Database = {
           notes?: string | null
           organization_id?: string
           phone?: string | null
+          secondary_contact_name?: string | null
+          secondary_contact_phone?: string | null
+          tax_id?: string | null
         }
         Relationships: [
           {
@@ -437,10 +455,12 @@ export type Database = {
       }
       leads: {
         Row: {
+          approx_area: number | null
           assigned_to: string | null
           created_at: string
           email: string
           estimated_value: number | null
+          has_land: string | null
           id: string
           landing_page: string | null
           location: string | null
@@ -449,8 +469,10 @@ export type Database = {
           need: string | null
           organization_id: string
           phone: string | null
+          project_type: string | null
           source: string
           status: string
+          timeline: string | null
           updated_at: string
           utm_campaign: string | null
           utm_content: string | null
@@ -459,10 +481,12 @@ export type Database = {
           utm_term: string | null
         }
         Insert: {
+          approx_area?: number | null
           assigned_to?: string | null
           created_at?: string
           email: string
           estimated_value?: number | null
+          has_land?: string | null
           id?: string
           landing_page?: string | null
           location?: string | null
@@ -471,8 +495,10 @@ export type Database = {
           need?: string | null
           organization_id: string
           phone?: string | null
+          project_type?: string | null
           source?: string
           status?: string
+          timeline?: string | null
           updated_at?: string
           utm_campaign?: string | null
           utm_content?: string | null
@@ -481,10 +507,12 @@ export type Database = {
           utm_term?: string | null
         }
         Update: {
+          approx_area?: number | null
           assigned_to?: string | null
           created_at?: string
           email?: string
           estimated_value?: number | null
+          has_land?: string | null
           id?: string
           landing_page?: string | null
           location?: string | null
@@ -493,8 +521,10 @@ export type Database = {
           need?: string | null
           organization_id?: string
           phone?: string | null
+          project_type?: string | null
           source?: string
           status?: string
+          timeline?: string | null
           updated_at?: string
           utm_campaign?: string | null
           utm_content?: string | null

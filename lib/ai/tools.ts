@@ -5,9 +5,12 @@ import { applyPhaseTemplate } from "@/lib/phase-templates";
 import type { createClient } from "@/lib/supabase/server";
 import { getCurrentOrganizationId } from "@/lib/supabase/org";
 import {
+  CONTACT_PREFERENCE,
   CONTRACT_STATUSES,
   EXPENSE_CATEGORIES,
+  HAS_LAND_OPTIONS,
   LEAD_STATUSES,
+  LEAD_TIMELINE,
   PAYMENT_STATUSES,
   PHASE_STATUSES,
   PROJECT_CATEGORIES,
@@ -280,6 +283,12 @@ const clientToolSchema = z.object({
   company: z.string().trim().optional(),
   address: z.string().trim().optional(),
   notes: z.string().trim().optional(),
+  city: z.string().trim().optional(),
+  country: z.string().trim().optional(),
+  tax_id: z.string().trim().optional(),
+  secondary_contact_name: z.string().trim().optional(),
+  secondary_contact_phone: z.string().trim().optional(),
+  contact_preference: z.enum(CONTACT_PREFERENCE as [string, ...string[]]).optional(),
 });
 
 export async function createClientTool(supabase: SupabaseClient, args: Record<string, unknown>) {
@@ -314,6 +323,12 @@ const updateClientSchema = z.object({
   company: z.string().trim().optional(),
   address: z.string().trim().optional(),
   notes: z.string().trim().optional(),
+  city: z.string().trim().optional(),
+  country: z.string().trim().optional(),
+  tax_id: z.string().trim().optional(),
+  secondary_contact_name: z.string().trim().optional(),
+  secondary_contact_phone: z.string().trim().optional(),
+  contact_preference: z.enum(CONTACT_PREFERENCE as [string, ...string[]]).optional(),
 });
 
 export async function updateClientTool(supabase: SupabaseClient, args: Record<string, unknown>) {
@@ -488,6 +503,10 @@ const createLeadSchema = z.object({
   phone: z.string().trim().optional(),
   need: z.string().trim().optional(),
   estimated_value: z.number().nonnegative().optional(),
+  project_type: z.enum(PROJECT_CATEGORIES as [string, ...string[]]).optional(),
+  has_land: z.enum(HAS_LAND_OPTIONS as [string, ...string[]]).optional(),
+  approx_area: z.number().nonnegative().optional(),
+  timeline: z.enum(LEAD_TIMELINE as [string, ...string[]]).optional(),
 });
 
 export async function createLeadTool(supabase: SupabaseClient, args: Record<string, unknown>) {
@@ -1137,6 +1156,12 @@ export const AI_TOOLS = [
           company: { type: "string", description: "Empresa (opcional)" },
           address: { type: "string", description: "Dirección (opcional)" },
           notes: { type: "string", description: "Notas (opcional)" },
+          city: { type: "string", description: "Ciudad (opcional)" },
+          country: { type: "string", description: "País (opcional)" },
+          tax_id: { type: "string", description: "Cédula o RUC (opcional)" },
+          secondary_contact_name: { type: "string", description: "Nombre de un contacto secundario (opcional)" },
+          secondary_contact_phone: { type: "string", description: "Teléfono del contacto secundario (opcional)" },
+          contact_preference: { type: "string", description: "email | telefono | whatsapp (opcional)" },
         },
         required: ["name"],
       },
@@ -1146,7 +1171,7 @@ export const AI_TOOLS = [
     type: "function" as const,
     function: {
       name: "updateClientRecord",
-      description: "Actualiza datos de un cliente existente (nombre, email, teléfono, empresa, dirección o notas). Usa listClients para resolver el clientId.",
+      description: "Actualiza datos de un cliente existente. Usa listClients para resolver el clientId.",
       parameters: {
         type: "object",
         properties: {
@@ -1157,6 +1182,12 @@ export const AI_TOOLS = [
           company: { type: "string", description: "Empresa nueva (opcional)" },
           address: { type: "string", description: "Dirección nueva (opcional)" },
           notes: { type: "string", description: "Notas nuevas (opcional)" },
+          city: { type: "string", description: "Ciudad nueva (opcional)" },
+          country: { type: "string", description: "País nuevo (opcional)" },
+          tax_id: { type: "string", description: "Cédula o RUC nuevo (opcional)" },
+          secondary_contact_name: { type: "string", description: "Nombre de un contacto secundario (opcional)" },
+          secondary_contact_phone: { type: "string", description: "Teléfono del contacto secundario (opcional)" },
+          contact_preference: { type: "string", description: "email | telefono | whatsapp (opcional)" },
         },
         required: ["clientId"],
       },
@@ -1246,7 +1277,7 @@ export const AI_TOOLS = [
     type: "function" as const,
     function: {
       name: "createLead",
-      description: "Crea un lead nuevo. Nombre y email son obligatorios — nunca inventes teléfono, necesidad o valor estimado: pídelos si el usuario no los dio.",
+      description: "Crea un lead nuevo. Nombre y email son obligatorios — nunca inventes teléfono, necesidad, valor estimado ni ningún otro dato: pídelos si el usuario no los dio.",
       parameters: {
         type: "object",
         properties: {
@@ -1255,6 +1286,10 @@ export const AI_TOOLS = [
           phone: { type: "string", description: "Teléfono (opcional)" },
           need: { type: "string", description: "Necesidad/proyecto que busca (opcional)" },
           estimated_value: { type: "number", description: "Valor estimado en USD (opcional)" },
+          project_type: { type: "string", description: "Residencial | Comercial | Institucional | Hospitalidad | Remodelación (opcional)" },
+          has_land: { type: "string", description: "si | no | buscando — si ya tiene el terreno (opcional)" },
+          approx_area: { type: "number", description: "Área aproximada del proyecto en m² (opcional)" },
+          timeline: { type: "string", description: "inmediato | unos_meses | explorando — cuándo quiere empezar (opcional)" },
         },
         required: ["name", "email"],
       },
