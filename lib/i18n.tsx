@@ -68,7 +68,7 @@ export const dict = {
     intro: {
       headingBefore: "Cada proyecto empieza por entender cómo entra el sol, de dónde viene el viento y cómo se va a ",
       headingBold: "vivir el espacio",
-      headingAfter: ", mucho antes de dibujar una fachada.",
+      headingAfter: ".",
       statProjects: "Proyectos entregados en Ecuador y Estados Unidos",
       statSupervision: "Supervisión directa en obra",
     },
@@ -156,16 +156,16 @@ export const dict = {
       contacto: "Contact",
     },
     hero: {
-      line1: "We design and build",
-      line2: "projects that seek",
-      line3: "to transcend.",
+      line1: "Ideas that",
+      line2: "become",
+      line3: "spaces.",
       subtext:
         "Architecture, design, and construction conceived to create spaces with identity, purpose, and permanence.",
     },
     intro: {
       headingBefore: "Every project starts by understanding where the sun comes from, which way the wind blows, and how the space will be ",
       headingBold: "lived in",
-      headingAfter: ", long before a façade is drawn.",
+      headingAfter: ".",
       statProjects: "Projects delivered in Ecuador and the United States",
       statSupervision: "Direct on-site supervision",
     },

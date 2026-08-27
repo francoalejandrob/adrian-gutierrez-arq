@@ -70,6 +70,7 @@ El formulario de contacto (`/api/contact`) envía un correo usando
    RESEND_API_KEY=tu_api_key_de_resend
    CONTACT_TO_EMAIL=adriangch95@gmail.com
    CONTACT_FROM_EMAIL=onboarding@resend.dev
+   NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
    ```
 
    - `CONTACT_TO_EMAIL` es la bandeja donde llegan las solicitudes del
@@ -163,7 +164,8 @@ El código ya está en GitHub: https://github.com/francoalejandrob/adrian-gutier
 2. Importa el proyecto en [Vercel](https://vercel.com/new).
 3. Agrega las variables de entorno (`RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
    `CONTACT_FROM_EMAIL`, `NEXT_PUBLIC_SUPABASE_URL`,
-   `SUPABASE_SERVICE_ROLE_KEY` y, si ya tienes el feed de Instagram
+   `SUPABASE_SERVICE_ROLE_KEY`, `ARCHIOS_ORGANIZATION_ID`,
+   `NEXT_PUBLIC_GA_MEASUREMENT_ID` y, si ya tienes el feed de Instagram
    configurado, `IG_ACCESS_TOKEN` e `IG_USER_ID`) en la configuración del
    proyecto en Vercel.
 4. Despliega.

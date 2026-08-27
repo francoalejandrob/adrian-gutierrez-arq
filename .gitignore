@@ -23,6 +23,8 @@
 # misc
 .DS_Store
 *.pem
+# Google Cloud service-account keys must never enter version control.
+archios-adrian-integraciones-*.json
 
 # debug
 npm-debug.log*
@@ -47,3 +49,6 @@ next-env.d.ts
 /proyectos
 /Instagram
 /Nueva carpeta
+
+.vercel
+.env*

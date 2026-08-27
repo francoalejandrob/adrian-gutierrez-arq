@@ -9,12 +9,18 @@ import {
   useTransform,
 } from "framer-motion";
 import RevealText from "@/components/reveal-text";
-import { studio } from "@/lib/content";
-import { useT } from "@/lib/i18n";
+import { useLocale, useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
+import type { WebsiteContent } from "@/lib/website-content";
 
-export default function Hero() {
+export default function Hero({ content }: { content?: WebsiteContent["hero"] }) {
   const t = useT();
+  const { locale } = useLocale();
+  const translatedHero = {
+    location: "Salinas, Ecuador", coordinates: "2.21° S / 80.95° W",
+    line1: t.hero.line1, line2: t.hero.line2, line3: t.hero.line3, subtext: t.hero.subtext,
+  };
+  const hero = locale === "es" && content ? content : translatedHero;
   const sectionRef = useRef<HTMLElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
@@ -77,17 +83,17 @@ export default function Hero() {
           transition={{ duration: 0.6, ease: EASE_OUT }}
           className="mb-8 font-mono text-xs uppercase tracking-[0.25em] text-naranja"
         >
-          {studio.location} · {studio.coordinates}
+          {hero.location} · {hero.coordinates}
         </motion.p>
         <h1 className="font-display text-5xl leading-[1.15] tracking-normal sm:text-6xl md:text-7xl">
           <span className="block">
-            <RevealText text={t.hero.line1} triggerOnMount delay={0.15} />
+            <RevealText text={hero.line1} triggerOnMount delay={0.15} />
           </span>
           <span className="block">
-            <RevealText text={t.hero.line2} triggerOnMount delay={0.3} />
+            <RevealText text={hero.line2} triggerOnMount delay={0.3} />
           </span>
           <span className="block">
-            <RevealText text={t.hero.line3} triggerOnMount delay={0.45} />
+            <RevealText text={hero.line3} triggerOnMount delay={0.45} />
           </span>
         </h1>
         <motion.p
@@ -96,7 +102,7 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.85, ease: EASE_OUT }}
           className="mt-8 max-w-xl text-xl text-hueso/85"
         >
-          {t.hero.subtext}
+          {hero.subtext}
         </motion.p>
       </motion.div>
 

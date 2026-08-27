@@ -6,6 +6,7 @@ import BlueprintArt, { BlueprintVariant } from "@/components/blueprint-art";
 import { architectBio as architectBioEs, studio } from "@/lib/content";
 import { architectBioEn, useLocale, useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
+import type { WebsiteContent } from "@/lib/website-content";
 
 const detailStripArt: BlueprintVariant[] = [
   "estudio",
@@ -14,10 +15,10 @@ const detailStripArt: BlueprintVariant[] = [
   "sostenibilidad",
 ];
 
-export default function SobreEstudio() {
+export default function SobreEstudio({ content }: { content?: WebsiteContent["about"] }) {
   const t = useT();
   const { locale } = useLocale();
-  const architectBio = locale === "es" ? architectBioEs : architectBioEn;
+  const architectBio = content && locale === "es" ? content : locale === "es" ? architectBioEs : architectBioEn;
 
   return (
     <section id="estudio" className="bg-carbon py-14 text-hueso md:py-20">

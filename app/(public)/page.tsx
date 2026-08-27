@@ -7,16 +7,17 @@ import InstagramFeed from "@/components/instagram-feed";
 import Proceso from "@/components/proceso";
 import Contacto from "@/components/contacto";
 import { getInstagramPosts } from "@/lib/instagram";
+import { getWebsiteContent } from "@/lib/website-content";
 
 export default async function Home() {
-  const instagramPosts = await getInstagramPosts();
+  const [instagramPosts, websiteContent] = await Promise.all([getInstagramPosts(), getWebsiteContent()]);
 
   return (
     <>
-      <Hero />
+      <Hero content={websiteContent.hero} />
       <Intro />
-      <ProyectosGrid />
-      <SobreEstudio />
+      <ProyectosGrid projects={websiteContent.projects} />
+      <SobreEstudio content={websiteContent.about} />
       <ContactoCta />
       <InstagramFeed posts={instagramPosts} />
       <Proceso />

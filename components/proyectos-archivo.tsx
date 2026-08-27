@@ -4,25 +4,21 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Project, projects } from "@/lib/content";
+import { type Project } from "@/lib/content";
 import { useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
 
-const CATEGORIES = [
-  "Todos",
-  ...Array.from(new Set(projects.map((p) => p.category))),
-] as const;
-
-export default function ProyectosArchivo() {
+export default function ProyectosArchivo({ projects }: { projects: Project[] }) {
   const t = useT();
-  const [active, setActive] = useState<(typeof CATEGORIES)[number]>("Todos");
+  const categories: Array<"Todos" | Project["category"]> = ["Todos", ...Array.from(new Set(projects.map((p) => p.category)))];
+  const [active, setActive] = useState<"Todos" | Project["category"]>("Todos");
 
   const filtered = useMemo(
     () =>
       active === "Todos"
         ? projects
         : projects.filter((project) => project.category === active),
-    [active],
+    [active, projects],
   );
 
   return (
@@ -36,7 +32,7 @@ export default function ProyectosArchivo() {
       <p className="mt-6 max-w-xl text-piedra">{t.proyectosPage.subheading}</p>
 
       <div className="mt-16 flex flex-wrap gap-3">
-        {CATEGORIES.map((category) => (
+        {categories.map((category) => (
           <button
             key={category}
             type="button"

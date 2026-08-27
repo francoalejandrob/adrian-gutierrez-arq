@@ -11,14 +11,13 @@ import Image from "next/image";
 import Link from "next/link";
 import ArrowIcon from "@/components/icons/arrow-icon";
 import RevealText from "@/components/reveal-text";
-import { Project, projects } from "@/lib/content";
+import { type Project } from "@/lib/content";
 import { translateLocation, translateProject, useLocale, useT } from "@/lib/i18n";
 import { EASE_OUT } from "@/lib/motion";
 
-const featuredProjects = projects.filter((project) => project.featured);
-
-export default function ProyectosGrid() {
+export default function ProyectosGrid({ projects }: { projects: Project[] }) {
   const t = useT();
+  const featuredProjects = projects.filter((project) => project.featured);
 
   return (
     <section id="proyectos" className="bg-hueso py-14 md:py-20">

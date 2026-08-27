@@ -63,12 +63,16 @@ export async function POST(request: Request) {
   // email send below — if Supabase is down, the lead just isn't recorded,
   // but the studio still gets the email like before.
   try {
+    const organizationId = process.env.ARCHIOS_ORGANIZATION_ID;
+    if (!organizationId) {
+      throw new Error("ARCHIOS_ORGANIZATION_ID is not configured");
+    }
+
     const supabase = createAdminClient();
     const { data: organization } = await supabase
       .from("organizations")
       .select("id")
-      .order("created_at", { ascending: true })
-      .limit(1)
+      .eq("id", organizationId)
       .maybeSingle();
 
     if (organization) {
